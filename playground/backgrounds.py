@@ -10,12 +10,14 @@ def create_test_image(gap=3, N=25):
     '''
 
     # generate a random model
-    p_generate = models.Gaussian2D(amplitude=10**np.random.uniform(.5, 2),
+    p_generate = (models.Const2D(amplitude=10**np.random.uniform(0, 1)) +
+               models.Gaussian2D(amplitude=10**np.random.uniform(.5, 2),
                                    x_mean=np.random.uniform(-N, N),
                                    y_mean=np.random.uniform(-N, N),
                                    x_stddev=np.random.uniform(2, N),
                                    y_stddev=np.random.uniform(2, N),
-                                   theta=np.random.uniform(0, 2*np.pi))
+                                   theta=np.random.uniform(0, 2*np.pi)))
+
 
     # create fake x and y arrays
     x, y = np.meshgrid(np.arange(-N-gap, N+gap+1), np.arange(-N-gap, N+gap+1))
@@ -65,6 +67,7 @@ def bin_image(image, binning=100, visualize=False):
 def fit_2d_gaussian(x, y, z,
                     imagebinning=1,
                     ignore=0,
+                    baseline=10,
                     amplitude=10,
                     x_mean=0, y_mean=0,
                     x_stddev=500, y_stddev=500, theta=0,
@@ -88,9 +91,10 @@ def fit_2d_gaussian(x, y, z,
     '''
 
     # create an initial model, with the initial guesses
-    p_init = models.Gaussian2D(amplitude=amplitude,
+    p_init = (models.Const2D(amplitude=baseline) +
+           models.Gaussian2D(amplitude=amplitude,
                                x_mean=x_mean, y_mean=y_mean,
-                               x_stddev=x_stddev, y_stddev=y_stddev, theta=theta)
+                               x_stddev=x_stddev, y_stddev=y_stddev, theta=theta))
 
     # construct the fitter (using LM)
     fit_p = fitting.LevMarLSQFitter()
@@ -123,7 +127,8 @@ def plot_2d_gaussian(p, **kw):
     '''
 
     # plot the ellipse on each image
-    e = dict(zip(p.param_names, p.parameters))
+    baseline, gaussian = p
+    e = dict(zip(gaussian.param_names, gaussian.parameters))
     howmanysigma = 2
     ellipse = Ellipse(xy=(e['x_mean'], e['y_mean']),
                       width=howmanysigma*e['x_stddev'],
