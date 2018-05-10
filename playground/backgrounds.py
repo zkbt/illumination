@@ -1,9 +1,12 @@
-import warnings
+import warnings, os, glob
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.modeling import models, fitting
 from matplotlib.patches import Ellipse
 from craftroom.cmaps import one2another
+from astropy.io import fits
+from astropy.table import Table, vstack
+
 okcmap = one2another('red', 'red', alphabottom=0.3, alphatop=0)
 
 def create_test_image(gap=3, N=25):
@@ -116,21 +119,6 @@ def guess_2d_gaussian(x, y, z, ok=None):
 
     return initial
 
-
-    # fit it (binning by 100)
-    p = bg.fit_2d_gaussian(x, y, crudelysubtracted, imagebinning=25, baseline=0, amplitude=500,
-                                                           x_mean=x_guess, y_mean=y_guess,
-                                                           x_stddev=500, y_stddev=500, theta=np.pi/4)
-    #plot_fit(xsmall, ysmall, zsmall, truth)
-    bg.plot_fit(x, y, image, p)
-    plt.scatter(x_guess, y_guess, color='green')
-
-    print(f)
-    print(x_guess, y_guess, baseline_guess)
-    #plt.colorbar()
-    #plt.suptitle(f + '\n\n')
-    plt.show()
-
 def fit_model(x, y, z, ok=None, model=None, imagebinning=1, **kw):
     '''
     Fit the scattered light in a list of images (with x, y, z) for each.
@@ -204,7 +192,7 @@ def plot_fit(x, y, z, ok, models=None, colors=None, cmap='gray', **kw):
     '''
 
     # set the scale for the image to plot
-    vmin, vmax = np.percentile(z, [0, 100])
+    vmin, vmax = np.percentile(z[ok], [1, 99])
 
     # plot the data with the best-fit model
     fi, ax = plt.subplots(1, 3, figsize=(8, 2.5), sharex=True, sharey=True)
@@ -217,21 +205,24 @@ def plot_fit(x, y, z, ok, models=None, colors=None, cmap='gray', **kw):
     for m, c in zip(models, colors):
         plot_2d_gaussian(m, color=c)
     plt.axis('off')
-    plt.xlabel("Data")
+    textkw = dict(color='white', alpha=0.5, weight='bold')
+    plt.text(0.05, 0.05, 'Data', transform=plt.gca().transAxes, **textkw)
 
     plt.sca(ax[1])
     showimage(x, y, fitted(x,y), ok, vmin=vmin, vmax=vmax, cmap=cmap, **kw)
     for m, c in zip(models, colors):
         plot_2d_gaussian(m, color=c)
     plt.axis('off')
-    plt.xlabel("Model")
+    plt.text(0.05, 0.05, 'Model', transform=plt.gca().transAxes, **textkw)
+
 
     plt.sca(ax[2])
     showimage(x, y, z-fitted(x,y), ok, vmin=vmin, vmax=vmax, cmap=cmap, **kw)
     for m, c in zip(models, colors):
         plot_2d_gaussian(m, color=c)
     plt.axis('off')
-    plt.xlabel("Residual")
+    plt.text(0.05, 0.05, 'Residual', transform=plt.gca().transAxes, **textkw)
+
 
 def load_camera(filename):
     '''
@@ -281,15 +272,36 @@ def test(**kw):
     initial = guess_2d_gaussian(x,y,z)
 
     # fit it (binning by 100)
-    fitted = fit_model(x, y, z, model=initial)
+    fitted = fit_model(x, y, z, ok, model=initial)
 
     #plot_fit(xsmall, ysmall, zsmall, truth)
     plot_fit(x, y, z, ok, models=[fitted, initial, truth], colors=['darkorchid', 'gray', 'hotpink'])
 
-
-def fit_camera(filename):
+def fit_camera(filename, 
+               binby=200, 
+               constrain_theta='clockhands', 
+               constrain_size=(100, 3000),
+               visualize=True):
     '''
     Fit an image from a full camera.
+    
+    Parameters
+    ----------
+    
+    filename : str
+        Path to the FITS file for a full-camera stitched image.
+    binby : int
+        Factor by which to bin the image (speeds up fitting).
+    constrain_theta : str or None
+        'clockhands' means the angle rotates with location in the field
+        None means the angle of the Gaussian is unconstrained
+    constrain_size : 2-element tuple
+        The min and max values for the widths of the blobs
+        
+    Returns:
+    table : an astropy Table
+        a single-row table of parameters for diffuse light fit
+        
     '''
 
     # load an image from a FITS file
@@ -297,13 +309,55 @@ def fit_camera(filename):
 
     # throw out the corners
     r = np.sqrt(x**2 + y**2)
-    ok *= r < np.max(x)*1.2
+    ok *= r < np.max(x)
 
     # make an initial guess model
     initial = guess_2d_gaussian(x,y,z)
-
+    base, gauss = initial
+    # should we make sure theta is is set by the position?
+    if constrain_theta == 'clockhands':
+        def tiedtheta(initial):
+            '''
+            Define theta from the clock position in the image.
+            '''
+            b, g = initial
+            return np.arctan2(g.y_mean, g.x_mean)
+        gauss.theta.tied = tiedtheta
+    
+    # should we set a typical size for the blob?
+    if constrain_size:
+        gauss.x_stddev.bounds = constrain_size
+        gauss.y_stddev.bounds = constrain_size
+    
     # fit it (binning by 100)
-    fitted = fit_model(x, y, z, model=initial)
+    fitted = fit_model(x, y, z, ok, model=initial, imagebinning=binby)
 
-    #plot_fit(xsmall, ysmall, zsmall, truth)
-    plot_fit(x, y, z, ok, models=[fitted, initial], colors=['darkorchid', 'gray'])
+    if visualize:
+        #plot_fit(xsmall, ysmall, zsmall, truth)
+        plot_fit(x, y, z, ok, models=[fitted, initial], colors=['darkorchid', 'gray'])
+        label = os.path.basename(filename).replace('.fits', '')
+        plt.suptitle(label)
+        plotfilename = os.path.join('plots', 'fitted_{}.png'.format(label))
+        plt.savefig(plotfilename, dpi=400)
+        
+    
+    b, g = fitted
+    binitial, ginitial = initial
+    imtype, camera, spm, time = os.path.basename(filename).split('.')[0].split('_')
+    d = dict(baseline=b.amplitude.value,
+             amplitude=g.amplitude.value,
+             x=g.x_mean.value,
+             y=g.y_mean.value,
+             radius=(g.x_mean.value**2 + g.y_mean.value**2),
+             theta=g.theta.value,
+             radial_width=g.x_stddev.value,
+             theta_width=g.y_stddev.value,
+             moment_x=ginitial.x_mean.value,
+             moment_y=ginitial.y_mean.value,
+             imtype=imtype,
+             camera=camera,
+             spm=spm,
+             spacecrafttime=time,
+             filename=os.path.basename(filename))
+    
+    return Table([d], names=['baseline', 'amplitude', 'x', 'y', 'radius', 'theta', 'radial_width', 'theta_width', 'moment_x', 'moment_y', 'imtype', 'camera', 'spm', 'spacecrafttime', 'filename'])
