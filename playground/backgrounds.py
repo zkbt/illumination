@@ -18,9 +18,6 @@ def create_test_image(gap=3, N=25):
                                    y_stddev=np.random.uniform(2, N),
                                    theta=np.random.uniform(0, 2*np.pi)))
 
-    p_generate.x_stddev.fixed = True
-    p_generate.y_stddev.fixed = True
-
     # create fake x and y arrays
     x, y = np.meshgrid(np.arange(-N-gap, N+gap+1), np.arange(-N-gap, N+gap+1))
 
