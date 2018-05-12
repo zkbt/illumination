@@ -12,7 +12,8 @@ mpl.rcParams['font.size'] = 8#'small'
 # some basics
 import numpy as np, matplotlib.pyplot as plt
 import os, copy, subprocess, glob
-from matplotlib.animation import PillowWriter
+
+import matplotlib.animation as ani
 
 from .talker import Talker
 
