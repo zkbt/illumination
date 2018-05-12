@@ -5,7 +5,7 @@ These are some tools for playing around with early TESS pixels.
 ### Installation
 You can clone this into your own space and install directly from that editable package. From some base directory where you like to store code, run
 ```
-git clone https://tessgit.mit.edu/zkbt/playground.git
+git clone git@tessgit.mit.edu:zkbt/playground.git
 cd playground/
 pip install -e .
 ```
