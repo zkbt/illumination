@@ -37,7 +37,7 @@ setup(name = "playground",
       'Programming Language :: Python',
       'Topic :: Scientific/Engineering :: Astronomy'
       ],
-    install_requires=['numpy', 'matplotlib', 'scipy', 'astropy', 'tqdm'],
+    install_requires=['numpy', 'matplotlib', 'scipy', 'astropy'],
     zip_safe=False,
     license='MIT',
 )
