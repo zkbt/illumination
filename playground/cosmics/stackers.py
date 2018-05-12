@@ -34,11 +34,11 @@ class Sum(Stacker):
             (this will be ignored for the straight sum)
         '''
 
-        xpixels, ypixels, subexposures = array.shape
+        subexposures, xpixels, ypixels = array.shape
         exposures = subexposures//nsubexposures
         # reshape into something more convenient for summing
-        splitintosubexposures = array.reshape(xpixels, ypixels, exposures, nsubexposures)
-        return np.sum(splitintosubexposures, -1)
+        splitintosubexposures = array.reshape(exposures, nsubexposures, xpixels, ypixels)
+        return np.sum(splitintosubexposures, 1)
 
 
 class Central(Stacker):
@@ -73,20 +73,20 @@ class Central(Stacker):
         assert(self.n - self.m == 2)
 
         # figure out the original shape
-        xpixels, ypixels, subexposures = array.shape
+        subexposures, xpixels, ypixels = array.shape
         exposures = subexposures//nsubexposures
         assert(subexposures % nsubexposures == 0)
 
         # reshape into something more convenient for summing
-        splitintosubexposures = array.reshape(xpixels, ypixels, exposures, nsubexposures)
-        splitintochunks = splitintosubexposures.reshape(xpixels, ypixels, exposures, int(nsubexposures//self.n), self.n)
+        splitintosubexposures = array.reshape(exposures, nsubexposures, xpixels, ypixels)
+        splitintochunks = splitintosubexposures.reshape( exposures, int(nsubexposures//self.n), self.n, xpixels, ypixels)
 
         # calculate the sum of the truncated means (and recalibrate to the original scale!!!)
-        sum = np.sum(splitintochunks, -1)
-        min = np.min(splitintochunks, -1)
-        max = np.max(splitintochunks, -1)
+        sum = np.sum(splitintochunks, 2)
+        min = np.min(splitintochunks, 2)
+        max = np.max(splitintochunks, 2)
 
         # rescale back to the original scale
-        photons = np.sum(sum - max - min, -1)*self.n/self.m
+        photons = np.sum(sum - max - min, 1)*self.n/self.m
 
         return photons.squeeze()

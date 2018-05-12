@@ -32,7 +32,7 @@ def create_test_array(xsize=5, ysize=5, n=100):
 	stars = (sf*gauss(x[:,:,np.newaxis], y[:,:,np.newaxis], x0=sx, y0=sy)).sum(2)
 
 	# create a model images
-	model = (bg + stars)[:,:,np.newaxis]*np.ones(n)
+	model = (bg + stars)[np.newaxis,:,:]*np.ones(n).reshape((n, 1, 1))
 
 	# add some noise to it
 	image = np.random.normal(model, np.sqrt(model))

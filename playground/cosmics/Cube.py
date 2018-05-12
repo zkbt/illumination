@@ -4,7 +4,7 @@ from .imports import *
 from .stackers import Central, Sum
 from .cartoon import *
 
-
+timeaxis = 0
 #WIP! Still need to add a method that uses the stacker to bin to another cadence.
 class Cube(Talker):
 	'''
@@ -35,13 +35,11 @@ class Cube(Talker):
 
 		# set shapes
 		self.shape = self.photons.shape
-		self.xpixels = self.shape[1]
-		self.ypixels = self.shape[0]
-		self.n = self.shape[2]
+		self.n = self.shape[0]
+		self.ypixels = self.shape[1]
+		self.xpixels = self.shape[2]
 
 		# make up a fake time axis
-
-
 		# default for plotting
 		self.todisplay = self.photons
 
@@ -122,7 +120,7 @@ class Cube(Talker):
 		Make an imshow of a single frame of the cube.
 		'''
 
-		image = self.todisplay[:,:,timestep]
+		image = self.todisplay[timestep, :,:]
 		plotted = plt.imshow(image, interpolation='nearest', origin='lower')
 
 		return plotted
@@ -137,10 +135,10 @@ class Cube(Talker):
 		# the "with" construction is a little confusing, but feel free to copy and paste this
 		with writer.saving(fig, filename, fig.get_dpi()):
 
-			for i in range(self.shape[-1]):
+			for i in range(self.n):
 
 				# update the data to match this frame
-				plotted.set_data(self.todisplay[:,:,i])
+				plotted.set_data(self.todisplay[i, :,:])
 
 				# save this snapshot to a movie frame
 				writer.grab_frame()
@@ -186,7 +184,7 @@ class Cube(Talker):
 		Slightly reshape an image by adding an extra dimension,
 		so it can be cast into operations on the whole cube.
 		'''
-		return image.reshape(self.xpixels, self.ypixels, 1)
+		return image.reshape(1, self.xpixels, self.ypixels)
 
 	def median(self, which='photons'):
 		'''
@@ -197,7 +195,7 @@ class Cube(Talker):
 		try:
 			self.summaries[key+which]
 		except:
-			self.summaries[key+which] = np.median(array, 2)
+			self.summaries[key+which] = np.median(array, timeaxis)
 		return self.summaries[key+which]
 
 	def mean(self, which='photons'):
@@ -209,7 +207,7 @@ class Cube(Talker):
 		try:
 			self.summaries[key+which]
 		except:
-			self.summaries[key+which] = np.mean(array, 2)
+			self.summaries[key+which] = np.mean(array, timeaxis)
 		return self.summaries[key+which]
 
 
@@ -222,7 +220,7 @@ class Cube(Talker):
 		try:
 			self.summaries[key+which]
 		except:
-			self.summaries[key+which] = np.median(np.abs(array - self.cubify(self.median(which))), 2)
+			self.summaries[key+which] = np.median(np.abs(array - self.cubify(self.median(which))), timeaxis)
 		return self.summaries[key+which]
 
 	def std(self, which='photons'):
@@ -234,7 +232,7 @@ class Cube(Talker):
 		try:
 			self.summaries[key+which]
 		except:
-			self.summaries[key+which] = np.std(array, 2)
+			self.summaries[key+which] = np.std(array, timeaxis)
 		return self.summaries[key+which]
 
 	def sigma(self, which='photons', robust=True):
@@ -253,7 +251,7 @@ class Cube(Talker):
 		(this assumes *zero* jitter)
 		'''
 		shape = np.array(self.photons.shape)
-		shape[-1] = 1
+		shape[timeaxis] = 1
 		bad = self.photons > (self.median() + threshold*self.sigma(robust=True)).reshape(shape)
 		x, y, z = bad.nonzero()
 		self.photons[x,y,z] = self.median()[x,y]
@@ -290,7 +288,7 @@ class Cube(Talker):
 		mkdir(directory)
 		for i in range(self.n):
 			# pick some kind of normalization for the image
-			image = flux[:,:,i]
+			image = flux[i, :,:]
 
 			filename = os.path.join(directory, normalization + '_{0:05.0f}.fits'.format(i))
 			hdu = astropy.io.fits.PrimaryHDU(image)
@@ -308,10 +306,10 @@ class Cube(Talker):
 			normalizationarray = self.cadence
 			ylabel = 'Photons/s'
 		elif normalization.lower() == 'master':
-			normalizationarray = self.master().reshape(self.ypixels, self.xpixels, 1)
+			normalizationarray = self.master().reshape(1, self.ypixels, self.xpixels)
 			ylabel='Relative Flux'
 		elif normalization.lower() == 'median':
-			normalizationarray = self.median().reshape(self.ypixels, self.xpixels, 1)
+			normalizationarray = self.median().reshape(1, self.ypixels, self.xpixels)
 			ylabel='Relative Flux'
 
 		# create a relative light curve (dF/F, in most cases)
@@ -363,7 +361,7 @@ class Cube(Talker):
 		# loop over pixels (in x and y directions)
 		for i in range(self.ypixels):
 			for j in range(self.xpixels):
-				ax[(i,j)].plot(self.time, photonsnormalized[i,j,:], color=color, **kw)
+				ax[(i,j)].plot(self.time, photonsnormalized[:,i,j], color=color, **kw)
 
 		# set the ylimits, if available
 		#if ylim is None:
@@ -383,7 +381,7 @@ def test(normalization='none', **kw):
 	summed = unbinned.stack(cadence=120, strategy=Sum())
 	ax = unbinned.plot(normalization=normalization, alpha=0.5)
 	central.plot(ax=ax, normalization=normalization, color='black', zorder=100, marker='o')
-	summed.plot(ax=ax, normalization=normalization, color='red', zorder=100, marker='x', alpha=0.5)
+	summed.plot(ax=ax, normalization=normalization, color='red', zorder=100, marker='.', alpha=0.5)
 
 	plt.show()
 	return unbinned, central, summed
