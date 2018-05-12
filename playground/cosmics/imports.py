@@ -3,13 +3,10 @@
 #import os
 #os.environ["SPYFFIDATA"] = '/Users/zkbt/Cosmos/Data/TESS/FFIs'
 
-import matplotlib as mpl
-
 # some basics
 import numpy as np, matplotlib.pyplot as plt
 import os, copy, subprocess, glob
 import matplotlib.animation as ani
-
 from .talker import Talker
 
 def mkdir(path):
