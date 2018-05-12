@@ -18,7 +18,7 @@ def create_test_array(xsize=5, ysize=5, n=100):
 	sy = np.random.uniform(0, ysize, N)
 
 	# set some background level
-	bg = 100
+	bg = 30
 
 	# create a semi-reasonable magnitude distribution for stars
 	sf = 10000*10**(-0.4*np.random.triangular(0, 10, 10, N))

@@ -1,10 +1,11 @@
 '''Generate TESS pixel lightcurve cubes with dimensions (xpix)x(ypix)x(time).'''
 from .imports import *
 #from Strategies import *
-from .Stacker import Central, Sum
-from matplotlib.animation import PillowWriter
+from .stackers import Central, Sum
 from .cartoon import *
 
+
+#WIP! Still need to add a method that uses the stacker to bin to another cadence.
 class Cube(Talker):
 	'''
 	Cube to handle simulated postage stamp pixel light curves;
@@ -31,21 +32,22 @@ class Cube(Talker):
 
 		# store the photons as a 3D array
 		self.photons = photons
-		self.cosmics = np.zeros_like(self.photons)
-		self.noiseless = np.zeros_like(self.photons)
-		self.unmitigated = np.zeros_like(self.photons)
 
 		# set shapes
 		self.shape = self.photons.shape
-		self.xpixels = self.shape[0]
-		self.ypixels = self.shape[1]
+		self.xpixels = self.shape[1]
+		self.ypixels = self.shape[0]
 		self.n = self.shape[2]
+
+		# make up a fake time axis
+
 
 		# default for plotting
 		self.todisplay = self.photons
 
-		# is there a subexposure cadence buried behind this one?
+		# make up a fake time axis
 		self.cadence = cadence
+		self.time = np.arange(self.n)*self.cadence
 
 		# create empty (xpixels, ypixels, n)
 		if self.cadence == 2:
@@ -66,28 +68,23 @@ class Cube(Talker):
 		return '<Cube | {} | {}s>'.format(self.shape, self.cadence)
 
 
-	# is this necessary??????????
-	def bin(self, nsubexposures=60, strategy=Central(n=10), plot=False):
+	def stack(self, cadence, strategy=Central(n=10), plot=False):
 		'''
-		Bin together 2-second exposures, using some cosmic strategy.
+		Stack together 2-second exposures, using some cosmic strategy.
 		'''
 
-
-		# add an additional array to keep track of what the unmitigated lightcurves would look like
-		binned.unmitigated = np.zeros_like(binned.photons)
+		# by how many subexposures do we need to bin this one?
+		nsubexposures = np.int(cadence/self.cadence)
 
 		# loop over the x and y pixels
-		self.speak('binning {0} cube by {1} subexposures into a {2} cube'.format(self.shape, nsubexposures, binned.shape))
-		for x in np.arange(self.shape[0]):
-			for y in np.arange(self.shape[1]):
-				self.speak('   {x}, {y} out of ({size}, {size})'.format(x=x, y=y, size=self.size))
-				timeseries = Timeseries1D(self, (x,y), nsubexposures=nsubexposures)
-				strategy.calculate(timeseries)
-				if plot:
-					strategy.plot()
-				binned.photons[x,y] = strategy.binned['flux']
-				binned.cosmicinputs[x,y] = strategy.binned['naive'] - strategy.binned['nocosmics']
-				binned.unmitigated[x,y] = strategy.binned['naive']
+		self.speak('binning {0} cube by {1} subexposures'.format(self.shape, nsubexposures))
+
+		# make the stacked array
+		array = strategy(self.photons, nsubexposures)
+
+		# return the stacked array
+		binned = Cube(array, cadence)
+
 		return binned
 
 	@property
@@ -120,12 +117,12 @@ class Cube(Talker):
 		'''
 		pass
 
-	def plot(self, timestep, custom=None):
+	def imshow(self, timestep=0, custom=None):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''
 
-		image = self.todisplay[:,:,0]
+		image = self.todisplay[:,:,timestep]
 		plotted = plt.imshow(image, interpolation='nearest', origin='lower')
 
 		return plotted
@@ -134,14 +131,13 @@ class Cube(Talker):
 	def movie(self, array=None, filename='test.gif'):
 		self.speak('displaying (up to {0:.0f} exposures) of the pixel cube'.format(limit))
 
-		plotted = self.plot()
+		plotted = self.imshow()
 		writer = PillowWriter()
 
 		# the "with" construction is a little confusing, but feel free to copy and paste this
 		with writer.saving(fig, filename, fig.get_dpi()):
 
-			for i in range(self.shape[0]):
-
+			for i in range(self.shape[-1]):
 
 				# update the data to match this frame
 				plotted.set_data(self.todisplay[:,:,i])
@@ -186,11 +182,16 @@ class Cube(Talker):
 	"""
 
 	def cubify(self, image):
-		'''Slightly reshape an image, so it can be cast into operations on the whole cube.'''
+		'''
+		Slightly reshape an image by adding an extra dimension,
+		so it can be cast into operations on the whole cube.
+		'''
 		return image.reshape(self.xpixels, self.ypixels, 1)
 
 	def median(self, which='photons'):
-		'''The median image.'''
+		'''
+		The median image.
+		'''
 		array = self.__dict__[which].astype(np.float64)
 		key = 'median'
 		try:
@@ -200,7 +201,9 @@ class Cube(Talker):
 		return self.summaries[key+which]
 
 	def mean(self, which='photons'):
-		'''The median image.'''
+		'''
+		The mean image.
+		'''
 		array = self.__dict__[which].astype(np.float64)
 		key = 'mean'
 		try:
@@ -211,7 +214,9 @@ class Cube(Talker):
 
 
 	def mad(self, which='photons'):
-		'''The median of the absolute deviation image.'''
+		'''
+		The median of the absolute deviation image.
+		'''
 		array = self.__dict__[which].astype(np.float64)
 		key = 'mad'
 		try:
@@ -221,7 +226,9 @@ class Cube(Talker):
 		return self.summaries[key+which]
 
 	def std(self, which='photons'):
-		'''The standard deviation image.'''
+		'''
+		The standard deviation image.
+		'''
 		array = self.__dict__[which].astype(np.float64)
 		key = 'std'
 		try:
@@ -231,13 +238,20 @@ class Cube(Talker):
 		return self.summaries[key+which]
 
 	def sigma(self, which='photons', robust=True):
+		'''
+		The sigma of the image, using either a robust MAD or not.
+		'''
 		if robust:
 			return 1.4826*self.mad(which)
 		else:
 			return self.std(which)
 
 	def oneWeirdTrickToTrimCosmics(self, threshold=4):
-		'''To be used for simulating ground-based cosmics removal.'''
+		'''
+		To be used for simulating ground-based cosmics removal.
+
+		(this assumes *zero* jitter)
+		'''
 		shape = np.array(self.photons.shape)
 		shape[-1] = 1
 		bad = self.photons > (self.median() + threshold*self.sigma(robust=True)).reshape(shape)
@@ -246,15 +260,22 @@ class Cube(Talker):
 		self.speak('trimmed {0} cosmics from cube!'.format(np.sum(bad)))
 
 	def master(self, which='photons'):
-		'''The (calculated) master frame.'''
+		'''
+		The (calculated) master frame.
+		'''
 		return self.median(which)
 
 	def nsigma(self, which='photons', robust=True):
+		'''
+		Calculate the number of sigma of each deviation from the median.
+		'''
 		array = self.__dict__[which].astype(np.float64)
 		return (array - self.cubify(self.median(which)))/self.cubify(self.sigma(which, robust=robust))
 
-	def write(self, normalization='none'):
-		'''Save all the images to FITS, inside the cube directory.'''
+	def write(self, normalization='none', directory='cube'):
+		'''
+		Save all the images to FITS, inside the cube directory.
+		'''
 
 		# make a directory for the normalization used
 		dir = self.directory + normalization + '/'
@@ -266,35 +287,40 @@ class Cube(Talker):
 			flux = self.nsigma()
 
 		# loop through the images in the cube
+		mkdir(directory)
 		for i in range(self.n):
 			# pick some kind of normalization for the image
 			image = flux[:,:,i]
-			self.ccd.writeToFITS(image, dir + normalization + '_{0:05.0f}.fits'.format(i))
+
+			filename = os.path.join(directory, normalization + '_{0:05.0f}.fits'.format(i))
+			hdu = astropy.io.fits.PrimaryHDU(image)
+			hdu.writeto(filename, overwrite=True)
 
 
-	def plot(self, normalization='none', ylim=None):
+
+			self.ccd.writeToFITS(image, filename)
+
+
+	def plot(self, ax=None, normalization='none', ylim=[None, None], color='gray', **kw):
 
 		# choose how to normalize the lightcurves for plotting
 		if normalization.lower() == 'none':
-			normalizationarray = 1.0
-			ylabel = 'Photons'
+			normalizationarray = self.cadence
+			ylabel = 'Photons/s'
 		elif normalization.lower() == 'master':
-			normalizationarray = self.master().reshape(self.xpixels, self.ypixels, 1)
+			normalizationarray = self.master().reshape(self.ypixels, self.xpixels, 1)
 			ylabel='Relative Flux'
 		elif normalization.lower() == 'median':
-			normalizationarray = self.median().reshape(self.xpixels, self.ypixels, 1)
+			normalizationarray = self.median().reshape(self.ypixels, self.xpixels, 1)
 			ylabel='Relative Flux'
 
 		# create a relative light curve (dF/F, in most cases)
 		photonsnormalized = self.photons/normalizationarray
-		cosmicsnormalized = self.cosmics/normalizationarray
-		noiselessnormalized = self.noiseless/normalizationarray
 
-		something = cosmicsnormalized > 0
-		cosmicsnormalized[something] += noiselessnormalized[something]
 
 		# set up a logarithmic color scale (going between 0 and 1)
-		def color(x):
+		# (I think this could be done better with a Norm/cmap)
+		def cmap(x):
 			zero = np.min(np.log(self.master()*0.5))
 			span = np.max(np.log(self.master())) - zero
 			#normalized = (np.log(x) -  zero)/span
@@ -304,47 +330,60 @@ class Cube(Talker):
 
 		# create a plot
 		scale = 1.5
-		plt.figure('{} | normalization={}'.format(self, normalization),
-					figsize = (np.minimum(self.xpixels*scale,10),np.minimum(self.ypixels*scale, 10)), dpi=72)
-		gs = plt.matplotlib.gridspec.GridSpec(self.xpixels,self.ypixels, wspace=0, hspace=0)
+
+		# set up the axes, if they don't already exist
+		if ax is None:
+			plt.figure('{} | normalization={}'.format(self, normalization),
+						figsize = (self.xpixels*scale,self.ypixels*scale), dpi=72)
+			gs = plt.matplotlib.gridspec.GridSpec(self.ypixels, self.xpixels, wspace=0, hspace=0)
+			ax = {}
+			a = None
+
+			# loop over pixels (in x and y directions)
+			for i in range(self.ypixels):
+				for j in range(self.xpixels):
+
+					# set up axis sharing, so zooming on one plot zooms the other
+					ax[(i,j)] = plt.subplot(gs[-(i+1),j], sharex=a, sharey=a)
+					a = ax[(i,j)]
+
+
+					# color the plot panel based on the pixel's intensity
+					a.patch.set_facecolor(cmap(self.median()[i,j]))
+
+					# mess with the labels
+					if i == 0 and j == 0:
+						plt.setp(a.get_xticklabels(), rotation=90)
+						a.set_xlabel('Time (s)')
+						a.set_ylabel(ylabel)
+					else:
+						plt.setp(a.get_xticklabels(), visible=False)
+						plt.setp(a.get_yticklabels(), visible=False)
 
 		# loop over pixels (in x and y directions)
 		for i in range(self.ypixels):
 			for j in range(self.xpixels):
+				ax[(i,j)].plot(self.time, photonsnormalized[i,j,:], color=color, **kw)
 
-				# set up axis sharing, so zooming on one plot zooms the other
-				try:
-					sharex, sharey = ax, ax
-				except:
-					sharex, sharey = None, None
-				ax = plt.subplot(gs[-(i+1),j], sharex=sharex, sharey=sharey)
+		# set the ylimits, if available
+		#if ylim is None:
+		#	ax.set_ylim(np.min(photonsnormalized), np.max(photonsnormalized))
+		#else:
+		ax[(i,j)].set_ylim(*ylim)
 
-				# color the plot panel based on the pixel's intensity
-				ax.patch.set_facecolor(color(self.median()[i,j]))
+		return ax
 
+def test(normalization='none', **kw):
+	'''
+	Make a plot of the cube.
+	'''
+	a = create_test_array(n=600, **kw)
+	unbinned = Cube(a, cadence=2)
+	central = unbinned.stack(cadence=120, strategy=Central(10))
+	summed = unbinned.stack(cadence=120, strategy=Sum())
+	ax = unbinned.plot(normalization=normalization, alpha=0.5)
+	central.plot(ax=ax, normalization=normalization, color='black', zorder=100, marker='o')
+	summed.plot(ax=ax, normalization=normalization, color='red', zorder=100, marker='x', alpha=0.5)
 
-				ax.plot(photonsnormalized[i,j,:], color='black')
-				ax.plot(noiselessnormalized[i,j,:], color='blue', alpha=0.5)
-				ax.plot(cosmicsnormalized[i,j,:], color='red', alpha=0.8)
-
-				if i == 0 and j == 0:
-					plt.setp(ax.get_xticklabels(), rotation=90)
-					ax.set_xlabel('Time')
-					ax.set_ylabel(ylabel)
-				else:
-					plt.setp(ax.get_xticklabels(), visible=False)
-					plt.setp(ax.get_yticklabels(), visible=False)
-
-
-		if ylim is None:
-			ax.set_ylim(np.min(photonsnormalized), np.max(photonsnormalized))
-		else:
-			ax.set_ylim(*ylim)
-		plt.draw()
-
-def test(**kw):
-	a = create_test_array(**kw)
-	c = Cube(a)
-	c.plot()
 	plt.show()
-	return c
+	return unbinned, central, summed
