@@ -135,6 +135,8 @@ class Cube(Talker):
 		except:
 			writer = ani.ImageMagickWriter()
 
+		fig = plt.figure()
+		
 		# the "with" construction is a little confusing, but feel free to copy and paste this
 		with writer.saving(fig, filename, fig.get_dpi()):
 
