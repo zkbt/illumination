@@ -126,8 +126,8 @@ class Cube(Talker):
 		return plotted
 
 
-	def movie(self, array=None, filename='test.gif', limit=10):
-		self.speak('displaying (up to {0:.0f} exposures) of the pixel cube'.format(limit))
+	def movie(self, array=None, filename='test.gif'):
+		self.speak('displaying {} exposures of the pixel cube'.format(self.n))
 
 		plotted = self.imshow()
 		try:
@@ -135,8 +135,7 @@ class Cube(Talker):
 		except:
 			writer = ani.ImageMagickWriter()
 
-		fig = plt.figure()
-		
+		fig = plt.gcf()
 		# the "with" construction is a little confusing, but feel free to copy and paste this
 		with writer.saving(fig, filename, fig.get_dpi()):
 
