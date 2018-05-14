@@ -106,7 +106,7 @@ class Stamp(Cube):
 	def filename(self, directory='.'):
 		'''The base filename for this stamp.'''
 
-		return os.path.join(directory, 'TIC{TIC_ID}_{ROW_CENT}-{COL_CENT})_CAM{CAM}_SPM{SPM}_{INT_TIME}s.npy'.format(**self.static))
+		return os.path.join(directory, 'tic{TIC_ID}_{ROW_CENT}-{COL_CENT}_cam{CAM}_spm{SPM}_{INT_TIME}s.npy'.format(**self.static))
 
 	def load(self, filename):
 		'''
