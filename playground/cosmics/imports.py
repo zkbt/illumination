@@ -7,6 +7,7 @@
 import numpy as np, matplotlib.pyplot as plt
 import os, copy, subprocess, glob
 import matplotlib.animation as ani
+from astropy.io import fits
 from .talker import Talker
 
 def mkdir(path):
