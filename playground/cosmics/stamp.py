@@ -133,7 +133,7 @@ class Stamp(Cube):
 		for k in self._savable:
 			tosave[k] = vars(self)[k]
 		np.save(filename, tosave)
-		self.speak('saved to {}'.format(filename))
+		self.speak('saved to {} at {}'.format(filename, Time.now().iso))
 
 def populate(base='/pdo/ramp/zkbt/orbit-8193/', cam=1, spm=1, extensions=3, limit=3):
 
@@ -142,10 +142,9 @@ def populate(base='/pdo/ramp/zkbt/orbit-8193/', cam=1, spm=1, extensions=3, limi
 
 	subarray_files = glob.glob(os.path.join(base, '/pdo/ramp/zkbt/orbit-8193/cam{cam}/cam{cam}_spm{spm}*.fits'.format(**locals())))
 	for i in range(extensions):
-		print
 		extension = i + 1
 		s = Stamp(subarray_files[:limit], extension=extension)
-		print('{} at {}'.format(s.filename(stamps_directory), Time.now().iso))
+		s.save(s.filename(stamps_directory))
 	return s
 
 def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, **kw):
