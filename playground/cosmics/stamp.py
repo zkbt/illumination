@@ -103,7 +103,10 @@ class Stamp(Cube):
 
 		Cube.__init__(self, photons=photons, temporal=temporal, spatial=spatial, static=static)
 
+	def filename(self, directory='.'):
+		'''The base filename for this stamp.'''
 
+		return os.path.join(directory, 'TIC{TIC_ID}_{ROW_CENT}-{COL_CENT})_CAM{CAM}_SPM{SPM}_{INT_TIME}s.npy'.format(self.static))
 
 	def load(self, filename):
 		'''
@@ -131,7 +134,22 @@ class Stamp(Cube):
 		np.save(filename, tosave)
 		self.speak('saved to {}'.format(filename))
 
+def populate(base='/pdo/ramp/zkbt/orbit-8193/', limit=3):
 
+	stamps_directory = os.path.join(base, 'stamps')
+	mkdir(stamps_directory)
+
+	subarray_files = glob.glob(os.path.join(base, '/pdo/ramp/zkbt/orbit-8193/'))
+	stamps = []
+	for f in subarray_files[:limit]:
+		s = Stamp(f)
+		subdirectory = os.path.join(stamps_directory, 'cam{CAM}-spm{SPM}'.format(**self.static))
+		mkdir(subdirectory)
+
+		print(self.filename(subdirectory))
+		stamps.append(s)
+		
+	return stamps
 
 def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, **kw):
 
@@ -153,11 +171,14 @@ def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, **kw):
 
 	return Cube(spatial=spatial, photons=photons, temporal=temporal, static=static)
 
-try:
-	s = Stamp('/pdo/ramp/zkbt/orbit-8193/cam1/cam1_spm1_*_sparse_subarrays.fits')
-except IndexError:
-	s = create_test_stamp()
 
+
+def example():
+	try:
+		s = Stamp('/pdo/ramp/zkbt/orbit-8193/cam1/cam1_spm1_*_sparse_subarrays.fits')
+	except IndexError:
+		s = create_test_stamp()
+	return s
 '''
 # check out info for one of them
 #hdu = fits.open(files[0])

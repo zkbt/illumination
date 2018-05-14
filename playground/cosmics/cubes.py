@@ -124,7 +124,7 @@ class Cube(Talker):
 		self.colorbarlabelfordisplay = label
 
 
-	def imshow(self, timestep=0, nsigma=0.1):
+	def imshow(self, timestep=0, nsigma=0.5):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''

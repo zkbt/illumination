@@ -16,6 +16,7 @@ def mkdir(path):
         '''
         try:
             os.mkdir(path)
+            print("made {}".format(path))
         except FileExistsError:
             pass
 
