@@ -85,8 +85,15 @@ class Cube(Talker):
 		# make the stacked array
 		array = strategy(self.photons, nsubexposures)
 
+		temporal = {}
+		nexposures = len(temporal['TIME'])
+		for k in temporal.keys():
+			temporal[k] = strategy.average1d(self.temporal[k])
+
+		static = dict(**self.static)	
 		# return the stacked array
-		binned = Cube(array, cadence)
+
+		binned = Cube(array, cadence, temporal=temporal, spatial=self.spatial, static=self)
 
 		return binned
 

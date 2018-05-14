@@ -17,29 +17,40 @@ class Stamp(Cube):
 	TESS postage stamp. Similar to a lightweight version of lightkurve.
 	"""
 
-	def __init__(self, path, extension=1, limit=600, **kw):
+	def __init__(self, path, extension=1, limit=None,
+				 photons=None, spatial={}, static={}, temporal={}, **kw):
 		'''
 
 		Parameters
 		----------
 		path : str, list of strings, list of HDULists
 			A filename for a '.npy' file.
-			A search path
+			A list of FITS files.
+			A search path of FITS files (e.g. containing *.fits)
+		extension : int
+			Which stamp to pull from the subarray?
+		limit : int
+			How many files (in the search path) should we stop at?
+		cube_kw : dict
+			The inputs for a Cube.
 		'''
 
 		# figure out how to load the stamp
-		if '.npy' in path:
-			self.load(path)
+		if photons is not None:
+			Cube.__init__(self, photons=photons, spatial={}, static={}, temporal={})
 		else:
-			if type(path) == list:
-				filenames = path
-			elif '*' in path:
-				filenames = glob.glob(path)
-				if limit < len(filenames):
-					filenames = filenames[:limit]
+			if '.npy' in path:
+				self.load(path)
 			else:
-				raise ValueError("{} can't be used to make a stamp.".format(path))
-			self._fromSparseSubarrays(filenames, extension)
+				if type(path) == list:
+					filenames = path
+				elif '*' in path:
+					filenames = glob.glob(path)
+					if limit < len(filenames):
+						filenames = filenames[:limit]
+				else:
+					raise ValueError("{} can't be used to make a stamp.".format(path))
+				self._fromSparseSubarrays(filenames, extension)
 
 		self.ticid = self.static['TIC_ID']
 		self.cadence = self.static['INT_TIME']
@@ -101,7 +112,7 @@ class Stamp(Cube):
 			h, d = hdu[extension].header, hdu[extension].data
 			photons[i,:,:] = d
 
-		Cube.__init__(self, photons=photons, temporal=temporal, spatial=spatial, static=static)
+		self.__init__(self, photons=photons, temporal=temporal, spatial=spatial, static=static)
 		self.speak('populated {}'.format(self))
 
 	def filename(self, directory='.'):
@@ -117,7 +128,7 @@ class Stamp(Cube):
 		# make sure we're dealing with a npy saved file
 		assert('.npy' in filename)
 		loaded = np.load(filename)[()]
-		Cube.__init__(self, **loaded)
+		self.__init__(self, **loaded)
 		self.speak('loaded from {}'.format(filename))
 
 	def save(self, filename):
@@ -135,7 +146,7 @@ class Stamp(Cube):
 		np.save(filename, tosave)
 		self.speak('saved to {} at {}'.format(filename, Time.now().iso))
 
-def populate(base='/pdo/ramp/zkbt/orbit-8193/', cam=1, spm=1, extensions=3, limit=3):
+def populate(base='/pdo/ramp/zkbt/orbit-8193/', cam=1, spm=1, extensions=3, limit=None):
 
 	stamps_directory = os.path.join(base, 'stamps')
 	mkdir(stamps_directory)
@@ -156,7 +167,7 @@ def populate(base='/pdo/ramp/zkbt/orbit-8193/', cam=1, spm=1, extensions=3, limi
 def organize():
 	for cam in [1,2,3,4]:
 		for spm in [3,2,1]:
-			populate(spm=spm, cam=cam, extensions=5, limit=None)
+			populate(spm=spm, cam=cam, extensions=10, limit=None)
 
 
 def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, **kw):

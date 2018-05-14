@@ -16,6 +16,18 @@ class Stacker(Talker):
     def __repr__(self):
         return "<{}>".format(self.name)
 
+    def average1d(self):
+        subexposures,  = array.shape
+        exposures = subexposures//nsubexposures
+
+        trim = exposures*nsubexposures
+        trimmed = array[:trim, :, :]
+
+        # reshape into something more convenient for summing
+        splitintosubexposures = trimmed.reshape(exposures, nsubexposures)
+
+        return np.sum(splitintosubexposures, 1)/nsubexposures
+
 class Sum(Stacker):
     '''
     Binning with Sum = simply sum along the time axis.
