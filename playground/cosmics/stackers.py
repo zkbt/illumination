@@ -36,8 +36,13 @@ class Sum(Stacker):
 
         subexposures, xpixels, ypixels = array.shape
         exposures = subexposures//nsubexposures
+
+        trim = exposures*nsubexposures
+        trimmed = array[:trim, :, :]
+
         # reshape into something more convenient for summing
-        splitintosubexposures = array.reshape(exposures, nsubexposures, xpixels, ypixels)
+        splitintosubexposures = trimmed.reshape(exposures, nsubexposures, xpixels, ypixels)
+
         return np.sum(splitintosubexposures, 1)
 
 
@@ -75,10 +80,11 @@ class Central(Stacker):
         # figure out the original shape
         subexposures, xpixels, ypixels = array.shape
         exposures = subexposures//nsubexposures
-        assert(subexposures % nsubexposures == 0)
+        trim = exposures*nsubexposures
+        trimmed = array[:trim, :, :]
 
         # reshape into something more convenient for summing
-        splitintosubexposures = array.reshape(exposures, nsubexposures, xpixels, ypixels)
+        splitintosubexposures = trimmed.reshape(exposures, nsubexposures, xpixels, ypixels)
         splitintochunks = splitintosubexposures.reshape( exposures, int(nsubexposures//self.n), self.n, xpixels, ypixels)
 
         # calculate the sum of the truncated means (and recalibrate to the original scale!!!)

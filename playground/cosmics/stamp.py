@@ -141,11 +141,23 @@ def populate(base='/pdo/ramp/zkbt/orbit-8193/', cam=1, spm=1, extensions=3, limi
 	mkdir(stamps_directory)
 
 	subarray_files = glob.glob(os.path.join(base, '/pdo/ramp/zkbt/orbit-8193/cam{cam}/cam{cam}_spm{spm}*.fits'.format(**locals())))
+	#hdus = [fits.open(f) for f in subarray_files[:limit]]
+
+	subdirectory = os.path.join(stamps_directory, 'spm{}'.format(spm))
+	mkdir(subdirectory)
+
 	for i in range(extensions):
 		extension = i + 1
+		print("populating (EXT={}, CAM={}, SPM={})".format(extension, cam, spm))
 		s = Stamp(subarray_files[:limit], extension=extension)
-		s.save(s.filename(stamps_directory))
+		s.save(s.filename(subdirectory))
 	return s
+
+def organize():
+	for cam in [1,2,3,4]:
+		for spm in [3,2,1]:
+			populate(spm=spm, cam=cam, extensions=5, limit=None)
+
 
 def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, **kw):
 
