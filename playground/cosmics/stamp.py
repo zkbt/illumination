@@ -5,7 +5,7 @@ sparse_subaray files.
 
 from .imports import *
 from .cubes import Cube, create_test_array
-
+from astropy.time import Time
 
 
 path = '/pdo/ramp/zkbt/orbit-8193/'
@@ -84,7 +84,7 @@ class Stamp(Cube):
 
 		# populate each time point
 		for i, f in enumerate(filenames):
-			print(i, f)
+			#print(i, f)
 
 			# the 0th extension contains time-dependent info
 			hdu = fits.open(f)
@@ -102,6 +102,7 @@ class Stamp(Cube):
 			photons[i,:,:] = d
 
 		Cube.__init__(self, photons=photons, temporal=temporal, spatial=spatial, static=static)
+		self.speak('populated {}'.format(self))
 
 	def filename(self, directory='.'):
 		'''The base filename for this stamp.'''
@@ -134,15 +135,17 @@ class Stamp(Cube):
 		np.save(filename, tosave)
 		self.speak('saved to {}'.format(filename))
 
-def populate(base='/pdo/ramp/zkbt/orbit-8193/', cam=1, spm=1, extension=1, limit=3):
+def populate(base='/pdo/ramp/zkbt/orbit-8193/', cam=1, spm=1, extensions=3, limit=3):
 
 	stamps_directory = os.path.join(base, 'stamps')
 	mkdir(stamps_directory)
 
 	subarray_files = glob.glob(os.path.join(base, '/pdo/ramp/zkbt/orbit-8193/cam{cam}/cam{cam}_spm{spm}*.fits'.format(**locals())))
-	for extension in range(3):
-		s = Stamp(subarray_files[:limit], extension=1)
-		print(s.filename(stamps_directory))
+	for i in range(extensions):
+		print
+		extension = i + 1
+		s = Stamp(subarray_files[:limit], extension=extension)
+		print('{} at {}'.format(s.filename(stamps_directory), Time.now().iso))
 	return s
 
 def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, **kw):
