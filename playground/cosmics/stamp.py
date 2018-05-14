@@ -17,7 +17,7 @@ class Stamp(Cube):
 	TESS postage stamp. Similar to a lightweight version of lightkurve.
 	"""
 
-	def __init__(self, path, **kw):
+	def __init__(self, path, extension=1, **kw):
 		'''
 
 		Parameters
@@ -121,6 +121,7 @@ class Stamp(Cube):
 		self.speak('saved to {}'.format(filename))
 
 
+s = Stamp('/pdo/ramp/zkbt/orbit-8193/cam1/cam1_spm1_*_sparse_subarrays.fits')
 
 '''
 # check out info for one of them
