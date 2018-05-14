@@ -4,7 +4,7 @@ sparse_subaray files.
 '''
 
 from .imports import *
-from .cubes import Cube
+from .cubes import Cube, create_test_array
 
 
 
@@ -66,10 +66,10 @@ class Stamp(Cube):
 		for key in ['SPM', 'CAM', 'INT_TIME']:
 			static[key] = frame.header[key]
 		for key in ['TIC_ID', 'COL_CENT', 'ROW_CENT']:
-			static[key] = star.header[key]	
-	
+			static[key] = star.header[key]
+
 		temporal = {}
-		for key in ['INT_TIME', 'QUAL_BIT', 'SPM', 'CAM', 'TIME', 'CADENCE']:
+		for key in ['QUAL_BIT', 'TIME', 'CADENCE']:
 			temporal[key] = np.empty(N)
 			temporal[key][0] = frame.header[key]
 		int_time, spm, cam = static['INT_TIME'], static['SPM'], static['CAM']
@@ -82,7 +82,7 @@ class Stamp(Cube):
 
 		# populate each time point
 		for i, f in enumerate(filenames):
-			print(i, f) 
+			print(i, f)
 
 			# the 0th extension contains time-dependent info
 			hdu = fits.open(f)
@@ -130,7 +130,31 @@ class Stamp(Cube):
 		self.speak('saved to {}'.format(filename))
 
 
-s = Stamp('/pdo/ramp/zkbt/orbit-8193/cam1/cam1_spm1_*_sparse_subarrays.fits')
+
+def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, **kw):
+
+	static = {'CAM': 1,
+	 'COL_CENT': col_cent,
+	 'INT_TIME': cadence,
+	 'ROW_CENT': row_cent,
+	 'SPM': 1,
+	 'TIC_ID': 1234567890}
+
+	spatial = {}
+
+	photons = create_test_array(**kw)
+	N = photons.shape[0]
+	temporal = {}
+	for k in ['TIME', 'CADENCE']:
+		temporal[k] = np.arange(N)*cadence
+	temporal['QUAL_BIT'] = np.zeros(N).astype(np.int)
+
+	return Cube(spatial=spatial, photons=photons, temporal=temporal, static=static)
+
+try:
+	s = Stamp('/pdo/ramp/zkbt/orbit-8193/cam1/cam1_spm1_*_sparse_subarrays.fits')
+except IndexError:
+	s = create_test_stamp()
 
 '''
 # check out info for one of them

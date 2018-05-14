@@ -4,6 +4,7 @@ from .imports import *
 from .stackers import Central, Sum
 from .cartoon import *
 
+from matplotlib.colors import SymLogNorm, LogNorm
 timeaxis = 0
 #WIP! Still need to add a method that uses the stacker to bin to another cadence.
 class Cube(Talker):
@@ -39,7 +40,6 @@ class Cube(Talker):
 
 		# store the photons as a 3D array
 		self.photons = photons
-
 
 		# set shapes
 		self.shape = self.photons.shape
@@ -90,66 +90,96 @@ class Cube(Talker):
 
 		return binned
 
-	@property
-	def image(self):
-		try:
-			return self.todisplay
-		except AttributeError:
-			return self.photons
-
-	def consider(self, array=None):
+	def consider(self, what='counts'):
 		'''
 		Decide what array to visualize in plots.
 
 		Parameters
 		----------
 
-		array : 3D array to visualize
-			If it's None, then revert to photons.
+		what : str
+			Describe what should be visualized.
+
 		'''
 
-		if array:
-			self.todisplay = array
-		else:
+		# what's the static title for all images?
+		self.titlefordisplay = 'TIC{TIC_ID} ({ROW_CENT}, {COL_CENT})\nCAM{CAM} | SPM{SPM} | {INT_TIME}s'.format(**self.static)
+
+		if what == 'photons':
 			self.todisplay = self.photons
+			def label(i=0):
+				return '{}s (photons)'.format(self.temporal['TIME'][i])
 
-	def addZoom(self):
-		'''
-		This should create a zoomed window of a section of the image,
-		at its location on the image (for looking at rotation).
-		'''
-		pass
+		if what == 'counts':
+			# kludge! (because don't have calibrated data yet!)
+			self.todisplay = self.photons
+			def label(i=0):
+				return '{}s (counts)'.format(self.temporal['TIME'][i])
 
-	def imshow(self, timestep=0, custom=None):
+		if what == 'differences':
+			self.todisplay = np.diff(self.photons, axis=0)
+			def label(i=0):
+				return '{}s - {}s (counts)'.format(self.temporal['TIME'][i+1], self.temporal['TIME'][i])
+			#self.colorbarlabelfordisplay = 'counts'
+
+		self.colorbarlabelfordisplay = label
+
+
+	def imshow(self, timestep=0):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''
 
+		a = self.todisplay
+		vmin, vmax = np.percentile(a, [1,99])
+		if (self.todisplay < 0).any():
+			scale = np.maximum(np.abs(vmin), np.abs(vmax))
+			vmin, vmax = -scale, scale
+			norm = SymLogNorm(1, vmin=vmin, vmax=vmax)
+			cmap = 'RdBu'
+			ticks = [vmin, 0, vmax]
+		else:
+			norm = LogNorm(vmin=vmin, vmax=vmax)
+			cmap = 'Blues'
+			ticks = [vmin, vmax]
+
+		# point at a particular image
 		image = self.todisplay[timestep, :,:]
-		plotted = plt.imshow(image, interpolation='nearest', origin='lower')
 
-		return plotted
+		plotted = plt.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
+		plt.title(self.titlefordisplay)
+		plt.axis('off')
+		colorbar = plt.colorbar(orientation='horizontal', label=self.colorbarlabelfordisplay(0), fraction=0.04, pad=0.02, drawedges=False, ticks=ticks)
+		colorbar.ax.set_xticklabels(['{:.0f}'.format(v) for v in ticks])
+		colorbar.outline.set_visible(False)
+
+		return plotted, colorbar
 
 
-	def movie(self, array=None, filename='test.gif'):
+	def movie(self, filename='test.gif'):
 		self.speak('displaying {} exposures of the pixel cube'.format(self.n))
 
-		plotted = self.imshow()
-		try:
-			writer = ani.PillowWriter()
-		except:
-			writer = ani.ImageMagickWriter()
+		plotted, colorbar = self.imshow()
+
+		if '.mp4' in filename:
+			writer = ani.writers['ffmpeg']()
+		else:
+			try:
+				writer = ani.writers['pillow']()
+			except RuntimeError:
+				writer = ani.writers['imagemagick']()
 
 		fig = plt.gcf()
+
 		# the "with" construction is a little confusing, but feel free to copy and paste this
 		with writer.saving(fig, filename, fig.get_dpi()):
 
-			for i in range(self.n):
+			for i in range(self.todisplay.shape[0]):
 				print(i, self.n)
 
 				# update the data to match this frame
 				plotted.set_data(self.todisplay[i, :,:])
-
+				colorbar.set_label(self.colorbarlabelfordisplay(i))
 				# save this snapshot to a movie frame
 				writer.grab_frame()
 
