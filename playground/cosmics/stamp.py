@@ -64,7 +64,7 @@ class Stamp(Cube):
 		for key in ['INT_TIME', 'QUAL_BIT', 'SPM', 'CAM', 'TIME', 'CADENCE']:
 			temporal[key] = np.empty(N)
 			temporal[key][0] = frame.header[key]
-		int_time, spm, camera = temporal['INT_TIME'], temporal['SPM'], temporal['CAM']
+		int_time, spm, camera = temporal['INT_TIME'][0], temporal['SPM'][0], temporal['CAM'][0]
 		# nothing (yet) that acts as a spatial image
 		spatial = {}
 
