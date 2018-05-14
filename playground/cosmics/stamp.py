@@ -106,7 +106,7 @@ class Stamp(Cube):
 	def filename(self, directory='.'):
 		'''The base filename for this stamp.'''
 
-		return os.path.join(directory, 'TIC{TIC_ID}_{ROW_CENT}-{COL_CENT})_CAM{CAM}_SPM{SPM}_{INT_TIME}s.npy'.format(self.static))
+		return os.path.join(directory, 'TIC{TIC_ID}_{ROW_CENT}-{COL_CENT})_CAM{CAM}_SPM{SPM}_{INT_TIME}s.npy'.format(**self.static))
 
 	def load(self, filename):
 		'''
@@ -134,22 +134,16 @@ class Stamp(Cube):
 		np.save(filename, tosave)
 		self.speak('saved to {}'.format(filename))
 
-def populate(base='/pdo/ramp/zkbt/orbit-8193/', limit=3):
+def populate(base='/pdo/ramp/zkbt/orbit-8193/', cam=1, spm=1, extension=1, limit=3):
 
 	stamps_directory = os.path.join(base, 'stamps')
 	mkdir(stamps_directory)
 
-	subarray_files = glob.glob(os.path.join(base, '/pdo/ramp/zkbt/orbit-8193/'))
-	stamps = []
-	for f in subarray_files[:limit]:
-		s = Stamp(f)
-		subdirectory = os.path.join(stamps_directory, 'cam{CAM}-spm{SPM}'.format(**self.static))
-		mkdir(subdirectory)
-
-		print(self.filename(subdirectory))
-		stamps.append(s)
-		
-	return stamps
+	subarray_files = glob.glob(os.path.join(base, '/pdo/ramp/zkbt/orbit-8193/cam{cam}/cam{cam}_spm{spm}*.fits'.format(**locals())))
+	for extension in range(3):
+		s = Stamp(subarray_files[:limit], extension=1)
+		print(s.filename(stamps_directory))
+	return s
 
 def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, **kw):
 
