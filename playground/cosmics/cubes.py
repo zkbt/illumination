@@ -124,7 +124,7 @@ class Cube(Talker):
 		self.colorbarlabelfordisplay = label
 
 
-	def imshow(self, timestep=0, nsigma=0.5):
+	def imshow(self, timestep=0, nsigma=0.1):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''
@@ -161,10 +161,10 @@ class Cube(Talker):
 		self.speak('displaying {} exposures of the pixel cube'.format(self.n))
 
 		plt.clf()
-		plotted, colorbar = self.imshow()
+		plotted, colorbar = self.imshow(**kw)
 
 		if '.mp4' in filename:
-			writer = ani.writers['ffmpeg'](fps=fps, **kw)
+			writer = ani.writers['ffmpeg'](fps=fps)
 		else:
 			try:
 				writer = ani.writers['pillow'](fps=fps)
