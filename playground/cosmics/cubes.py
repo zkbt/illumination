@@ -50,7 +50,7 @@ class Cube(Talker):
 		# store the other diagnostics (including time)
 		self.temporal = temporal
 		try:
-			self.time = self.temporal['time']
+			self.time = self.temporal['TIME']
 		except KeyError:
 			self.speak('making up imaginary times')
 			self.time = np.arange(self.n)*self.cadence

@@ -17,7 +17,7 @@ class Stamp(Cube):
 	TESS postage stamp. Similar to a lightweight version of lightkurve.
 	"""
 
-	def __init__(self, path, extension=1, **kw):
+	def __init__(self, path, extension=1, limit=600, **kw):
 		'''
 
 		Parameters
@@ -35,14 +35,16 @@ class Stamp(Cube):
 				filenames = path
 			elif '*' in path:
 				filenames = glob.glob(path)
+				if limit < len(filenames):
+					filenames = filenames[:limit]
 			else:
 				raise ValueError("{} can't be used to make a stamp.".format(path))
 			self._fromSparseSubarrays(filenames, extension)
 
 		self.ticid = self.static['TIC_ID']
-		self.camera = self.temporal['CAMERA'][0]
-		self.cadence = self.temporal['INT_TIME'][0]
-		self.spm = self.static['SPM'][0]
+		self.cadence = self.static['INT_TIME']
+		self.spm = self.static['SPM']
+		self.cam = self.static['CAM']
 
 
 
@@ -56,15 +58,21 @@ class Stamp(Cube):
 		hdus = fits.open(filenames[0])
 		frame = hdus[0]
 		star = hdus[extension]
-		static = star.header
+		static = {} #star.header
 
 		# make empty temporal arrays
 		N = len(filenames)
+
+		for key in ['SPM', 'CAM', 'INT_TIME']:
+			static[key] = frame.header[key]
+		for key in ['TIC_ID', 'COL_CENT', 'ROW_CENT']:
+			static[key] = star.header[key]	
+	
 		temporal = {}
 		for key in ['INT_TIME', 'QUAL_BIT', 'SPM', 'CAM', 'TIME', 'CADENCE']:
 			temporal[key] = np.empty(N)
 			temporal[key][0] = frame.header[key]
-		int_time, spm, cam = temporal['INT_TIME'][0], temporal['SPM'][0], temporal['CAM'][0]
+		int_time, spm, cam = static['INT_TIME'], static['SPM'], static['CAM']
 		# nothing (yet) that acts as a spatial image
 		spatial = {}
 
@@ -74,16 +82,17 @@ class Stamp(Cube):
 
 		# populate each time point
 		for i, f in enumerate(filenames):
+			print(i, f) 
 
 			# the 0th extension contains time-dependent info
 			hdu = fits.open(f)
 			h0, d0 = hdu[0].header, hdu[0].data
 
-			# make sure we're still on the right onw
+			# make sure we're still on the right one
 			assert(h0['INT_TIME'] == int_time)
 			assert(h0['SPM'] == spm)
 			assert(h0['CAM'] == cam)
-			for k in keys:
+			for k in temporal.keys():
 				temporal[k][i] = h0[k]
 
 			# the 1st extension contains the data for this star
@@ -100,7 +109,7 @@ class Stamp(Cube):
 		'''
 
 		# make sure we're dealing with a npy saved file
-		assert('.npy' in file)
+		assert('.npy' in filename)
 		loaded = np.load(filename)[()]
 		Cube.__init__(self, **loaded)
 		self.speak('loaded from {}'.format(filename))
@@ -111,11 +120,11 @@ class Stamp(Cube):
 		'''
 
 		# make sure we're dealing with a npy saved file
-		assert('.npy' in file)
+		assert('.npy' in filename)
 
 		# populate a dictionary to save
 		tosave = {}
-		for k in self.savable:
+		for k in self._savable:
 			tosave[k] = vars(self)[k]
 		np.save(filename, tosave)
 		self.speak('saved to {}'.format(filename))
