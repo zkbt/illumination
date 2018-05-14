@@ -52,43 +52,43 @@ class Stamp(Cube):
 		of FITS files make by faus' sparse_subarray code.
 		'''
 
-	    # open the first one, to get some basic info
+		# open the first one, to get some basic info
 		hdus = fits.open(filenames[0])
 		frame = hdus[0]
-	    star = hdus[extension]
-	    static = star.header
+		star = hdus[extension]
+		static = star.header
 
 		# make empty temporal arrays
-	    N = len(files)
+		N = len(files)
 		temporal = {}
 		for key in ['INT_TIME', 'QUAL_BIT', 'SPM', 'CAM', 'TIME', 'CADENCE']:
 			temporal[key] = np.empty(N)
 			temporal[key][0] = frame[key]
-			
+
 		# nothing (yet) that acts as a spatial image
 		spatial = {}
 
 		# make empty photon arrays
-	    data = star.data
-	    photons = np.empty((N, data.shape[0], data.shape[1]))
+		data = star.data
+		photons = np.empty((N, data.shape[0], data.shape[1]))
 
-	    # populate each time point
-	    for i, f in enumerate(files[:limit]):
+		# populate each time point
+		for i, f in enumerate(files[:limit]):
 
-	        # the 0th extension contains time-dependent info
-	        hdu = fits.open(f)
-	        h0, d0 = hdu[0].header, hdu[0].data
+			# the 0th extension contains time-dependent info
+			hdu = fits.open(f)
+			h0, d0 = hdu[0].header, hdu[0].data
 
 			# make sure we're still on the right onw
-	        assert(h0['INT_TIME'] == int_time)
-	        assert(h0['SPM'] == spm)
-	        assert(h0['CAM'] == cam)
-	        for k in keys:
-	            temporal[k][i] = h0[k]
+			assert(h0['INT_TIME'] == int_time)
+			assert(h0['SPM'] == spm)
+			assert(h0['CAM'] == cam)
+			for k in keys:
+				temporal[k][i] = h0[k]
 
-	        # the 1st extension contains the data for this star
-	        h, d = hdu[extension].header, hdu[extension].data
-	        photons[i,:,:] = d
+			# the 1st extension contains the data for this star
+			h, d = hdu[extension].header, hdu[extension].data
+			photons[i,:,:] = d
 
 		Cube.__init__(self, photons=photons, temporal=temporal, spatial=spatial, static=static)
 
@@ -122,7 +122,7 @@ class Stamp(Cube):
 
 
 
-
+'''
 # check out info for one of them
 #hdu = fits.open(files[0])
 #hdu.info()
@@ -185,3 +185,4 @@ plt.savefig('/pdo/ramp/zkbt/example-stamp-grid-mediannormalized.pdf')
 
 c.plot(normalization='none')
 plt.savefig('/pdo/ramp/zkbt/example-stamp-grid-unnormalized.pdf')
+'''
