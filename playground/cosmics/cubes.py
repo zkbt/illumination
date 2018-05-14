@@ -124,7 +124,7 @@ class Cube(Talker):
 		self.colorbarlabelfordisplay = label
 
 
-	def imshow(self, timestep=0, nsigma=1):
+	def imshow(self, timestep=0, nsigma=0.5):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''
@@ -181,7 +181,7 @@ class Cube(Talker):
 
 				# update the data to match this frame
 				plotted.set_data(self.todisplay[i, :,:])
-				# colorbar.set_label(self.colorbarlabelfordisplay(i))
+				colorbar.set_label(self.colorbarlabelfordisplay(i))
 				# save this snapshot to a movie frame
 				writer.grab_frame()
 
