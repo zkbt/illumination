@@ -18,3 +18,13 @@ def mkdir(path):
             os.mkdir(path)
         except FileExistsError:
             pass
+
+def mad(x):
+        '''
+        Returns the median absolute deviation from the median,
+                a robust estimator of a distribution's width.
+
+                For a Gaussian distribution, sigma~1.48*MAD.
+        '''
+        med = np.median(x)
+        return np.median(np.abs(x - med))

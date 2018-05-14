@@ -120,12 +120,11 @@ class Cube(Talker):
 			self.todisplay = np.diff(self.photons, axis=0)
 			def label(i=0):
 				return '{}s - {}s (counts)'.format(self.temporal['TIME'][i+1], self.temporal['TIME'][i])
-			#self.colorbarlabelfordisplay = 'counts'
 
 		self.colorbarlabelfordisplay = label
 
 
-	def imshow(self, timestep=0):
+	def imshow(self, timestep=0, nsigma=1):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''
@@ -135,9 +134,11 @@ class Cube(Talker):
 		if (self.todisplay < 0).any():
 			scale = np.maximum(np.abs(vmin), np.abs(vmax))
 			vmin, vmax = -scale, scale
-			norm = SymLogNorm(1, vmin=vmin, vmax=vmax)
+
+			sigma = mad(self.todisplay)
+			norm = SymLogNorm(nsigma*sigma, linscale=2, vmin=vmin, vmax=vmax)
 			cmap = 'RdBu'
-			ticks = [vmin, 0, vmax]
+			ticks = [vmin, -nsigma*sigma, 0, nsigma*sigma, vmax]
 		else:
 			norm = LogNorm(vmin=vmin, vmax=vmax)
 			cmap = 'Blues'
@@ -149,7 +150,7 @@ class Cube(Talker):
 		plotted = plt.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 		plt.title(self.titlefordisplay)
 		plt.axis('off')
-		colorbar = plt.colorbar(orientation='horizontal', label=self.colorbarlabelfordisplay(0), fraction=0.04, pad=0.02, drawedges=False, ticks=ticks)
+		colorbar = plt.colorbar(plotted, orientation='horizontal', label=self.colorbarlabelfordisplay(0), fraction=0.04, pad=0.02, ticks=ticks)
 		colorbar.ax.set_xticklabels(['{:.0f}'.format(v) for v in ticks])
 		colorbar.outline.set_visible(False)
 
@@ -159,6 +160,7 @@ class Cube(Talker):
 	def movie(self, filename='test.gif', fps=30, **kw):
 		self.speak('displaying {} exposures of the pixel cube'.format(self.n))
 
+		plt.clf()
 		plotted, colorbar = self.imshow()
 
 		if '.mp4' in filename:
@@ -179,7 +181,7 @@ class Cube(Talker):
 
 				# update the data to match this frame
 				plotted.set_data(self.todisplay[i, :,:])
-				colorbar.set_label(self.colorbarlabelfordisplay(i))
+				# colorbar.set_label(self.colorbarlabelfordisplay(i))
 				# save this snapshot to a movie frame
 				writer.grab_frame()
 
