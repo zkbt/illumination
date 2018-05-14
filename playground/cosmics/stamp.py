@@ -46,6 +46,8 @@ class Stamp(Cube):
 		self.spm = self.static['SPM']
 		self.cam = self.static['CAM']
 
+		# default to some particular view
+		self.consider('counts')
 
 
 	def _fromSparseSubarrays(self, filenames, extension=1):

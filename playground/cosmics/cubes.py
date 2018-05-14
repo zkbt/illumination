@@ -166,7 +166,7 @@ class Cube(Talker):
 		else:
 			try:
 				writer = ani.writers['pillow']()
-			except RuntimeError:
+			except (RuntimeError, KeyError):
 				writer = ani.writers['imagemagick']()
 
 		fig = plt.gcf()
