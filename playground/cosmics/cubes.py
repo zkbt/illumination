@@ -156,18 +156,18 @@ class Cube(Talker):
 		return plotted, colorbar
 
 
-	def movie(self, filename='test.gif'):
+	def movie(self, filename='test.gif', fps=30, **kw):
 		self.speak('displaying {} exposures of the pixel cube'.format(self.n))
 
 		plotted, colorbar = self.imshow()
 
 		if '.mp4' in filename:
-			writer = ani.writers['ffmpeg']()
+			writer = ani.writers['ffmpeg'](fps=fps, **kw)
 		else:
 			try:
-				writer = ani.writers['pillow']()
+				writer = ani.writers['pillow'](fps=fps)
 			except (RuntimeError, KeyError):
-				writer = ani.writers['imagemagick']()
+				writer = ani.writers['imagemagick'](fps=fps)
 
 		fig = plt.gcf()
 
