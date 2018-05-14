@@ -11,8 +11,15 @@ class Cube(Talker):
 	Cube to handle simulated postage stamp pixel light curves;
 			has dimensions of (xpixels, ypixels, time).
 	'''
+	_savable = ['photons', 'temporal', 'static', 'spatial']
 
-	def __init__(self, photons, cadence=2):
+	def __init__(self, photons,
+					   cadence=2, # what cadence is this cube (in s)
+					   time=None, # array of times for the cube
+					   temporal={}, # temporal variables
+					   spatial={}, # spatial variables
+					   static={}, # static variables
+					   ):
 		'''
 		Initialize a cube object.
 
@@ -33,28 +40,26 @@ class Cube(Talker):
 		# store the photons as a 3D array
 		self.photons = photons
 
+
 		# set shapes
 		self.shape = self.photons.shape
 		self.n = self.shape[0]
 		self.ypixels = self.shape[1]
 		self.xpixels = self.shape[2]
 
+		# store the other diagnostics (including time)
+		self.temporal = temporal
+		try:
+			self.time = self.temporal['time']
+		except KeyError:
+			self.speak('making up imaginary times')
+			self.time = np.arange(self.n)*self.cadence
+		self.spatial = spatial
+		self.static = static
+
 		# make up a fake time axis
 		# default for plotting
 		self.todisplay = self.photons
-
-		# make up a fake time axis
-		self.cadence = cadence
-		self.time = np.arange(self.n)*self.cadence
-
-		# create empty (xpixels, ypixels, n)
-		if self.cadence == 2:
-			bits = np.float32
-		else:
-			bits = np.float64
-
-		# maybe populate these later?
-		# self.photons, self.cosmics, self.noiseless, self.unmitigated = np.zeros(self.shape).astype(bits), np.zeros(self.shape).astype(bits), np.zeros(self.shape).astype(bits), np.zeros(self.shape).astype(bits)
 
 		# create a dictionary to store a bunch of summaries
 		self.summaries = {}
