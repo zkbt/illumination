@@ -59,7 +59,7 @@ class Stamp(Cube):
 		static = star.header
 
 		# make empty temporal arrays
-		N = len(files)
+		N = len(filenames)
 		temporal = {}
 		for key in ['INT_TIME', 'QUAL_BIT', 'SPM', 'CAM', 'TIME', 'CADENCE']:
 			temporal[key] = np.empty(N)
@@ -73,7 +73,7 @@ class Stamp(Cube):
 		photons = np.empty((N, data.shape[0], data.shape[1]))
 
 		# populate each time point
-		for i, f in enumerate(files[:limit]):
+		for i, f in enumerate(filenames):
 
 			# the 0th extension contains time-dependent info
 			hdu = fits.open(f)
