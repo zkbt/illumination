@@ -37,7 +37,7 @@ class Stamp(Cube):
 
 		# figure out how to load the stamp
 		if photons is not None:
-			Cube.__init__(self, photons=photons, spatial={}, static={}, temporal={})
+			Cube.__init__(self, photons=photons, spatial=spatial, static=static, temporal=temporal)
 		else:
 			if '.npy' in path:
 				self.load(path)
