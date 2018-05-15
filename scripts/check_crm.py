@@ -1,6 +1,7 @@
 #tic = 248093171
 from playground.cosmics.stamps import *
 from playground.tv.illustrations import CubesIllustration
+from playground.tv.animation import animate
 
 possible = glob.glob('/pdo/ramp/zkbt/orbit-8193/stamps/spm*/tic*_*_cam*_spm*_*s.npy')
 tics = [int(f.split('tic')[1].split('_')[0]) for f in possible]
