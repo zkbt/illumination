@@ -4,12 +4,13 @@
 #os.environ["SPYFFIDATA"] = '/Users/zkbt/Cosmos/Data/TESS/FFIs'
 
 # some basics
+from __future__ import print_function
+
 import numpy as np, matplotlib.pyplot as plt
 import os, copy, subprocess, glob
 import matplotlib.animation as ani
 from astropy.io import fits
 from .talker import Talker
-from __future__ import print_function
 
 def mkdir(path):
         '''
