@@ -17,7 +17,7 @@ def checkcrm(tic=tics[0]):
         stamps[name] = Stamp(file)
 
     stamps['difference'] = copy.copy(stamps['nocrm'])
-    stamps['difference'].photons = stamps['nocrm'].photons - stamps['onboardcrm'].photons*5/4
+    stamps['difference'].photons = stamps['nocrm'].photons - stamps['crm'].photons*5/4
     stamps['difference'].consider()
 
     #stamps['zach'] = stamps['2s'].stack(120)
@@ -33,7 +33,8 @@ def checkcrm(tic=tics[0]):
     # imshow
 
 
-    ci = CubesIllustration(stamps.values, names=stamps.keys)
+    todisplay = ['2s', 'nocrm', 'crm', 'difference']
+    ci = CubesIllustration([stamps[k] for k in todisplay], names=todisplay)
     ci.plot()
 
     '''

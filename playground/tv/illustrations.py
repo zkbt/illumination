@@ -7,13 +7,13 @@ class Illustration:
     for a linked visualization of images.
     '''
     name = ''
-    def __init__(self, figsize=None, dpi=None, *args,  **kwargs):
+    def __init__(self, nrows, ncols, figkw=dict(figsize=None, dpi=None), **kwargs):
         '''
         Initialize an Illustration,
         setting up its figure and basic layout.
         '''
-        self.figure = plt.figure(figsize=figsize, dpi=dpi)
-        self.grid = gs.GridSpec(*args, **kwargs)
+        self.figure = plt.figure(**figkw)
+        self.grid = gs.GridSpec(nrows, ncols, **kwargs)
         self.frames = {}
 
     def _timesandcadence(self, round=1.0):
