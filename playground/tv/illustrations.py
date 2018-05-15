@@ -79,7 +79,7 @@ class CubesIllustration(Illustration):
                 ax = plt.subplot(self.grid[i, j])
                 c = cubes.pop(0)
                 try:
-                    n = names[i]
+                    n = names[i*cols + j]
                 except IndexError:
                     n = (i,j)
 
