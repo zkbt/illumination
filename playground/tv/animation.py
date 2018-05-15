@@ -32,8 +32,9 @@ def animate(illustration, filename='test.mp4', fps=30, dpi=None, **kw):
 	with writer.saving(illustration.figure, filename, dpi or illustration.figure.get_dpi()):
 
 		for i, t in enumerate(times):
-			for k, f in illustration.frames.items():
-				print(' finished {}/{} frames'.format(i, len(times)), end='\r')
-				f.update(t)
+			print(' finished {}/{} times'.format(i, len(times)), end='\r')
+
+			# update the illustration to a new time
+			illustration.update(t)
 
 			writer.grab_frame()

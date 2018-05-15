@@ -45,6 +45,21 @@ class FrameBase:
 		'''
 		raise RuntimeError("Don't know how to `update` {}".format(self.name))
 
+	def _findtimestep(self, time):
+		'''
+		Given a time, identify its index.
+		'''
+		try:
+			return np.flatnonzero(self._gettimes() < time)[-1]
+		except IndexError:
+			return 0
+
+	def _gettimes(self):
+		'''
+		Get the available times associated with this frame.
+		'''
+		return self.data.time
+
 class imshowStampFrame(FrameBase):
 
 	def plot(self, timestep=0, nsigma=1.0):
@@ -95,24 +110,17 @@ class imshowStampFrame(FrameBase):
 		colorbarred.ax.set_xticklabels(['{:.0f}'.format(v) for v in ticks])
 		colorbarred.outline.set_visible(False)
 
+		# add a time label
+		texted = plt.text(0.05, 0.05, self._timestring(self._gettimes()[timestep]), transform=self.ax.transAxes)
+
 		# store the things that were plotted, so they can be updated
-		self.plotted = dict(imshow=imshowed, colorbar=colorbarred)
+		self.plotted = dict(imshow=imshowed, text=texted, colorbar=colorbarred)
+
+		# keep track of the current plotted timestep
 		self.currenttimestep = timestep
 
-	def _findtimestep(self, time):
-		'''
-		Given a time, identify its index.
-		'''
-		try:
-			return np.flatnonzero(self._gettimes() < time)[-1]
-		except IndexError:
-			return 0
-
-	def _gettimes(self):
-		'''
-		Get the available times associated with this frame.
-		'''
-		return self.data.time
+	def _timestring(self, time):
+		return '{}s'.format(time)
 
 	def update(self, time):
 		'''
@@ -123,3 +131,4 @@ class imshowStampFrame(FrameBase):
 		timestep = self._findtimestep(time)
 		if timestep != self.currenttimestep:
 			self.plotted['imshow'].set_data(self.data.todisplay[timestep, :, :])
+			self.plotted['text'].set_text(self._timestring(self._gettimes()[timestep]))

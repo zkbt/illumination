@@ -174,9 +174,9 @@ def organize():
 			populate(spm=spm, cam=cam, extensions=10, limit=None)
 
 
-def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, **kw):
+def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, **kw):
 
-	static = {'CAM': 1,
+	static = {'CAM': cam,
 	 'COL_CENT': col_cent,
 	 'INT_TIME': cadence,
 	 'ROW_CENT': row_cent,

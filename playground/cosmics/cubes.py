@@ -12,6 +12,8 @@ class Cube(Talker):
 			has dimensions of (xpixels, ypixels, time).
 	'''
 	_savable = ['photons', 'temporal', 'static', 'spatial']
+	titlefordisplay = ''
+	colorbarlabelfordisplay = ''
 
 	def __init__(self, photons,
 					   cadence=2, # what cadence is this cube (in s)
@@ -85,7 +87,6 @@ class Cube(Talker):
 		array = strategy(self.photons, nsubexposures)
 
 		temporal = {}
-		nexposures = len(temporal['TIME'])
 		for k in temporal.keys():
 			temporal[k] = strategy.average1d(self.temporal[k])
 
