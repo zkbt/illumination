@@ -21,7 +21,7 @@ def checkcrm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
     stamps['difference'].photons = stamps['nocrm'].photons - stamps['crm'].photons*5/4
     stamps['difference'].consider()
 
-    basedirectory = '/pdo/ramp/zkbt/orbit-8193/stamps/
+    basedirectory = '/pdo/ramp/zkbt/orbit-8193/stamps/'
     #stamps['zach'] = stamps['2s'].stack(120)
     #stamps['zach'].titlefordisplay = 'Zach'
     #def bla(x):
@@ -43,3 +43,7 @@ def checkcrm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
         animate(ci, mintime=mintime, maxtimespan=maxtimespan, filename=os.path.join(basedirectory, '{}-crm.gif'.format(tic)))
 
     return stamps, ci
+
+def moviemany():
+    for t in tics:
+        checkcrm(t, movie=True, maxtimespan=600)

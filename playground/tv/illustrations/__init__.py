@@ -1,1 +1,2 @@
 from .CubesIllustration import CubesIllustration
+from .FourCameraIllustration import FourCameraIllustration

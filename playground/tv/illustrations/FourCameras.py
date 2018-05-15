@@ -6,10 +6,9 @@ class FourCameraIllustration(Illustration):
     def __init__(self):
 
         each = 4
-        N = len(cubes)
         rows, cols = 1, 4
 
-        Illustration.__init__(self, rows, cols,
+        IllustrationBase.__init__(self, rows, cols,
                                 figkw=dict(figsize=(each*len(cubes), each)),
                                 hspace=0.1, left=0.05, right=0.95,
                                 bottom=0.15, top=0.9)

@@ -1,7 +1,7 @@
 from ..imports import *
 from ..frames import *
 
-class Illustration:
+class IllustrationBase:
     '''
     This contains the basic layout and organization
     for a linked visualization of images.
