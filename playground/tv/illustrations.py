@@ -66,7 +66,7 @@ class CubesIllustration(Illustration):
         cols = np.minimum(np.ceil(np.sqrt(N)*aspectratio), N).astype(np.int)
         rows = np.maximum(np.ceil(N/cols), 1).astype(np.int)
         Illustration.__init__(self, rows, cols,
-                                figsize=(each*len(cubes), each),
+                                figkw=dict(figsize=(each*len(cubes), each)),
                                 hspace=0.1, left=0.05, right=0.95,
                                 bottom=0.15, top=0.9)
 
