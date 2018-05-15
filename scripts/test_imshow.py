@@ -1,21 +1,37 @@
 from playground.cosmics.stamps import *
 from playground.tv.frames import *
-from playground.tv.illustrations import imshowCubes
+from playground.tv.illustrations import CubesIllustration
 from playground.tv.animation import animate
 
-#plt.ion()
+
+
+
+plt.ion()
 s = create_test_stamp(n=5)
 f = imshowStampFrame(data=s)
-#f.plot()
+f.plot()
+
+
 
 
 stamps = []
-for i in range(4):
-    stamps.append(create_test_stamp())
+s2 = create_test_stamp(n=180)
+s120 = s2.stack(cadence=120)
+stamps = [s2, s120]
 
-ic = imshowCubes(stamps)
+#s120.photons = stamps['nocrm'].photons - stamps['onboardcrm'].photons*5/4
+#    stamps['difference'].consider()
+
+#stamps = [, create_test_stamp(cadence=120, n=3)]
+
+
+#for i in range(4):
+#    stamps.append(create_test_stamp())
+
+ic = CubesIllustration(stamps)
 ic.plot()
 animate(ic)
+
 '''
     # plots
     plt.figure()
