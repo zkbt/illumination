@@ -40,7 +40,7 @@ def animate(illustration, filename='test.mp4',
 	with writer.saving(illustration.figure, filename, dpi or illustration.figure.get_dpi()):
 
 		for i, t in enumerate(times):
-			print(' finished {}/{} times'.format(i, len(times)), end='\r')
+			print(' {}/{} at {}'.format(i, len(times), Time.now().iso), end='\r')
 
 			# update the illustration to a new time
 			illustration.update(t)

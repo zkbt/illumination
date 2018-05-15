@@ -7,7 +7,7 @@ tics = [int(f.split('tic')[1].split('_')[0]) for f in possible]
 
 #for tic in tics:
 
-def checkcrm(tic=tics[0]):
+def checkcrm(tic=tics[0], movie=False):
 
     stamps = {}
     kinds = ['2s', 'nocrm', 'crm']
@@ -37,6 +37,8 @@ def checkcrm(tic=tics[0]):
     ci = CubesIllustration([stamps[k] for k in todisplay], names=todisplay)
     ci.plot()
 
+    if movie:
+        animate(ci, **kwargs)
     '''
     fi, ax = plt.subplots(1, len(stamps), sharex=True, sharey=True, figsize=(20,6), dpi=50)
     for i, k in enumerate(kinds):# + ['difference'] + ['zach']):
@@ -50,4 +52,6 @@ def checkcrm(tic=tics[0]):
         f = stamps[k].photons.sum(-1).sum(-1)
         plt.scatter(t, f/stamps[k].cadence, s=2, label=k)
     '''
+
+
     return stamps, ci
