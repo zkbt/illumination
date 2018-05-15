@@ -15,7 +15,9 @@ def get_writer(filename, fps=30):
 			writer = ani.writers['imagemagick'](fps=fps)
 	return writer
 
-def animate(illustration, filename='test.mp4', fps=30, dpi=None, **kw):
+def animate(illustration, filename='test.mp4',
+			maxtimespan=None,
+			fps=30, dpi=None, **kw):
 	'''
 	Create an animation from an Illustration,
 	using the time axes associated with each frame.
@@ -23,7 +25,12 @@ def animate(illustration, filename='test.mp4', fps=30, dpi=None, **kw):
 
 	# figure out the times to display
 	actualtimes, cadence = illustration._timesandcadence()
-	times = np.arange(min(actualtimes), max(actualtimes) + cadence, cadence)
+
+	lower, upper = min(actualtimes), max(actualtimes) + cadence
+	if maxtimespan is not None:
+		upper = lower + maxtimespan
+
+	times = np.arange(lower, upper, cadence)
 	print('animating {} times at {}s cadence for {}'.format(len(times), cadence, illustration))
 
 	# get the writer
