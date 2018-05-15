@@ -16,7 +16,7 @@ def get_writer(filename, fps=30):
 	return writer
 
 def animate(illustration, filename='test.mp4',
-			maxtimespan=None,
+			mintime=None, maxtimespan=None,
 			fps=30, dpi=None, **kw):
 	'''
 	Create an animation from an Illustration,
@@ -27,6 +27,9 @@ def animate(illustration, filename='test.mp4',
 	actualtimes, cadence = illustration._timesandcadence()
 
 	lower, upper = min(actualtimes), max(actualtimes) + cadence
+
+	if mintime is not None:
+		lower = mintime
 	if maxtimespan is not None:
 		upper = lower + maxtimespan
 

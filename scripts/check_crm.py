@@ -7,7 +7,7 @@ tics = [int(f.split('tic')[1].split('_')[0]) for f in possible]
 
 #for tic in tics:
 
-def checkcrm(tic=tics[0], movie=False):
+def checkcrm(tic=tics[0], movie=False, mintime = 1209031557):
 
     stamps = {}
     kinds = ['2s', 'nocrm', 'crm']
@@ -38,7 +38,7 @@ def checkcrm(tic=tics[0], movie=False):
     ci.plot()
 
     if movie:
-        animate(ci, **kwargs)
+        animate(ci, mintime=mintime, maxtimespan=600, **kwargs)
     '''
     fi, ax = plt.subplots(1, len(stamps), sharex=True, sharey=True, figsize=(20,6), dpi=50)
     for i, k in enumerate(kinds):# + ['difference'] + ['zach']):
