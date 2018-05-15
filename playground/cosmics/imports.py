@@ -9,6 +9,7 @@ import os, copy, subprocess, glob
 import matplotlib.animation as ani
 from astropy.io import fits
 from .talker import Talker
+from __future__ import print_function
 
 def mkdir(path):
         '''

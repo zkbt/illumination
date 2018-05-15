@@ -1,6 +1,8 @@
 import os, copy, subprocess, glob
+from __future__ import print_function
 
 import numpy as np, matplotlib.pyplot as plt
+
 import matplotlib.animation as ani
 import matplotlib.gridspec as gs
 
