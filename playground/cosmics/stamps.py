@@ -17,7 +17,7 @@ class Stamp(Cube):
 	TESS postage stamp. Similar to a lightweight version of lightkurve.
 	"""
 
-	def __init__(self, path, extension=1, limit=None,
+	def __init__(self, path=None, extension=1, limit=None,
 				 photons=None, spatial={}, static={}, temporal={}, **kw):
 		'''
 
@@ -59,6 +59,10 @@ class Stamp(Cube):
 
 		# default to some particular view
 		self.consider('counts')
+
+	@property
+	def titlefordisplay(self):
+		return 'TIC{TIC_ID} ({ROW_CENT}, {COL_CENT})\nCAM{CAM} | SPM{SPM} | {INT_TIME}s'.format(**self.static)
 
 
 	def _fromSparseSubarrays(self, filenames, extension=1):
@@ -188,7 +192,7 @@ def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, **kw):
 		temporal[k] = np.arange(N)*cadence
 	temporal['QUAL_BIT'] = np.zeros(N).astype(np.int)
 
-	return Cube(spatial=spatial, photons=photons, temporal=temporal, static=static)
+	return Stamp(spatial=spatial, photons=photons, temporal=temporal, static=static)
 
 
 

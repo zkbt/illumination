@@ -1,5 +1,8 @@
 notebooks/
 .ipynb_checkpoints/
+*.gif
+*.mp4
+probablyjunk
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -4,7 +4,6 @@ from .imports import *
 from .stackers import Central, Sum
 from .cartoon import *
 
-from matplotlib.colors import SymLogNorm, LogNorm
 timeaxis = 0
 #WIP! Still need to add a method that uses the stacker to bin to another cadence.
 class Cube(Talker):
@@ -90,7 +89,7 @@ class Cube(Talker):
 		for k in temporal.keys():
 			temporal[k] = strategy.average1d(self.temporal[k])
 
-		static = dict(**self.static)	
+		static = dict(**self.static)
 		# return the stacked array
 
 		binned = Cube(array, cadence, temporal=temporal, spatial=self.spatial, static=self)
@@ -109,27 +108,24 @@ class Cube(Talker):
 
 		'''
 
-		# what's the static title for all images?
-		self.titlefordisplay = 'TIC{TIC_ID} ({ROW_CENT}, {COL_CENT})\nCAM{CAM} | SPM{SPM} | {INT_TIME}s'.format(**self.static)
-
 		if what == 'photons':
 			self.todisplay = self.photons
-			def label(i=0):
-				return '{}s (photons)'.format(self.temporal['TIME'][i])
+			#def label(i=0):
+			#	return '{}s (photons)'.format(self.temporal['TIME'][i])
+			self.colorbarlabelfordisplay = 'counts'
 
 		if what == 'counts':
 			# kludge! (because don't have calibrated data yet!)
 			self.todisplay = self.photons
-			def label(i=0):
-				return '{}s (counts)'.format(self.temporal['TIME'][i])
+			#def label(i=0):
+			#	return '{}s (counts)'.format(self.temporal['TIME'][i])
+			self.colorbarlabelfordisplay = 'counts'
 
 		if what == 'differences':
 			self.todisplay = np.diff(self.photons, axis=0)
-			def label(i=0):
-				return '{}s - {}s (counts)'.format(self.temporal['TIME'][i+1], self.temporal['TIME'][i])
-
-		self.colorbarlabelfordisplay = label
-
+			#def label(i=0):
+			#	return '{}s - {}s (counts)'.format(self.temporal['TIME'][i+1], self.temporal['TIME'][i])
+			self.colorbarlabelfordisplay = 'difference (counts)'
 
 	def imshow(self, timestep=0, nsigma=0.5):
 		'''
