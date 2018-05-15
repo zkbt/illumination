@@ -8,7 +8,7 @@ tics = [int(f.split('tic')[1].split('_')[0]) for f in possible]
 
 #for tic in tics:
 
-def checkcrm(tic=tics[0], movie=False, mintime = 1209031557):
+def checkcrm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
 
     stamps = {}
     kinds = ['2s', 'nocrm', 'crm']
@@ -21,6 +21,7 @@ def checkcrm(tic=tics[0], movie=False, mintime = 1209031557):
     stamps['difference'].photons = stamps['nocrm'].photons - stamps['crm'].photons*5/4
     stamps['difference'].consider()
 
+    basedirectory = '/pdo/ramp/zkbt/orbit-8193/stamps/
     #stamps['zach'] = stamps['2s'].stack(120)
     #stamps['zach'].titlefordisplay = 'Zach'
     #def bla(x):
@@ -39,20 +40,6 @@ def checkcrm(tic=tics[0], movie=False, mintime = 1209031557):
     ci.plot()
 
     if movie:
-        animate(ci, mintime=mintime, maxtimespan=600, **kwargs)
-    '''
-    fi, ax = plt.subplots(1, len(stamps), sharex=True, sharey=True, figsize=(20,6), dpi=50)
-    for i, k in enumerate(kinds):# + ['difference'] + ['zach']):
-        plt.sca(ax[i])
-        stamps[k].imshow()
-
-    # plots
-    plt.figure()
-    for k in stamps.keys():
-        t = stamps[k].time
-        f = stamps[k].photons.sum(-1).sum(-1)
-        plt.scatter(t, f/stamps[k].cadence, s=2, label=k)
-    '''
-
+        animate(ci, mintime=mintime, maxtimespan=maxtimespan, filename=os.path.join(basedirectory, '{}-crm.gif'.format(tic)))
 
     return stamps, ci

@@ -1,13 +1,16 @@
 from __future__ import print_function
 from .imports import *
- 
+
 def get_writer(filename, fps=30):
 	'''
 	Try to get an appropriate writer,
 	given the filename provided.
 	'''
 	if '.mp4' in filename:
-		writer = ani.writers['ffmpeg'](fps=fps)
+		try:
+			writer = ani.writers['ffmpeg'](fps=fps)
+		except (RuntimeError,KeyError):
+			raise RuntimeError('This computer seems unable to ffmpeg.')
 	else:
 		try:
 			writer = ani.writers['pillow'](fps=fps)
@@ -39,11 +42,12 @@ def animate(illustration, filename='test.mp4',
 	# get the writer
 	writer = get_writer(filename, fps=fps)
 
+	print(' to be saved at {}'.format(filename))
 	# set up the animation writer
 	with writer.saving(illustration.figure, filename, dpi or illustration.figure.get_dpi()):
 
 		for i, t in enumerate(times):
-			print(' {}/{} at {}'.format(i, len(times), Time.now().iso), end='\r')
+			print('  {}/{} at {}'.format(i, len(times), Time.now().iso), end='\r')
 
 			# update the illustration to a new time
 			illustration.update(t)
