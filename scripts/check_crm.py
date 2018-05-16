@@ -28,7 +28,7 @@ def check_crm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
     stamps['difference'] = copy.copy(stamps['nocrm'])
     stamps['difference'].photons = stamps['nocrm'].photons - stamps['crm'].photons*5/4
     stamps['difference'].consider()
-    stamps['difference'].label = '(No CRM) - (CRM)*10/8'
+    stamps['difference'].label = '120s | (No CRM) - (CRM)*10/8'
 
     basedirectory = '/pdo/ramp/zkbt/orbit-8193/stamps/'
     #stamps['zach'] = stamps['2s'].stack(120)
