@@ -47,10 +47,9 @@ def check_crm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
     todisplay = ['2s', 'nocrm', 'crm', 'difference']
     ci = StampsIllustration([stamps[k] for k in todisplay], names=todisplay)
     ci.plot()
-    ci.figure.set_dpi(50)
 
     if movie:
-        animate(ci, mintime=mintime, maxtimespan=maxtimespan,  dpi=50, filename=os.path.join(basedirectory, '{}-crm.gif'.format(tic)))
+        animate(ci, mintime=mintime, maxtimespan=maxtimespan, filename=os.path.join(basedirectory, '{}-crm.mp4'.format(tic)))
 
     return stamps, ci
 
