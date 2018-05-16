@@ -12,7 +12,8 @@ class Cube(Talker):
 			has dimensions of (xpixels, ypixels, time).
 	'''
 	_savable = ['photons', 'temporal', 'static', 'spatial']
-	titlefordisplay = ''
+	identifier = ''
+	label = ''
 	colorbarlabelfordisplay = ''
 
 	def __init__(self, photons,
@@ -60,8 +61,7 @@ class Cube(Talker):
 
 		# make up a fake time axis
 		# default for plotting
-		self.todisplay = self.photons
-
+		self.consider()
 		# create a dictionary to store a bunch of summaries
 		self.summaries = {}
 
@@ -128,6 +128,14 @@ class Cube(Talker):
 			#	return '{}s - {}s (counts)'.format(self.temporal['TIME'][i+1], self.temporal['TIME'][i])
 			self.colorbarlabelfordisplay = 'difference (counts)'
 
+	@property
+	def titlefordisplay(self):
+		'''
+		What to be displayed as a title for a plot
+		(this should probably be moved to a Frame instead?)
+		'''
+		return '{}\n{}'.format(self.identifier, self.label)
+
 	def imshow(self, timestep=0, nsigma=0.5):
 		'''
 		Make an imshow of a single frame of the cube.
@@ -188,6 +196,7 @@ class Cube(Talker):
 				colorbar.set_label(self.colorbarlabelfordisplay(i))
 				# save this snapshot to a movie frame
 				writer.grab_frame()
+
 
 	"""
 	@property

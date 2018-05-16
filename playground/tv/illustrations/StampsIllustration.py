@@ -1,5 +1,6 @@
 from .IllustrationBase import *
-class CubesIllustration(IllustrationBase):
+
+class StampsIllustration(IllustrationBase):
 
     def __init__(self, cubes, names=[], aspectratio=np.inf):
 
@@ -7,10 +8,17 @@ class CubesIllustration(IllustrationBase):
         N = len(cubes)
         cols = np.minimum(np.ceil(np.sqrt(N)*aspectratio), N).astype(np.int)
         rows = np.maximum(np.ceil(N/cols), 1).astype(np.int)
+        hspace, wspace = 0.15, 0.1
+        left, right = 0.05, 0.95
+        bottom, top = 0.15, 0.85
+        wsize = each*cols*(1 + (cols-1)*wspace)/(right-left)
+        hsize = each*rows*(1 + (rows-1)*hspace)/(top-bottom)
+
         IllustrationBase.__init__(self, rows, cols,
-                                figkw=dict(figsize=(each*N, each)),
-                                hspace=0.1, left=0.05, right=0.95,
-                                bottom=0.15, top=0.85)
+                                    figkw=dict(figsize=(wsize, hsize)),
+                                    hspace=hspace, wspace=wspace,
+                                    left=left, right=right,
+                                    bottom=bottom, top=top)
 
         for i in range(rows):
             for j in range(cols):

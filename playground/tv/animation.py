@@ -24,7 +24,10 @@ def animate(illustration, filename='test.mp4',
 	'''
 	Create an animation from an Illustration,
 	using the time axes associated with each frame.
+
+	The Illustration needs to have been plotted once already.
 	'''
+
 
 	# figure out the times to display
 	actualtimes, cadence = illustration._timesandcadence()

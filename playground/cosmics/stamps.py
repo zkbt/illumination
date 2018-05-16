@@ -57,13 +57,11 @@ class Stamp(Cube):
 		self.spm = self.static['SPM']
 		self.cam = self.static['CAM']
 
+		self.identifier= 'TIC{TIC_ID}\n(CAM{CAM} | {ROW_CENT}, {COL_CENT})'.format(**self.static)
+		self.label = 'SPM{SPM} | {INT_TIME}s'.format(**self.static)
+
 		# default to some particular view
 		self.consider('counts')
-
-	@property
-	def titlefordisplay(self):
-		return 'TIC{TIC_ID} ({ROW_CENT}, {COL_CENT})\nCAM{CAM} | SPM{SPM} | {INT_TIME}s'.format(**self.static)
-
 
 	def _fromSparseSubarrays(self, filenames, extension=1):
 		'''
@@ -174,14 +172,14 @@ def organize():
 			populate(spm=spm, cam=cam, extensions=10, limit=None)
 
 
-def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, **kw):
+def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, spm=1, tic_id=1234567890, **kw):
 
 	static = {'CAM': cam,
 	 'COL_CENT': col_cent,
 	 'INT_TIME': cadence,
 	 'ROW_CENT': row_cent,
-	 'SPM': 1,
-	 'TIC_ID': 1234567890}
+	 'SPM': spm,
+	 'TIC_ID': tic_id}
 
 	spatial = {}
 
