@@ -8,7 +8,12 @@ tics = [int(f.split('tic')[1].split('_')[0]) for f in possible]
 
 #for tic in tics:
 
-def checkcrm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
+def check_crm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
+    '''
+    For a give TIC, this loads a pre-created .npy stamp
+    and extracts the appropriate 2s, 120s with CRM, and 120s no CRM
+    data for each.
+    '''
 
     stamps = {}
     kinds = ['2s', 'nocrm', 'crm']
@@ -42,9 +47,10 @@ def checkcrm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
     todisplay = ['2s', 'nocrm', 'crm', 'difference']
     ci = StampsIllustration([stamps[k] for k in todisplay], names=todisplay)
     ci.plot()
+    ci.figure.set_dpi(50)
 
     if movie:
-        animate(ci, mintime=mintime, maxtimespan=maxtimespan, filename=os.path.join(basedirectory, '{}-crm.gif'.format(tic)))
+        animate(ci, mintime=mintime, maxtimespan=maxtimespan,  dpi=50, filename=os.path.join(basedirectory, '{}-crm.gif'.format(tic)))
 
     return stamps, ci
 

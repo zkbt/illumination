@@ -4,7 +4,7 @@ class StampsIllustration(IllustrationBase):
 
     def __init__(self, cubes, names=[], aspectratio=np.inf):
 
-        each = 4
+        each = 3
         N = len(cubes)
         cols = np.minimum(np.ceil(np.sqrt(N)*aspectratio), N).astype(np.int)
         rows = np.maximum(np.ceil(N/cols), 1).astype(np.int)
