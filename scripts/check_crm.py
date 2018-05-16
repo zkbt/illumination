@@ -1,6 +1,6 @@
 #tic = 248093171
 from playground.cosmics.stamps import *
-from playground.tv.illustrations import CubesIllustration
+from playground.tv.illustrations import StampsIllustration
 from playground.tv.animation import animate
 
 possible = glob.glob('/pdo/ramp/zkbt/orbit-8193/stamps/spm*/tic*_*_cam*_spm*_*s.npy')
@@ -17,9 +17,13 @@ def checkcrm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
         file = glob.glob(search)[0]
         stamps[name] = Stamp(file)
 
+    stamps['2s'].label = '2s'
+    stamps['nocrm'].label = '120s | No CRM'
+    stamps['crm'].label = '120s | CRM'
     stamps['difference'] = copy.copy(stamps['nocrm'])
     stamps['difference'].photons = stamps['nocrm'].photons - stamps['crm'].photons*5/4
     stamps['difference'].consider()
+    stamps['difference'].label = '(No CRM) - (CRM)*10/8'
 
     basedirectory = '/pdo/ramp/zkbt/orbit-8193/stamps/'
     #stamps['zach'] = stamps['2s'].stack(120)
@@ -36,7 +40,7 @@ def checkcrm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
 
 
     todisplay = ['2s', 'nocrm', 'crm', 'difference']
-    ci = CubesIllustration([stamps[k] for k in todisplay], names=todisplay)
+    ci = StampsIllustration([stamps[k] for k in todisplay], names=todisplay)
     ci.plot()
 
     if movie:

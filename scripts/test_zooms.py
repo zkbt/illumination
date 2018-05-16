@@ -8,7 +8,7 @@ stamps = [create_test_stamp(cadence=2,
                             col_cent=np.random.randint(0, N),
                             row_cent=np.random.randint(0, N),
                             cam=np.random.randint(0, 4)+1)
-          for i in range(10)]
+          for i in range(5)]
 for i, s in enumerate(stamps):
     s.static['TIC_ID'] += 1
 
