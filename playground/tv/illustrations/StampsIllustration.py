@@ -4,13 +4,13 @@ class StampsIllustration(IllustrationBase):
 
     def __init__(self, cubes, names=[], aspectratio=np.inf):
 
-        each = 3
+        each = 3.2
         N = len(cubes)
         cols = np.minimum(np.ceil(np.sqrt(N)*aspectratio), N).astype(np.int)
         rows = np.maximum(np.ceil(N/cols), 1).astype(np.int)
-        hspace, wspace = 0.15, 0.1
+        hspace, wspace = 0.15, 0.08
         left, right = 0.05, 0.95
-        bottom, top = 0.15, 0.85
+        bottom, top = 0.15, 0.82
         wsize = each*cols*(1 + (cols-1)*wspace)/(right-left)
         hsize = each*rows*(1 + (rows-1)*hspace)/(top-bottom)
 

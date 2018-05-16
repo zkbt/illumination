@@ -56,4 +56,4 @@ def check_crm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
 
 def moviemany():
     for t in tics:
-        checkcrm(t, movie=True, maxtimespan=600)
+        check_crm(t, movie=True, maxtimespan=600)
