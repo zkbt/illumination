@@ -1,4 +1,4 @@
-from .imports import *
+from ..imports import *
 from .illustrations import FourCameraIllustration
 
 def showfits(pattern='*.fits'):
