@@ -1,3 +1,3 @@
 from .FrameBase import FrameBase
-from .imshowStampFrame import imshowStampFrame
+from .imshowFrame import imshowFrame
 from .CameraFrame import CameraFrame

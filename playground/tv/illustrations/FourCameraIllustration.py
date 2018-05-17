@@ -59,4 +59,4 @@ class ZoomsIllustration(FourCameraIllustration):
             ax = plt.axes([left, bottom, width, height])
 
             key = 'STAMP{}'.format(i)
-            self.frames[key] = imshowStampFrame(ax=ax, data=s, name=key)
+            self.frames[key] = imshowFrame(ax=ax, data=s, name=key)

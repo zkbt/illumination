@@ -1,9 +1,29 @@
 from .FrameBase import *
-from matplotlib.colors import SymLogNorm, LogNorm
+from ..colors import cmap_norm_ticks
+from ..sequence import make_sequence
 
-class imshowStampFrame(FrameBase):
+class imshowFrame(FrameBase):
 
-	def plot(self, timestep=0, nsigma=1.0):
+
+	frametype = 'base'
+
+	def __init__(self, *args, **kwargs):
+		FrameBase.__init__(self, *args, **kwargs)
+
+		# make sure that the data are a sequence of images
+		self.data = make_sequence(self.data)
+
+	def _cmap_norm_ticks(self, *args, **kwargs):
+		o = self._overarching
+		try:
+			return o.cmap, o.norm, o.ticks
+		except AttributeError:
+			self.cmap, self.norm, self.ticks = cmap_norm_ticks(*args, **kwargs)
+			return self.cmap, self.norm, self.ticks
+
+
+
+	def plot(self, timestep=0, **kwargs):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''
@@ -12,30 +32,8 @@ class imshowStampFrame(FrameBase):
 		plt.sca(self.ax)
 
 		# pull out the array to work on
-		a = self.data.todisplay
-
-		# figure out a decent color scale
-		vmin, vmax = np.percentile(a, [1,99])
-		# (probably move this to an inherited level, so we can share it?)
-		if (a < 0).any():
-			# go diverging, if this is a difference that crosses zero
-			scale = np.maximum(np.abs(vmin), np.abs(vmax))
-			vmin, vmax = -scale, scale
-			span = np.log10(scale)
-			whatfractionislinear = 0.1
-			sigma = mad(a)
-
-			norm = SymLogNorm(nsigma*sigma, linscale=span*whatfractionislinear, vmin=vmin, vmax=vmax)
-			cmap = 'RdBu'
-			ticks = [vmin, -nsigma*sigma, 0, nsigma*sigma, vmax]
-		else:
-			# go simple logarithmic, if this is all positive
-			norm = LogNorm(vmin=vmin, vmax=vmax)
-			cmap = 'Blues'
-			ticks = [vmin, vmin*np.sqrt(vmax/vmin), vmax]
-
-		# point at a particular image
-		image = a[timestep, :,:]
+		image, actual_time = self._get_image()
+		cmap, norm, ticks = self._cmap_norm_ticks(image)
 
 		# display the image for this frame
 		imshowed = plt.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
@@ -61,15 +59,31 @@ class imshowStampFrame(FrameBase):
 		self.currenttimestep = timestep
 
 	def _timestring(self, time):
+		'''
+		Return a string, given an input time (still in spacecraft time).
+		'''
 		return '{}s'.format(time)
+
+	def _get_image(self, time=None):
+		'''
+		Get the image at a given time (defaulting to the first time).
+		'''
+
+		if time is None:
+			time = self._gettimes()[0]
+		timestep = self._find_timestep(time)
+		image = self.data[timestep]
+		actual_time = self._gettimes()[timestep]
+		return image, actual_time
 
 	def update(self, time):
 		'''
 		Update this frame to a particular time (for use in animations).
 		'''
-
 		# update the data, if we need to
-		timestep = self._findtimestep(time)
+		timestep = self._find_timestep(time)
+		image, actual_time = self._get_image(time)
+
 		if timestep != self.currenttimestep:
-			self.plotted['imshow'].set_data(self.data.todisplay[timestep, :, :])
-			self.plotted['text'].set_text(self._timestring(self._gettimes()[timestep]))
+			self.plotted['imshow'].set_data(image)
+			self.plotted['text'].set_text(self._timestring(actual_time))

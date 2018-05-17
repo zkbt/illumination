@@ -33,4 +33,4 @@ class StampsIllustration(IllustrationBase):
                 except IndexError:
                     n = (i,j)
 
-                self.frames[n] = imshowStampFrame(ax=ax, data=c, name=n)
+                self.frames[n] = imshowFrame(ax=ax, data=c)

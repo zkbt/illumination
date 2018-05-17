@@ -8,7 +8,7 @@ from playground.tv.animation import animate
 
 #plt.ion()
 s = create_test_stamp(n=5)
-f = imshowStampFrame(data=s)
+f = imshowFrame(data=s)
 f.plot()
 
 

@@ -1,6 +1,6 @@
 from ..imports import *
 from ..cosmics.stamps import Stamp
-
+from .utils import create_test_fits
 
 class Sequence(Talker):
 	'''
@@ -8,10 +8,11 @@ class Sequence(Talker):
 	which can be viewed (and animated)
 	in a tv frame.
 	'''
-	def __init__(self, *args, **kwargs):
+	def __init__(self, name='generic', *args, **kwargs):
 		Talker.__init__(self)
+		self.name = name
 
-	def _findtimestep(self, time):
+	def _find_timestep(self, time):
 		'''
 		Given a time, identify its index.
 		'''
@@ -26,9 +27,12 @@ class Sequence(Talker):
 		'''
 		return self.time
 
+	def __repr__(self):
+		return '<{} of {} images>'.format(self.nametag, self.N)
+
 class FITS_Sequence(Sequence):
 
-	def __init__(self, initial, ext_image=1, ext_primary=0):
+	def __init__(self, initial, ext_image=1, ext_primary=0, name='FITS'):
 		'''
 		Initialize a Sequence of FITS images. The goal is
 		to create a list of FITS HDUs, one for each time.
@@ -44,7 +48,7 @@ class FITS_Sequence(Sequence):
 			-list of loaded FITS HDULists, and an extension to use.
 
 		'''
-		Sequence.__init__(self)
+		Sequence.__init__(self, name=name)
 
 		self.hdulists = []
 
@@ -96,13 +100,10 @@ class FITS_Sequence(Sequence):
 		# if only a single image, everything is static (but can be viewed as temporal)
 
 		if len(self.hdulists) == 1:
-			both = fits.HeaderDiff(pri, img)
-
-			for k in both.common_keywords:
-				self.static[k] = img[k]
-			for k, v in zip(both.diff_keywords, both.diff_keyword_values):
-				self.static[k] = v
-			self.temporal = self.static
+			for h in [pri, img]:
+				for k in h.keys():
+					self.static[k] = h[k]
+					self.temporal[k] = [self.static[k]]
 		else:
 			extensions = np.unique([self.ext_primary, self.ext_image])
 			for e in extensions:
@@ -125,20 +126,42 @@ class FITS_Sequence(Sequence):
 		# try to pull a time axis from these
 		for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB']:
 			try:
-				self.time = self.temporal[k]
+				self.time = np.asarray(self.temporal[k])
 				self.speak('using {} as the time axis'.format(k))
 				break
 			except KeyError:
 				pass
 
+	def __getitem__(self, timestep):
+		'''
+		Return the image data for a given timestep.
+		'''
+		return self.hdulists[timestep][self.ext_image].data
 
 class StampSequence(Sequence):
-	def __init__(self, stamp):
+	def __init__(self, stamp, name='stamp'):
+		Sequence.__init__(self, name=name)
 		for k in stamp._savable:
 			vars(self)[k] = vars(stamp)[k]
+		self.stamp = stamp
+		self.time = self.stamp.time
+
+	def __getitem__(self, timestep):
+		'''
+		Return the image data for a given timestep.
+		'''
+		return self.stamp.todisplay[timestep, :, :]
+
+	@property
+	def titlefordisplay(self):
+		return self.stamp.titlefordisplay
+
+	@property
+	def colorbarlabelfordisplay(self):
+		return self.stamp.colorbarlabelfordisplay
 
 
-def make_sequence(initial):
+def make_sequence(initial, *args, **kwargs):
 	'''
 	Initialize a Sequence for viewing with tv.
 
@@ -155,23 +178,29 @@ def make_sequence(initial):
 
 	'''
 
-	# a Stamp?
-	if type(initial) == Stamp:
-		return StampSequence(initial)
+	if issubclass(initial.__class__, Sequence):
+		return initial
+	elif type(initial) == Stamp:
+		return StampSequence(initial, *args, **kwargs)
 	else:
-		return FITS_Sequence(initial)
+		return FITS_Sequence(initial, *args, **kwargs)
 
 
-def test(ext_image=0,
-		 pattern='/Users/zkbt/Dropbox/TESS/may-visit/simulated/ffi/1800s/ccd1/simulated_18h00m00s+66d33m39s_ccd1_*.fits'):
+def test_FITS():
+	'''
+	Run a test of the FITS_Sequence.
+	'''
+	filename = 'temporarytest.fits'
+	pattern = 'tempo*arytest.fits'
+	hdulist = create_test_fits()
+	hdulist.writeto(filename, overwrite=True)
+	ext_image = 1
 
 	a = FITS_Sequence(pattern, ext_image=ext_image)
 	files = glob.glob(pattern)
 	b = FITS_Sequence(files, ext_image=ext_image)
-	c = FITS_Sequence([fits.open(f) for f in files], ext_image=ext_image)
-	d = FITS_Sequence(files[0], ext_image=ext_image)
-	e = FITS_Sequence(fits.open(files[0]), ext_image=ext_image)
+	c = FITS_Sequence(hdulist, ext_image=ext_image)
+	d = FITS_Sequence(filename, ext_image=ext_image)
+	e = FITS_Sequence([hdulist], ext_image=ext_image)
 
-	for x in [a,b,c,d,e]:
-		print(x, x.N)
 	return a,b,c,d,e
