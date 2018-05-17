@@ -1,5 +1,5 @@
 from __future__ import print_function
-from .imports import *
+from ..imports import *
 
 def get_writer(filename, fps=30):
 	'''

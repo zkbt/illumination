@@ -1,5 +1,5 @@
 '''Generate TESS pixel lightcurve cubes with dimensions (xpix)x(ypix)x(time).'''
-from .imports import *
+from ..imports import *
 #from Strategies import *
 from .stackers import Central, Sum
 from .cartoon import *

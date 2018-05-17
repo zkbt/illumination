@@ -25,6 +25,7 @@ class Talker(object):
             self.nametag = self.__class__.__name__.lower()
         else:
             self.nametag = nametag
+        self.nametag = self.nametag.replace('_', '-')
 
     def speak(self, string='', level=0, progress=False):
         '''If verbose=True and terse=False, this will print to terminal. Otherwise, it won't.'''

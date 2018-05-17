@@ -1,4 +1,4 @@
-from .imports import *
+from ..imports import *
 
 def create_test_array(xsize=5, ysize=5, n=100):
 	'''

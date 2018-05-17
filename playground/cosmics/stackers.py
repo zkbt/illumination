@@ -4,7 +4,7 @@ Tools to stack images, using a variety of algorithms
 so that they can be better optimized for 2D images).
 '''
 
-from .imports import *
+from ..imports import *
 
 class Stacker(Talker):
     '''Stack a cube of images, using some filter.'''

@@ -3,7 +3,7 @@ This constructs a stamp, as a Cube, from a directory of
 sparse_subaray files.
 '''
 
-from .imports import *
+from ..imports import *
 from .cubes import Cube, create_test_array
 from astropy.time import Time
 
