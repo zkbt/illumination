@@ -281,7 +281,8 @@ def fit_camera(filename,
                binby=200, 
                constrain_theta='clockhands', 
                constrain_size=(100, 3000),
-               visualize=True):
+               visualize=True,
+               label=None):
     '''
     Fit an image from a full camera.
     
@@ -297,6 +298,8 @@ def fit_camera(filename,
         None means the angle of the Gaussian is unconstrained
     constrain_size : 2-element tuple
         The min and max values for the widths of the blobs
+    label : str
+        How should files be saved?
         
     Returns:
     table : an astropy Table
@@ -331,15 +334,17 @@ def fit_camera(filename,
     
     # fit it (binning by 100)
     fitted = fit_model(x, y, z, ok, model=initial, imagebinning=binby)
-
+    
+    if label is None:
+        label = os.path.basename(filename).replace('.fits', '')
     if visualize:
+
         #plot_fit(xsmall, ysmall, zsmall, truth)
         plot_fit(x, y, z, ok, models=[fitted, initial], colors=['darkorchid', 'gray'])
-        label = os.path.basename(filename).replace('.fits', '')
         plt.suptitle(label)
-        plotfilename = os.path.join('plots', 'fitted_{}.png'.format(label))
+        plotfilename = os.path.join('plots', 'fit_{}.png'.format(label))
         plt.savefig(plotfilename, dpi=400)
-        
+    
     
     b, g = fitted
     binitial, ginitial = initial
@@ -360,4 +365,9 @@ def fit_camera(filename,
              spacecrafttime=time,
              filename=os.path.basename(filename))
     
-    return Table([d], names=['baseline', 'amplitude', 'x', 'y', 'radius', 'theta', 'radial_width', 'theta_width', 'moment_x', 'moment_y', 'imtype', 'camera', 'spm', 'spacecrafttime', 'filename'])
+    row = Table([d], names=['baseline', 'amplitude', 'x', 'y', 'radius', 'theta', 'radial_width', 'theta_width', 'moment_x', 'moment_y', 'imtype', 'camera', 'spm', 'spacecrafttime', 'filename'])
+    
+    fitfilename = 'fits/fit_{}.txt'.format(label)
+    row.write(fitfilename, format='ascii.fixed_width', delimiter='|', bookend=False, overwrite=True)
+    
+    return row
