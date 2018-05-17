@@ -4,9 +4,7 @@ from ..sequence import make_sequence
 
 class imshowFrame(FrameBase):
 
-
-	frametype = 'base'
-
+	frametype = 'imshow'
 	def __init__(self, *args, **kwargs):
 		FrameBase.__init__(self, *args, **kwargs)
 
@@ -20,7 +18,6 @@ class imshowFrame(FrameBase):
 		except AttributeError:
 			self.cmap, self.norm, self.ticks = cmap_norm_ticks(*args, **kwargs)
 			return self.cmap, self.norm, self.ticks
-
 
 
 	def plot(self, timestep=0, **kwargs):

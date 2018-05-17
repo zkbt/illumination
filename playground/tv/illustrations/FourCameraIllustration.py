@@ -1,18 +1,17 @@
 from .IllustrationBase import *
 from ..frames import CameraFrame
 
-def cameraname(n):
-    return
-
 class FourCameraIllustration(IllustrationBase):
 
-    def __init__(self, orientation='horizontal'):
+    def __init__(self, orientation='horizontal', cam1=[], cam2=[], cam3=[], cam4=[]):
 
         # set up the basic geometry of the main axes
         sizeofcamera = 4
         N = 4
-        cols = np.minimum(np.ceil(np.sqrt(N)*aspectratio), N).astype(np.int)
-        rows = np.maximum(np.ceil(N/cols), 1).astype(np.int)
+        self.orientation = orientation
+        if self.orientation == 'horizontal':
+            cols = N
+            rows = 1
         IllustrationBase.__init__(self, rows, cols,
                                 figkw=dict(figsize=(sizeofcamera*cols, sizeofcamera*rows)),
                                 hspace=0.02, wspace=0.02,
@@ -27,8 +26,8 @@ class FourCameraIllustration(IllustrationBase):
                 ax = plt.subplot(self.grid[i, j])
 
                 # create a CameraFrame for this camera
-                name = 'Camera {}'.format(i*cols + j + 1)
-                self.frames[name] = CameraFrame(ax=ax, data=None, name=name)
+                name = 'cam{}'.format(i*cols + j+1)
+                self.frames[name] = CameraFrame(ax=ax, data=locals()[name])
 
 class ZoomsIllustration(FourCameraIllustration):
 

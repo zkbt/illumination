@@ -8,6 +8,9 @@ class Sequence(Talker):
 	which can be viewed (and animated)
 	in a tv frame.
 	'''
+
+	titlefordisplay = ''
+	colorbarlabelfordisplay = ''
 	def __init__(self, name='generic', *args, **kwargs):
 		Talker.__init__(self)
 		self.name = name
