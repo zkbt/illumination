@@ -1,7 +1,12 @@
 from ..imports import *
 from .illustrations import FourCameraIllustration
+from .utils import *
 
-def showfits(pattern='*.fits'):
+def camera_from_filename(f):
+    return os.path.basename(f).split('cam')[1].split('_')[0]
+
+
+def showfits(pattern='*.fits', get_camera=camera):
     '''
     Maybe this should be replaced with a FITS_Sequence?
     '''
@@ -10,7 +15,7 @@ def showfits(pattern='*.fits'):
     data = {'cam{}'.format(c):[] for c in [1,2,3,4]}
 
     for f in files:
-        cam = [os.path.basename(f).split('cam')[1].split('_')]
+        cam = get_camera(f)
         data['cam{}'.format(cam)].append(f)
 
     fci = FourCameraIllustration(**data)

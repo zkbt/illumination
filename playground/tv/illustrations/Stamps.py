@@ -1,6 +1,6 @@
 from .IllustrationBase import *
 
-class StampsIllustration(IllustrationBase):
+class Stamps(IllustrationBase):
 
     def __init__(self, cubes, names=[], aspectratio=np.inf):
 

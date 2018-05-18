@@ -1,16 +1,15 @@
 from .IllustrationBase import *
 from ..frames import CameraFrame
 
-class FourCameras(IllustrationBase):
+class SingleCamera(IllustrationBase):
     '''
     For displaying a single Camera.
     '''
 
-    def __init__(self, cam1=[], cam2=[], cam3=[], cam4=[], orientation='horizontal', sizeofcamera = 4, **kwargs):
+    def __init__(self, data, orientation='horizontal', sizeofcamera = 4, **kwargs):
 
         # set up the basic geometry of the main axes
-        sizeofcamera = 4
-        N = 4
+        N = 1
         self.orientation = orientation
         if self.orientation == 'horizontal':
             cols = N
@@ -29,5 +28,4 @@ class FourCameras(IllustrationBase):
                 ax = plt.subplot(self.grid[i, j])
 
                 # create a CameraFrame for this camera
-                name = 'cam{}'.format(i*cols + j+1)
-                self.frames[name] = CameraFrame(ax=ax, data=locals()[name], **kwargs)
+                self.frames['camera'] = CameraFrame(ax=ax, data=data, **kwargs)
