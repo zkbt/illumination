@@ -35,7 +35,7 @@ class Sequence(Talker):
 
 class FITS_Sequence(Sequence):
 
-	def __init__(self, initial, ext_image=1, ext_primary=0, name='FITS'):
+	def __init__(self, initial, ext_image=1, ext_primary=0, name='FITS', **kwargs):
 		'''
 		Initialize a Sequence of FITS images. The goal is
 		to create a list of FITS HDUs, one for each time.
@@ -76,13 +76,18 @@ class FITS_Sequence(Sequence):
 
 		self.ext_primary = ext_primary
 		self.ext_image = ext_image
+		#if len(self.hdulists) > 0:
+		#	self.ext_image = np.minimum(self.ext_image, len(self.hdulists[0]))
 
 		self.temporal = {}
 		self.static = {}
 		self.spatial = {}
 
-		self._populate_from_headers()
-
+		self.time = np.arange(self.N)
+		try:
+			self._populate_from_headers()
+		except:
+			self.speak('unable to populate headers for {}'.format(self))
 	@property
 	def N(self):
 		return len(self.hdulists)
@@ -133,7 +138,7 @@ class FITS_Sequence(Sequence):
 				self.speak('using {} as the time axis'.format(k))
 				break
 			except KeyError:
-				pass
+				break
 
 	def __getitem__(self, timestep):
 		'''
@@ -142,7 +147,7 @@ class FITS_Sequence(Sequence):
 		return self.hdulists[timestep][self.ext_image].data
 
 class StampSequence(Sequence):
-	def __init__(self, stamp, name='stamp'):
+	def __init__(self, stamp, name='stamp', **kwargs):
 		Sequence.__init__(self, name=name)
 		for k in stamp._savable:
 			vars(self)[k] = vars(stamp)[k]

@@ -9,7 +9,7 @@ class imshowFrame(FrameBase):
 		FrameBase.__init__(self, *args, **kwargs)
 
 		# make sure that the data are a sequence of images
-		self.data = make_sequence(self.data)
+		self.data = make_sequence(self.data, **kwargs)
 
 	def _cmap_norm_ticks(self, *args, **kwargs):
 		o = self._overarching
@@ -20,16 +20,20 @@ class imshowFrame(FrameBase):
 			return self.cmap, self.norm, self.ticks
 
 
-	def plot(self, timestep=0, **kwargs):
+	def plot(self, timestep=0, clean=True, **kwargs):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''
 
 		# make sure we point back at this frame
 		plt.sca(self.ax)
+		if clean:
+			plt.cla()
 
 		# pull out the array to work on
 		image, actual_time = self._get_image()
+		if image is None:
+			return
 		cmap, norm, ticks = self._cmap_norm_ticks(image)
 
 		# display the image for this frame
@@ -66,11 +70,14 @@ class imshowFrame(FrameBase):
 		Get the image at a given time (defaulting to the first time).
 		'''
 
-		if time is None:
-			time = self._gettimes()[0]
-		timestep = self._find_timestep(time)
-		image = self.data[timestep]
-		actual_time = self._gettimes()[timestep]
+		try:
+			if time is None:
+				time = self._gettimes()[0]
+			timestep = self._find_timestep(time)
+			image = self.data[timestep]
+			actual_time = self._gettimes()[timestep]
+		except IndexError:
+			return None, None
 		return image, actual_time
 
 	def update(self, time):
@@ -80,6 +87,8 @@ class imshowFrame(FrameBase):
 		# update the data, if we need to
 		timestep = self._find_timestep(time)
 		image, actual_time = self._get_image(time)
+		if image is None:
+			return
 
 		if timestep != self.currenttimestep:
 			self.plotted['imshow'].set_data(image)
