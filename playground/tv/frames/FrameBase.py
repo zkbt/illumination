@@ -83,8 +83,8 @@ class FrameBase:
 		if round is None:
 			diffs = np.diff(np.sort(alltimes))
 			round = np.min(diffs[diffs > 0])
-
-		rounded = round*np.round(np.array(alltimes)/round)
+		baseline = np.min(alltimes)
+		rounded = round*np.round(np.array(alltimes-baseline)/round) + baseline
 		times = np.unique(rounded)
 		cadence = np.min(np.diff(times))
 		return times, cadence

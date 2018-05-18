@@ -131,12 +131,12 @@ class FITS_Sequence(Sequence):
 				if len(np.unique(self.temporal[k])) == 1:
 					self.static[k] = self.temporal.pop(k)[0]
 
+
 		# try to pull a time axis from these
 		for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB']:
 			try:
 				self.time = np.asarray(self.temporal[k])
 				self.speak('using {} as the time axis'.format(k))
-				break
 			except KeyError:
 				break
 
