@@ -17,9 +17,10 @@ class imshowFrame(FrameBase):
 			return ill.cmap, ill.norm, ill.ticks
 		except AttributeError:
 			self.cmap, self.norm, self.ticks = cmap_norm_ticks(*args, **kwargs)
-			self.illustration.cmap = self.cmap
-			self.illustration.norm = self.norm
-			self.illustration.ticks = self.ticks
+			if self.illustration.sharecolorbar:
+				self.illustration.cmap = self.cmap
+				self.illustration.norm = self.norm
+				self.illustration.ticks = self.ticks
 			return self.cmap, self.norm, self.ticks
 
 
@@ -49,15 +50,31 @@ class imshowFrame(FrameBase):
 		plt.axis('off')
 
 		# add a colorbar
-		colorbarred = plt.colorbar(imshowed, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.02, ticks=ticks)
-		colorbarred.ax.set_xticklabels(['{:.0f}'.format(v) for v in ticks])
-		colorbarred.outline.set_visible(False)
+		neednewcolorbar = True
+		if self.illustration is not None:
+			if self.illustration.sharecolorbar:
+				try:
+					colorbarred = self.illustration.colorbar
+					neednewcolorbar = False
+				except AttributeError:
+					pass
+		if neednewcolorbar:
+			try:
+				assert(self.illustration.sharecolorbar)
+				axes = [f.ax for f in self.illustration.frames.values()]
+			except (AttributeError, AssertionError):
+				axes = self.ax
+			colorbarred = plt.colorbar(imshowed, ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.02, ticks=ticks)
+			colorbarred.ax.set_xticklabels(['{:.0f}'.format(v) for v in ticks])
+			colorbarred.outline.set_visible(False)
+			self.illustration.colorbar = colorbarred
+
 
 		# add a time label
 		texted = plt.text(0.05, 0.05, self._timestring(self._gettimes()[timestep]), transform=self.ax.transAxes)
 
 		# store the things that were plotted, so they can be updated
-		self.plotted = dict(imshow=imshowed, text=texted, colorbar=colorbarred)
+		self.plotted = dict(imshow=imshowed, text=texted)#, colorbar=colorbarred)
 
 		# keep track of the current plotted timestep
 		self.currenttimestep = timestep

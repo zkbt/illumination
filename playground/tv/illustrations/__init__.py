@@ -27,7 +27,7 @@ def test_FourCameras():
 def test_Stamps():
     print("\nTesting the Stamps illustration.")
     data = [create_test_stamp(cadence=120, n=25) for _ in range(4)]
-    illustration = Stamps(data)
+    illustration = Stamps(data, sharecolorbar=False)
     illustration.plot()
     filename = 'stamps-animation.mp4'
     animate(illustration, filename)

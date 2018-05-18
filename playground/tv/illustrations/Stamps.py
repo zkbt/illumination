@@ -2,7 +2,7 @@ from .IllustrationBase import *
 
 class Stamps(IllustrationBase):
 
-    def __init__(self, cubes, names=[], aspectratio=np.inf):
+    def __init__(self, cubes, names=[], aspectratio=np.inf, **kwargs):
 
         each = 3.2
         N = len(cubes)
@@ -18,7 +18,7 @@ class Stamps(IllustrationBase):
                                     figkw=dict(figsize=(wsize, hsize)),
                                     hspace=hspace, wspace=wspace,
                                     left=left, right=right,
-                                    bottom=bottom, top=top)
+                                    bottom=bottom, top=top, **kwargs)
 
         for i in range(rows):
             for j in range(cols):

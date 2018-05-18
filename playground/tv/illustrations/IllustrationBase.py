@@ -7,13 +7,14 @@ class IllustrationBase:
     for a linked visualization of images.
     '''
     name = ''
-    def __init__(self, nrows, ncols, figkw=dict(figsize=None, dpi=None), **kwargs):
+    def __init__(self, nrows, ncols, figkw=dict(figsize=None, dpi=None), sharecolorbar=True, **kwargs):
         '''
         Initialize an Illustration,
         setting up its figure and basic layout.
         '''
         self.figure = plt.figure(**figkw)
         self.grid = gs.GridSpec(nrows, ncols, **kwargs)
+        self.sharecolorbar = sharecolorbar
         self.frames = {}
 
     def _timesandcadence(self, round=None):
@@ -66,7 +67,7 @@ class Row(IllustrationBase):
     '''
     FIXME -- the initialization is probably still sketchy on this.
     '''
-    
+
     def __init__(self, *frameargs, **framekwargs):
 
         # store all the frames in a dictionary
