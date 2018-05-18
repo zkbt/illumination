@@ -6,7 +6,7 @@ class FrameBase:
 	plotted = None
 	frametype = 'base'
 
-	def __init__(self, ax=None, data=None, framename='', overarching=None, **kwargs):
+	def __init__(self, ax=None, data=None, framename='', illustration=None, **kwargs):
 		'''
 		Initialize this frame,
 		choosing the Axes in which it will display,
@@ -34,7 +34,7 @@ class FrameBase:
 		self.data = data
 
 		# is there another overarching frame this one should be aware of?
-		self._overarching = overarching
+		self.illustration = illustration
 
 	def plot(self):
 		'''
@@ -88,3 +88,28 @@ class FrameBase:
 		times = np.unique(rounded)
 		cadence = np.min(np.diff(times))
 		return times, cadence
+
+	def _transformimage(self, image):
+		'''
+		Some frames will want to flip or rotate an image before display.
+		This handles that transformation. (This should probably be set
+		up as an matplotlib.axes transform type of thing.)
+		'''
+		return image
+
+
+	def _transformxy(self, x, y):
+		'''
+		This handles the same transformation as that which goes into
+		transform image, but for x and y arrays.
+		'''
+		return x, y
+
+	def _get_orientation(self):
+		'''
+		Figure out the orientation of the overarching illustration.
+		'''
+		try:
+			return self.illustration.orientation
+		except:
+			return 'vertical'

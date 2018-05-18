@@ -1,5 +1,5 @@
 from .IllustrationBase import *
-from ..frames import CameraFrame
+from ..frames import CameraFrame, cameras
 
 class FourCameras(IllustrationBase):
     '''
@@ -16,7 +16,7 @@ class FourCameras(IllustrationBase):
             cols = N
             rows = 1
         IllustrationBase.__init__(self, rows, cols,
-                                figkw=dict(figsize=(sizeofcamera*cols, sizeofcamera*rows)),
+                                figkw=dict(figsize=(sizeofcamera*cols, sizeofcamera*rows*1.2)),
                                 hspace=0.02, wspace=0.02,
                                 left=0.05, right=0.95,
                                 bottom=0.1, top=0.9)
@@ -29,5 +29,6 @@ class FourCameras(IllustrationBase):
                 ax = plt.subplot(self.grid[i, j])
 
                 # create a CameraFrame for this camera
+                n = i*cols + j+1
                 name = 'cam{}'.format(i*cols + j+1)
-                self.frames[name] = CameraFrame(ax=ax, data=locals()[name], **kwargs)
+                self.frames[name] = cameras[name](ax=ax, data=locals()[name], illustration=self, **kwargs)

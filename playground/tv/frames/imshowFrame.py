@@ -12,9 +12,9 @@ class imshowFrame(FrameBase):
 		self.data = make_sequence(self.data, **kwargs)
 
 	def _cmap_norm_ticks(self, *args, **kwargs):
-		o = self._overarching
+		ill = self.illustration
 		try:
-			return o.cmap, o.norm, o.ticks
+			return ill.cmap, ill.norm, ill.ticks
 		except AttributeError:
 			self.cmap, self.norm, self.ticks = cmap_norm_ticks(*args, **kwargs)
 			return self.cmap, self.norm, self.ticks
@@ -74,7 +74,7 @@ class imshowFrame(FrameBase):
 			if time is None:
 				time = self._gettimes()[0]
 			timestep = self._find_timestep(time)
-			image = self.data[timestep]
+			image = self._transformimage(self.data[timestep])
 			actual_time = self._gettimes()[timestep]
 		except IndexError:
 			return None, None

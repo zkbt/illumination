@@ -63,7 +63,10 @@ class IllustrationBase:
             f.update(*args, **kwargs)
 
 class Row(IllustrationBase):
-
+    '''
+    FIXME -- the initialization is probably still sketchy on this.
+    '''
+    
     def __init__(self, *frameargs, **framekwargs):
 
         # store all the frames in a dictionary

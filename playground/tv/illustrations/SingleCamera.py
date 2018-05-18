@@ -28,4 +28,4 @@ class SingleCamera(IllustrationBase):
                 ax = plt.subplot(self.grid[i, j])
 
                 # create a CameraFrame for this camera
-                self.frames['camera'] = CameraFrame(ax=ax, data=data, **kwargs)
+                self.frames['camera'] = CameraFrame(illustration=self, ax=ax, data=data, **kwargs)
