@@ -36,6 +36,11 @@ class imshowFrame(FrameBase):
 			return
 		cmap, norm, ticks = self._cmap_norm_ticks(image)
 
+		if self.illustration is not None:
+			self.illustration.cmap = cmap
+			self.illustration.norm = norm
+			self.illustration.tikcs = ticks
+
 		# display the image for this frame
 		imshowed = plt.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 

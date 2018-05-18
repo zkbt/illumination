@@ -1,3 +1,5 @@
+# These tests got moved to 
+
 from playground.imports import *
 from playground.cosmics.stamps import *
 from playground.tv.frames import *
