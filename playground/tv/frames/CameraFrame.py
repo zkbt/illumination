@@ -12,6 +12,7 @@ class CameraFrame(imshowFrame):
 		plt.setp(self.ax.get_yticklabels(), visible=False)
 		self.ax.set_facecolor('black')
 
+# FIXME -- make sure I understand the geometry here (I don't think I do now)
 class Camera1Frame(CameraFrame):
 	def _transformimage(self, image):
 		'''
@@ -19,7 +20,7 @@ class Camera1Frame(CameraFrame):
 		+x is up, +y is left
 		'''
 		if self._get_orientation() == 'horizontal':
-			return image.T[:, ::-1]
+			return image.T[:, :]
 
 class Camera2Frame(CameraFrame):
 	def _transformimage(self, image):
@@ -28,7 +29,7 @@ class Camera2Frame(CameraFrame):
 		+x is up, +y is left
 		'''
 		if self._get_orientation() == 'horizontal':
-			return image.T[:, ::-1]
+			return image.T[:, :]
 
 class Camera3Frame(CameraFrame):
 	def _transformimage(self, image):
@@ -37,7 +38,7 @@ class Camera3Frame(CameraFrame):
 		+x is down, +y is right
 		'''
 		if self._get_orientation() == 'horizontal':
-			return image.T[::-1, :]
+			return image.T[::-1, ::-1]
 
 class Camera4Frame(CameraFrame):
 	def _transformimage(self, image):
@@ -46,6 +47,6 @@ class Camera4Frame(CameraFrame):
 		+x is down, +y is right
 		'''
 		if self._get_orientation() == 'horizontal':
-			return image.T[::-1, :]
+			return image.T[::-1, ::-1]
 
 cameras = {'cam1':Camera1Frame, 'cam2':Camera2Frame, 'cam3':Camera3Frame, 'cam4':Camera4Frame}
