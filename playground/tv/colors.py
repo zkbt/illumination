@@ -15,7 +15,7 @@ def cmap_norm_ticks(a, whatpercentiles=[1,99], howmanysigmaarelinear=1.5, whatfr
 
 	# figure out a decent color scale
 	vmin, vmax = np.percentile(a, whatpercentiles)
-	if (a < 0).any():
+	if (a <= 0).any():
 		# go diverging, if this is a difference that crosses zero
 		scale = np.maximum(np.abs(vmin), np.abs(vmax))
 		vmin, vmax = -scale, scale
