@@ -83,7 +83,7 @@ class imshowFrame(FrameBase):
 		'''
 		Return a string, given an input time (still in spacecraft time).
 		'''
-		return '{}s'.format(time)
+		return 't={}'.format(time)
 
 	def _get_image(self, time=None):
 		'''
