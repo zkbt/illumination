@@ -17,6 +17,9 @@ class imshowFrame(FrameBase):
 			return ill.cmap, ill.norm, ill.ticks
 		except AttributeError:
 			self.cmap, self.norm, self.ticks = cmap_norm_ticks(*args, **kwargs)
+			self.illustration.cmap = self.cmap
+			self.illustration.norm = self.norm
+			self.illustration.ticks = self.ticks
 			return self.cmap, self.norm, self.ticks
 
 
@@ -35,11 +38,6 @@ class imshowFrame(FrameBase):
 		if image is None:
 			return
 		cmap, norm, ticks = self._cmap_norm_ticks(image)
-
-		if self.illustration is not None:
-			self.illustration.cmap = cmap
-			self.illustration.norm = norm
-			self.illustration.tikcs = ticks
 
 		# display the image for this frame
 		imshowed = plt.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
