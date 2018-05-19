@@ -2,6 +2,7 @@ from .IllustrationBase import IllustrationBase, Row
 from .Stamps import Stamps
 from .FourCameras import FourCameras
 from .SingleCamera import SingleCamera
+from .SingleCameraWithZoom import SingleCameraWithZoom
 from ..utils import create_test_fits
 from ..animation import animate
 from ...cosmics.stamps import create_test_stamp
@@ -33,8 +34,19 @@ def test_Stamps():
     animate(illustration, filename)
     print("Take a look at {} and see what you think!".format(filename))
 
+def test_SingleCameraWithZoom(position=(250, 50), size=(50,50)):
+    print("\nTesting a Single Camera with a Zoom.")
+    illustration = SingleCameraWithZoom(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1,
+                    zoomposition=position, zoomsize=size)
+
+    illustration.plot()
+    filename = 'single-camera-zoom-animation.mp4'
+    animate(illustration, filename)
+    print("Take a look at {} and see what you think!".format(filename))
+    return illustration
 
 def test():
     test_Stamps()
     test_SingleCamera()
     test_FourCameras()
+    test_SingleCameraWithZoom()

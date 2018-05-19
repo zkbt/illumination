@@ -2,6 +2,7 @@ from .imshowFrame import *
 from matplotlib.colors import SymLogNorm, LogNorm
 
 class CameraFrame(imshowFrame):
+	frametype='Camera'
 	def __init__(self, *args, **kwargs):
 
 		imshowFrame.__init__(self, *args, **kwargs)
@@ -14,6 +15,7 @@ class CameraFrame(imshowFrame):
 
 # FIXME -- make sure I understand the geometry here (I don't think I do now)
 class Camera1Frame(CameraFrame):
+	frametype='Camera 1'
 	def _transformimage(self, image):
 		'''
 		horizontal:
@@ -23,6 +25,7 @@ class Camera1Frame(CameraFrame):
 			return image.T[:, :]
 
 class Camera2Frame(CameraFrame):
+	frametype='Camera 2'
 	def _transformimage(self, image):
 		'''
 		horizontal:
@@ -32,6 +35,7 @@ class Camera2Frame(CameraFrame):
 			return image.T[:, :]
 
 class Camera3Frame(CameraFrame):
+	frametype='Camera 3'
 	def _transformimage(self, image):
 		'''
 		horizontal:
@@ -41,6 +45,7 @@ class Camera3Frame(CameraFrame):
 			return image.T[::-1, ::-1]
 
 class Camera4Frame(CameraFrame):
+	frametype='Camera 4'
 	def _transformimage(self, image):
 		'''
 		horizontal:

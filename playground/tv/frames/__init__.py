@@ -1,6 +1,7 @@
 from .FrameBase import FrameBase
 from .imshowFrame import imshowFrame
 from .CameraFrame import CameraFrame, cameras
+from .ZoomFrame import ZoomFrame
 
 import matplotlib.pyplot as plt
 from ..utils import create_test_fits

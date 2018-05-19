@@ -44,7 +44,7 @@ class imshowFrame(FrameBase):
 		imshowed = plt.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 
 		# pull the title from the cube object (it can do some math)
-		plt.title(self.data.titlefordisplay)
+		plt.title(self.titlefordisplay)
 
 		# turn the axes lines off
 		plt.axis('off')
@@ -79,6 +79,13 @@ class imshowFrame(FrameBase):
 		# keep track of the current plotted timestep
 		self.currenttimestep = timestep
 
+	@property
+	def titlefordisplay(self):
+		try:
+			return self.data.titlefordisplay
+		except AttributeError:
+			return ''
+
 	def _timestring(self, time):
 		'''
 		Return a string, given an input time (still in spacecraft time).
@@ -99,6 +106,7 @@ class imshowFrame(FrameBase):
 		except IndexError:
 			return None, None
 		return image, actual_time
+
 
 	def update(self, time):
 		'''
