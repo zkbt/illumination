@@ -25,7 +25,9 @@ class Sequence(Talker):
 
 		diff = time - self._gettimes()
 		try:
-			return np.flatnonzero(np.abs(diff)<self.cadence()/2)[-1]
+			step = np.flatnonzero(np.abs(diff)<=(self.cadence()/2.0))
+			assert(len(step) == 1)
+			return step[0]
 		except IndexError:
 			return 0
 

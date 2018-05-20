@@ -2,6 +2,7 @@ from ..imports import *
 from .illustrations import *
 from .frames import ZoomFrame, LocalZoomFrame
 
+__all__ = ['add_grid_of_zooms', 'add_zoom']
 def add_zoom(illustration, position, size=(25,25), zoom=5, camera='camera'):
     '''
     Add a ZoomFrame to an illustration,
