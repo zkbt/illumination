@@ -76,7 +76,7 @@ class imshowFrame(FrameBase):
 			self.illustration.colorbar = colorbarred
 
 		# add a time label
-		texted = self.ax.text(0.02, 0.02, self._timestring(self._gettimes()[timestep]), zorder=1e6, transform=self.ax.transAxes)
+		texted = self.ax.text(0.02, -0.02, self._timestring(self._gettimes()[timestep]), va='top', zorder=1e6, transform=self.ax.transAxes)
 
 		# store the things that were plotted, so they can be updated
 		self.plotted = dict(imshow=imshowed, text=texted)#, colorbar=colorbarred)
