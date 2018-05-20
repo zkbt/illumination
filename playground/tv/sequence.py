@@ -15,12 +15,17 @@ class Sequence(Talker):
 		Talker.__init__(self)
 		self.name = name
 
+	def cadence(self):
+		return np.median(np.diff(self.time))
+
 	def _find_timestep(self, time):
 		'''
 		Given a time, identify its index.
 		'''
+
+		diff = time - self._gettimes()
 		try:
-			return np.flatnonzero(self._gettimes() <= time)[-1]
+			return np.flatnonzero(np.abs(diff)<self.cadence()/2)[-1]
 		except IndexError:
 			return 0
 
@@ -88,6 +93,7 @@ class FITS_Sequence(Sequence):
 			self._populate_from_headers()
 		except:
 			self.speak('unable to populate headers for {}'.format(self))
+
 	@property
 	def N(self):
 		return len(self.hdulists)

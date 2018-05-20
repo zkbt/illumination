@@ -52,10 +52,7 @@ class FrameBase:
 		'''
 		Given a time, identify its index.
 		'''
-		try:
-			return np.flatnonzero(self._gettimes() <= time)[-1]
-		except IndexError:
-			return 0
+		return self.data._find_timestep(time)
 
 	def _gettimes(self):
 		'''
