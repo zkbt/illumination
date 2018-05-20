@@ -38,7 +38,7 @@ class Camera1Frame(CameraFrame):
 		if self._get_orientation() == 'horizontal':
 			displayy = x
 			displayx = self.ymax-y
-		return x, y
+		return displayx, displayy
 
 class Camera2Frame(Camera1Frame):
 	frametype='Camera 2'
@@ -62,7 +62,7 @@ class Camera3Frame(CameraFrame):
 		if self._get_orientation() == 'horizontal':
 			displayy = self.xmax - x
 			displayx = y
-		return x, y
+		return displayx, displayy
 
 class Camera4Frame(Camera3Frame):
 	frametype='Camera 4'
