@@ -2,7 +2,7 @@ from ..imports import *
 from .illustrations import *
 from .frames import ZoomFrame, LocalZoomFrame
 
-def addZoom(illustration, position, size=(25,25), zoom=5, camera='camera'):
+def add_zoom(illustration, position, size=(25,25), zoom=5, camera='camera'):
     '''
     Add a ZoomFrame to an illustration,
     at roughly its position.
@@ -36,6 +36,16 @@ def addZoom(illustration, position, size=(25,25), zoom=5, camera='camera'):
 
     return illustration.frames[key]
 
+def add_grid_of_zooms(illustration, N=4, buffer=100, cameras=[1,2,3,4], zoom=10, size=10, **kw):
+    for c in cameras:
+        f = illustration.frames['cam{}'.format(c)]
+
+        buffer =size*zoom
+        for row in np.linspace(f.ymin+buffer, f.ymax-buffer, N):
+            for col in np.linspace(f.xmin+buffer, f.xmax-buffer, N):
+                add_zoom(illustration, position=(col,row), camera='cam{}'.format(c), size=size, zoom=zoom, **kw)
+
+
 def test_Zooms(N=3, testgeometry=False, zoom=10, size=(10,10)):
     '''
     Test the local zoom windows on a Single Camera.
@@ -49,13 +59,13 @@ def test_Zooms(N=3, testgeometry=False, zoom=10, size=(10,10)):
     if testgeometry:
         for row in [0,nrows]:
             for col in [0, ncols]:
-                f = addZoom(illustration, position=(col,row), zoom=zoom, size=size)
-        f = addZoom(illustration, position=(ncols/2,nrows/2), zoom=zoom, size=size)
+                f = add_zoom(illustration, position=(col,row), zoom=zoom, size=size)
+        f = add_zoom(illustration, position=(ncols/2,nrows/2), zoom=zoom, size=size)
         filename = 'single-camera-local-zoom-geometry-animation.mp4'
     else:
         for i in range(N):
             row, col = np.random.randint(0,nrows), np.random.randint(0,ncols)
-            f = addZoom(illustration, position=(col,row), zoom=zoom, size=size)
+            f = add_zoom(illustration, position=(col,row), zoom=zoom, size=size)
             f.titlefordisplay = ''
         filename = 'single-camera-local-zoom-animation.mp4'
     illustration.plot()
@@ -81,7 +91,7 @@ def test_FourCameraZooms(N=3, zoom=3, size=(50,50)):
 
     for i in range(N):
         row, col = np.random.randint(0,nrows), np.random.randint(0,ncols)
-        f = addZoom(illustration, camera='cam{}'.format(np.random.randint(1,5)),
+        f = add_zoom(illustration, camera='cam{}'.format(np.random.randint(1,5)),
                                   position=(col,row), zoom=zoom, size=size)
         f.titlefordisplay = ''
     filename = '{}-camera-local-zoom-animation.mp4'.format(cameras)
