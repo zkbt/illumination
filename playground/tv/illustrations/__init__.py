@@ -6,7 +6,7 @@ from .SingleCameraWithZoom import SingleCameraWithZoom
 from ..utils import create_test_fits
 from ..animation import animate
 from ...cosmics.stamps import create_test_stamp
-
+import matplotlib.pyplot as plt
 
 def test_SingleCamera():
     print("\nTesting a Single Camera illustration.")
@@ -15,6 +15,7 @@ def test_SingleCamera():
     filename = 'single-camera-animation.mp4'
     animate(illustration, filename)
     print("Take a look at {} and see what you think!".format(filename))
+    return illustration
 
 def test_FourCameras():
     print("\nTesting the Four Camera illustration.")
@@ -24,6 +25,7 @@ def test_FourCameras():
     filename = 'four-camera-animation.mp4'
     animate(illustration, filename)
     print("Take a look at {} and see what you think!".format(filename))
+    return illustration
 
 def test_Stamps():
     print("\nTesting the Stamps illustration.")
@@ -33,6 +35,7 @@ def test_Stamps():
     filename = 'stamps-animation.mp4'
     animate(illustration, filename)
     print("Take a look at {} and see what you think!".format(filename))
+    return illustration
 
 def test_SingleCameraWithZoom(position=(250, 50), size=(50,50)):
     print("\nTesting a Single Camera with a Zoom.")

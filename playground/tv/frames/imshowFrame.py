@@ -11,6 +11,11 @@ class imshowFrame(FrameBase):
 		# make sure that the data are a sequence of images
 		self.data = make_sequence(self.data, **kwargs)
 
+		try:
+			self.titlefordisplay =  self.data.titlefordisplay
+		except AttributeError:
+			self.titlefordisplay =  ''
+
 	def _cmap_norm_ticks(self, *args, **kwargs):
 		ill = self.illustration
 		try:
@@ -41,7 +46,8 @@ class imshowFrame(FrameBase):
 		cmap, norm, ticks = self._cmap_norm_ticks(image)
 
 		# display the image for this frame
-		imshowed = plt.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
+		extent = [0, image.shape[1], 0, image.shape[0]]
+		imshowed = self.ax.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 
 		# pull the title from the cube object (it can do some math)
 		plt.title(self.titlefordisplay)
@@ -61,7 +67,7 @@ class imshowFrame(FrameBase):
 		if neednewcolorbar:
 			try:
 				assert(self.illustration.sharecolorbar)
-				axes = [f.ax for f in self.illustration.frames.values()]
+				axes = [f.ax for f in self.illustration.frames.values() if f.ax is not None]
 			except (AttributeError, AssertionError):
 				axes = self.ax
 			colorbarred = plt.colorbar(imshowed, ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.02, ticks=ticks)
@@ -69,9 +75,8 @@ class imshowFrame(FrameBase):
 			colorbarred.outline.set_visible(False)
 			self.illustration.colorbar = colorbarred
 
-
 		# add a time label
-		texted = plt.text(0.05, 0.05, self._timestring(self._gettimes()[timestep]), transform=self.ax.transAxes)
+		texted = self.ax.text(0.05, 0.05, self._timestring(self._gettimes()[timestep]), transform=self.ax.transAxes)
 
 		# store the things that were plotted, so they can be updated
 		self.plotted = dict(imshow=imshowed, text=texted)#, colorbar=colorbarred)
@@ -79,12 +84,8 @@ class imshowFrame(FrameBase):
 		# keep track of the current plotted timestep
 		self.currenttimestep = timestep
 
-	@property
-	def titlefordisplay(self):
-		try:
-			return self.data.titlefordisplay
-		except AttributeError:
-			return ''
+		plt.xlim(*extent[0:2])
+		plt.ylim(*extent[2:4])
 
 	def _timestring(self, time):
 		'''

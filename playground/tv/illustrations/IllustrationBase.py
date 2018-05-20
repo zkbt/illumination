@@ -54,6 +54,7 @@ class IllustrationBase:
 		'''
 		for k, f in self.frames.items():
 			f.plot(*args, **kwargs)
+			print('plotting {}'.format(k))
 
 	def update(self, *args, **kwargs):
 		'''

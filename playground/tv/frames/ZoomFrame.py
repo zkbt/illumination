@@ -36,9 +36,7 @@ class ZoomFrame(imshowFrame):
 		plt.setp(self.ax.get_yticklabels(), visible=False)
 		self.ax.set_facecolor('black')
 
-	@property
-	def titlefordisplay(self):
-		return '{} | {}'.format(self.frametype, self.position)
+		self.titlefordisplay =  '{} | {}'.format(self.frametype, self.position)
 
 	def _gettimes(self):
 		'''
