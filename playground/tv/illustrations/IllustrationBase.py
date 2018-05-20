@@ -17,6 +17,12 @@ class IllustrationBase:
 		self.sharecolorbar = sharecolorbar
 		self.frames = {}
 
+	def _gettimes(self):
+		alltimes = []
+		for k, f in self.frames.items():
+			alltimes.extend(f._gettimes())
+		return alltimes
+		
 	def _timesandcadence(self, round=None):
 		'''
 		Get all the unique times available across all the frames,

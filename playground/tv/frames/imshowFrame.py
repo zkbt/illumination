@@ -76,7 +76,7 @@ class imshowFrame(FrameBase):
 			self.illustration.colorbar = colorbarred
 
 		# add a time label
-		texted = self.ax.text(0.05, 0.05, self._timestring(self._gettimes()[timestep]), transform=self.ax.transAxes)
+		texted = self.ax.text(0.05, 0.05, self._timestring(self._gettimes()[timestep]), zorder=1e6, transform=self.ax.transAxes)
 
 		# store the things that were plotted, so they can be updated
 		self.plotted = dict(imshow=imshowed, text=texted)#, colorbar=colorbarred)
@@ -91,7 +91,13 @@ class imshowFrame(FrameBase):
 		'''
 		Return a string, given an input time (still in spacecraft time).
 		'''
-		return 't={}'.format(time)
+		try:
+			offset = np.min(self.illustration._gettimes())
+		except AttributeError:
+			print('no illustration times found!')
+			offset=0
+
+		return 't={}{:+}'.format(offset, time-offset)
 
 	def _get_image(self, time=None):
 		'''
