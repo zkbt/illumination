@@ -65,8 +65,8 @@ class LocalZoomFrame(imshowFrame):
 		transformedbigimage, actual_time = self.source._get_image(time)
 
 		# get the position of this stamp, transformed to the rotated camera frame
-		transformedposition = self.source._transformxy(*self.position)
-		self.cutout = Cutout2D(transformedbigimage, transformedposition, self.size, mode='partial')
+		transformedxy = self.source._transformxy(*self.position)
+		self.cutout = Cutout2D(transformedbigimage, transformedxy, self.size, mode='partial')
 
 		# all coordinates for the cutout are now in the transformed coordinates
 		cutoutimage = self.cutout.data
@@ -77,6 +77,8 @@ class LocalZoomFrame(imshowFrame):
 		image, actual_time = self._get_image()
 		cmap, norm, ticks = self.source._cmap_norm_ticks(image)
 
+
+		# these are in the rotated camera frame
 		x, y = self.cutout.center_original
 		ysize, xsize = self.cutout.shape
 

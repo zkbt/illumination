@@ -25,7 +25,8 @@ class Camera1Frame(CameraFrame):
 	def _transformimage(self, image):
 		'''
 		horizontal:
-		+x is up, +y is left
+			(should be) +x is up, +y is left
+			(looks like) +x is up, +y is right
 		'''
 		if self._get_orientation() == 'horizontal':
 			return image.T[:, :]
@@ -37,7 +38,7 @@ class Camera1Frame(CameraFrame):
 		'''
 		if self._get_orientation() == 'horizontal':
 			displayy = x
-			displayx = self.ymax-y
+			displayx = y#self.ymax-y
 		return displayx, displayy
 
 class Camera2Frame(Camera1Frame):
@@ -49,7 +50,8 @@ class Camera3Frame(CameraFrame):
 	def _transformimage(self, image):
 		'''
 		horizontal:
-		+x is down, +y is right
+			(should be) +x is down, +y is right
+			(looks like) +x is down, +y is left
 		'''
 		if self._get_orientation() == 'horizontal':
 			return image.T[::-1, ::-1]
@@ -61,7 +63,7 @@ class Camera3Frame(CameraFrame):
 		'''
 		if self._get_orientation() == 'horizontal':
 			displayy = self.xmax - x
-			displayx = y
+			displayx = self.ymax - y
 		return displayx, displayy
 
 class Camera4Frame(Camera3Frame):
