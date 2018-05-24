@@ -25,8 +25,8 @@ class Stamp(Cube):
 		----------
 		path : str, list of strings, list of HDULists
 			A filename for a '.npy' file.
-			A list of FITS files.
-			A search path of FITS files (e.g. containing *.fits)
+			A list of FITS sparse_subarray files.
+			A search path of FITS sparse_subarray files (e.g. containing *.fits)
 		extension : int
 			Which stamp to pull from the subarray?
 		limit : int
@@ -148,28 +148,35 @@ class Stamp(Cube):
 		np.save(filename, tosave)
 		self.speak('saved to {} at {}'.format(filename, Time.now().iso))
 
-def populate(base='/pdo/ramp/zkbt/orbit-8193/', cam=1, spm=1, extensions=3, limit=None):
+def populate(sparse_subarray_directory='/pdo/ramp/zkbt/orbit-8193/', stamps_directory='stamps/', cam=1, spm=1, extensions=3, limit=None):
+	'''
+	Populate a bunch of stamps, from a directory of sparse subarrays.
+	'''
 
-	stamps_directory = os.path.join(base, 'stamps')
-	mkdir(stamps_directory)
-
-	subarray_files = glob.glob(os.path.join(base, '/pdo/ramp/zkbt/orbit-8193/cam{cam}/cam{cam}_spm{spm}*.fits'.format(**locals())))
+	subarray_files = glob.glob(os.path.join(sparse_subarray_directory, 'cam{cam}/cam{cam}_spm{spm}*.fits'.format(**locals())))
 	#hdus = [fits.open(f) for f in subarray_files[:limit]]
 
+	mkdir(stamps_directory)
 	subdirectory = os.path.join(stamps_directory, 'spm{}'.format(spm))
 	mkdir(subdirectory)
 
+	stamps = []
 	for i in range(extensions):
 		extension = i + 1
-		print("populating (EXT={}, CAM={}, SPM={})".format(extension, cam, spm))
-		s = Stamp(subarray_files[:limit], extension=extension)
-		s.save(s.filename(subdirectory))
-	return s
+		try:
+			print("populating (EXT={}, CAM={}, SPM={})".format(extension, cam, spm))
+			s = Stamp(subarray_files[:limit], extension=extension)
+			s.save(s.filename(subdirectory))
+			stamps.append(s)
+		except IndexError:
+			print("stopped before extension [{}]".format(extension))
+			break
+	return stamps
 
-def organize():
+def organize(**kw):
 	for cam in [1,2,3,4]:
 		for spm in [3,2,1]:
-			populate(spm=spm, cam=cam, extensions=10, limit=None)
+			populate(spm=spm, cam=cam, extensions=10, **kw)
 
 
 def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, spm=1, tic_id=1234567890, **kw):

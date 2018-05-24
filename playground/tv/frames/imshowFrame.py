@@ -5,12 +5,20 @@ from ..sequence import make_sequence
 class imshowFrame(FrameBase):
 
 	frametype = 'imshow'
+	xmin, xmax = None, None
+	ymin, ymax = None, None
 	def __init__(self, *args, **kwargs):
 		FrameBase.__init__(self, *args, **kwargs)
 
-		# make sure that the data are a sequence of images
+		# if the data re that the data are a sequence of images
 		self.data = make_sequence(self.data, **kwargs)
 
+		# if there's an image, use it to set the size
+		try:
+			self.ymax, self.xmax = self.data[0].shape
+		except IndexError:
+			pass
+			
 		try:
 			self.titlefordisplay =  self.data.titlefordisplay
 		except AttributeError:
@@ -42,6 +50,8 @@ class imshowFrame(FrameBase):
 		# pull out the array to work on
 		image, actual_time = self._get_image()
 		if image is None:
+			plt.xlim(self.xmin, self.xmax)
+			plt.ylim(self.ymin, self.ymax)
 			return
 		cmap, norm, ticks = self._cmap_norm_ticks(image)
 
@@ -70,7 +80,7 @@ class imshowFrame(FrameBase):
 				axes = [f.ax for f in self.illustration.frames.values() if f.ax is not None]
 			except (AttributeError, AssertionError):
 				axes = self.ax
-			colorbarred = plt.colorbar(imshowed, ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.02, ticks=ticks)
+			colorbarred = plt.colorbar(imshowed, ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.07, ticks=ticks)
 			colorbarred.ax.set_xticklabels(['{:.0f}'.format(v) for v in ticks])
 			colorbarred.outline.set_visible(False)
 			self.illustration.colorbar = colorbarred
@@ -84,8 +94,8 @@ class imshowFrame(FrameBase):
 		# keep track of the current plotted timestep
 		self.currenttimestep = timestep
 
-		plt.xlim(*extent[0:2])
-		plt.ylim(*extent[2:4])
+		plt.xlim(self.xmin, self.xmax)
+		plt.ylim(self.ymin, self.ymax)
 
 	def _timestring(self, time):
 		'''

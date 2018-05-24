@@ -71,7 +71,7 @@ class ZoomFrame(imshowFrame):
 		imshowFrame.plot(self, *args, **kwargs)
 
 		# add a box to the source image (cutout must have ben created, if plot has happened)
-		self.cutout.plot_on_original(ax=self.source.ax, clip_on=False)
+		self.cutout.plot_on_original(ax=self.source.ax, clip_on=True)
 
 	def update(self, time):
 		'''

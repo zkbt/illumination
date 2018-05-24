@@ -1,21 +1,32 @@
 from .imshowFrame import *
 from astropy.nddata.utils import Cutout2D
 from matplotlib.patches import Rectangle
+from .LocalZoomFrame import LocalZoomFrame
 
-class LocalZoomFrame(imshowFrame):
-	frametype = 'Zoom'
-	def __init__(self, source, position=(0,0), size=(10,10), zoom=10, **kwargs):
+class LocalStampFrame(imshowFrame):
+	'''
+	This frame imshows a Stamp object
+	at its appropriate location on
+	some source CameraFrame.
+	'''
+
+	frametype = 'Stamp'
+	def __init__(self, data, source, position=(0,0), zoom=10, **kwargs):
 		'''
-		Initialize a ZoomFrame that can display
+		Initialize a LocalStampFrame that can display
 		images taken from a zoomed subset of
 		a `source` imshowFrame. This is kind
 		of like a magnifying class you can
-		drop down on an image.
+		drop down on an image, but its data
+		comes from a single stamp at a time.
 
 		It *doesn't* add a new axis.
 
 		Parameters
 		----------
+
+		data : Stamp
+			A StampSequence that contains all its own data.
 
 		source : imshowFrame
 			A frame into which this one will be zooming.
@@ -25,16 +36,13 @@ class LocalZoomFrame(imshowFrame):
 			(These are in original image coordinates,
 			not those that have been transformed for display.)
 
-		shape : (tuple)
-			The (x, y) = (ncols, nrows) shape of the zoom.
 		'''
 
-		FrameBase.__init__(self,  **kwargs)
+		imshowFrame.__init__(self,  data=data, **kwargs)
 
 		self.source = source
 		self.position = position
-		self.size = size
-		self.zoom =zoom
+		self.zoom = zoom
 
 		self.titlefordisplay =  '{} | {}'.format(self.frametype, self.position)
 
@@ -42,7 +50,7 @@ class LocalZoomFrame(imshowFrame):
 		'''
 		Get the available times associated with this frame.
 		'''
-		return self.source._gettimes()
+		return self.data._gettimes()
 
 	def _timestring(self, time):
 		'''
@@ -54,42 +62,27 @@ class LocalZoomFrame(imshowFrame):
 		'''
 		Get the timestep, by using the source frame.
 		'''
-		return self.source._find_timestep(time)
+		return self.data._find_timestep(time)
 
-	def _get_image(self, time=None):
-		'''
-		Get the image at a given time (defaulting to the first time),
-		by pulling it from the source frame.
-		'''
-
-		# get the image, transform to the rotated camera frame
-		transformedbigimage, actual_time = self.source._get_image(time)
-
-		# get the position of this stamp, transformed to the rotated camera frame
-		transformedxy = self.source._transformxy(*self.position)
-		self.cutout = Cutout2D(transformedbigimage, transformedxy, self.size, mode='partial')
-
-		# all coordinates for the cutout are now in the transformed coordinates
-		cutoutimage = self.cutout.data
-		return cutoutimage, actual_time
-
+	def position_center(self):
+		return self.data.col_cent
 	def plot(self, timestep=0, **kwargs):
 
 		image, actual_time = self._get_image()
 		cmap, norm, ticks = self.source._cmap_norm_ticks(image)
 
-
+		# KLUDGE! ZOOM AND STAMP SHOULD BE CONSISTENT!
 		# these are in the rotated camera frame
-		x, y = self.cutout.center_original
-		ysize, xsize = self.cutout.shape
+		x, y = self.position #self.cutout.center_original
+		ysize, xsize = self.data[0].shape
 
 		left, right = x - xsize*self.zoom/2, x + xsize*self.zoom/2
 		bottom, top = y - ysize*self.zoom/2, y + ysize*self.zoom/2
 
 		extent = [left, right, bottom, top]
 
-
-		zooms = [self.illustration.frames[k] for k in self.illustration.frames.keys() if 'zoom' in k]
+		# THIS IS ANOTHER DIFFERENCE!
+		zooms = [self.illustration.frames[k] for k in self.illustration.frames.keys() if 'stamp' in k]
 		zorder = zooms.index(self)
 
 		imshowed = self.source.ax.imshow(image,

@@ -5,7 +5,7 @@ from .stackers import Central, Sum
 from .cartoon import *
 
 timeaxis = 0
-#WIP! Still need to add a method that uses the stacker to bin to another cadence.
+
 class Cube(Talker):
 	'''
 	Cube to handle simulated postage stamp pixel light curves;
@@ -426,7 +426,7 @@ class Cube(Talker):
 
 		return ax
 
-def test(normalization='none', **kw):
+def test_cube(normalization='none', **kw):
 	'''
 	Make a plot of the cube.
 	'''

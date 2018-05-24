@@ -15,8 +15,13 @@ class CameraFrame(imshowFrame):
 
 
 		self.xmin, self.ymin = 0, 0
-		self.ymax, self.xmax = self.data[0].shape
-		# need to implement something for a camera that has no image in it
+		try:
+			# if there's an image, use it to set the size
+			self.ymax, self.xmax = self.data[0].shape
+		except IndexError:
+			# allow us to create an empty image
+			self.ymax = 4156
+			self.xmax = 4272
 
 
 # FIXME -- make sure I understand the geometry here (I don't think I do now)

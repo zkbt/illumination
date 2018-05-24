@@ -1,5 +1,5 @@
 from ..imports import *
-from ..cosmics.stamps import Stamp
+from ..cosmics.stamps import Stamp, create_test_stamp
 from .utils import create_test_fits
 
 class Sequence(Talker):
@@ -28,7 +28,7 @@ class Sequence(Talker):
 			step = np.flatnonzero(np.abs(diff)<=(self.cadence()/2.0))
 			assert(len(step) == 1)
 			return step[0]
-		except IndexError:
+		except (IndexError, AssertionError):
 			return 0
 
 	def _gettimes(self):
@@ -154,11 +154,37 @@ class FITS_Sequence(Sequence):
 		'''
 		return self.hdulists[timestep][self.ext_image].data
 
-class StampSequence(Sequence):
-	def __init__(self, stamp, name='stamp', **kwargs):
+class Stamp_Sequence(Sequence):
+	def __init__(self, initial, name='Stamp', **kwargs):
+		'''
+		Initialize a Sequence from a Stamp.
+
+
+		Parameters
+		----------
+		initial : (many possible types)
+			-a single Stamp object
+			-something that can initialize a Stamp
+				A filename for a '.npy' file.
+				A list of FITS sparse_subarray files.
+				A search path of FITS sparse_subarray files (e.g. containing *.fits)
+
+		**kwargs : dict
+			Keyword arguments are passed to Stamp(initial, **kwargs)
+		'''
+
+		# make sure we have at least a stamp
+		if type(initial) == Stamp:
+			stamp = initial
+		elif (type(initial) == str) or (type(initial) == list):
+			stamp = Stamp(initial, **kwargs)
+
+		# create a sequence out of that stamp
 		Sequence.__init__(self, name=name)
 		for k in stamp._savable:
 			vars(self)[k] = vars(stamp)[k]
+
+		# set up the basic sequence
 		self.stamp = stamp
 		self.time = self.stamp.time
 
@@ -167,6 +193,10 @@ class StampSequence(Sequence):
 		Return the image data for a given timestep.
 		'''
 		return self.stamp.todisplay[timestep, :, :]
+
+	@property
+	def N(self):
+		return len(self.time)
 
 	@property
 	def titlefordisplay(self):
@@ -197,10 +227,21 @@ def make_sequence(initial, *args, **kwargs):
 	if issubclass(initial.__class__, Sequence):
 		return initial
 	elif type(initial) == Stamp:
-		return StampSequence(initial, *args, **kwargs)
+		return Stamp_Sequence(initial, *args, **kwargs)
 	else:
 		return FITS_Sequence(initial, *args, **kwargs)
 
+def test_Stamps():
+	'''
+	Run a test of Stamps_Sequence
+	'''
+
+	filename = 'temporarystamp.npy'
+	stamp = create_test_stamp()
+	stamp.save(filename)
+	a = Stamp_Sequence(stamp)
+	b = Stamp_Sequence(filename)
+	return a, b
 
 def test_FITS():
 	'''
