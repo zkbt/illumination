@@ -4,6 +4,9 @@ notebooks/
 *.mp4
 *.mov
 *.fits
+*.npy
+.pytest_cache/
+
 probablyjunk
 
 # Byte-compiled / optimized / DLL files
