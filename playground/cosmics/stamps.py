@@ -100,7 +100,7 @@ class Stamp(Cube):
 		#if flip:
 		#	data = star.data.T
 		#else:
-		#	data = star.data
+		data = star.data
 		photons = np.empty((N, data.shape[0], data.shape[1]))
 
 		# populate each time point
