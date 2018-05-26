@@ -38,7 +38,8 @@ class FrameBase:
 
 		# keep track of a list of frames included in this one
 		self.includes = []
-		
+
+		self._currenttimestring = None
 	def __repr__(self):
 		return '<{} Frame | {}>'.format(self.frametype, self.data)
 

@@ -132,4 +132,7 @@ class LocalStampFrame(imshowFrame):
 
 		if timestep != self.currenttimestep:
 			self.plotted['imshow'].set_data(image)
-			self.source.plotted['text'].set_text(self.source._timestring(actual_time))
+			timestring = self.source._timestring(actual_time)
+			if self.source._currenttimestring != timestring:
+				self.source.plotted['text'].set_text(timestring)
+				self.source._currenttimestring = timestring
