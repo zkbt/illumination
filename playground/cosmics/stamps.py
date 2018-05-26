@@ -94,7 +94,7 @@ class Stamp(Cube):
 		spatial = {}
 
 		# KLUDGE, to convert ccd1 and ccd2 to camaer coords
-		flip = static['COL_CENT'] < 4272/2
+		flip = static['COL_CENT'] > 4272/2
 
 		# make empty photon arrays
 		if flip:
@@ -128,7 +128,7 @@ class Stamp(Cube):
 		self.__init__(self, photons=photons, temporal=temporal, spatial=spatial, static=static)
 		self.speak('populated {}'.format(self))
 		if flip:
-			self.speak('applied a KLUDGE to CCD1 + CCD2 (COL_CENT<2136?)')
+			self.speak('applied a KLUDGE to CCD1 + CCD2 (COL_CENT>2136?)')
 
 	def filename(self, directory='.'):
 		'''The base filename for this stamp.'''
