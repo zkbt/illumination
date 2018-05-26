@@ -25,71 +25,108 @@ class imshowFrame(FrameBase):
 			self.titlefordisplay =  ''
 
 	def _cmap_norm_ticks(self, *args, **kwargs):
-		ill = self.illustration
-		try:
-			return ill.cmap, ill.norm, ill.ticks
-		except AttributeError:
-			self.cmap, self.norm, self.ticks = cmap_norm_ticks(*args, **kwargs)
-			if self.illustration.sharecolorbar:
-				self.illustration.cmap = self.cmap
-				self.illustration.norm = self.norm
-				self.illustration.ticks = self.ticks
-			return self.cmap, self.norm, self.ticks
+		'''
+		Return the cmap and normalization.
 
+		If the illustration has shared colorbar,
+		then use the cmap and norm from there.
+
+		Otherwise, make a colorbar for this frame.
+
+		*args and **kwargs are passed to colors.cmap_norm_ticks
+		'''
+
+		if self.illustration.sharecolorbar:
+			# pull the cmap and normalization from the illustration
+			 self.cmap, self.norm, self.ticks = self.illustration._cmap_norm_ticks()
+			 return self.cmap, self.norm, self.ticks
+		else:
+			try:
+				return self.cmap, self.norm, self.ticks
+			except AttributeError:
+				# create the cmap from the given data
+				self.cmap, self.norm, self.ticks = cmap_norm_ticks(*args, **kwargs)
+
+				# make a colorbar attached to the frame
+				#	axes = [f.ax for f in self.illustration.frames.values() if f.ax is not None]
+				self.colorbar = plt.matplotlib.colorbar.ColorbarBase(
+									ax=self.ax,
+									cmap=self.cmap,
+									norm=self.norm,
+									orientation='horizontal',
+									#label=self.data.colorbarlabelfordisplay,
+									#fraction=0.04,
+									#pad=0.07,
+									ticks=self.ticks)
+
+				#colorbarred = plt.colorbar(self.plotted['imshow'], ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.07, ticks=ticks)
+				self.colorbar.ax.set_xticklabels(['{:.0f}'.format(v) for v in self.ticks])
+				self.colorbar.outline.set_visible(False)
+				self.plotted['colorbar'] = self.colorbar
+				return self.cmap, self.norm, self.ticks
+
+	def _ensure_colorbar_exists(self, image):
+		'''
+		Make sure this axes has its colorbar created.
+
+		Parameters
+		----------
+
+		image : the output from imshow
+
+		'''
+		if self.illustration.sharecolorbar:
+			# try to use a shared colorbar for the whole illustration
+			try:
+				self.illustration.colorbar
+			except AttributeError:
+				self.illustration.colorbar = self.illustration._add_colorbar(image, ticks=self.ticks)
+		else:
+			# create a colorbar for this illustration
+			self.illustration._add_colorbar(image, self.ax, ticks=self.ticks)
 
 	def plot(self, timestep=0, clean=True, **kwargs):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''
 
+		self.plotted = {}
+
 		# make sure we point back at this frame
 		plt.sca(self.ax)
+
+		# clean up by erasing this frame's axes
 		if clean:
 			plt.cla()
 
 		# pull out the array to work on
 		image, actual_time = self._get_image()
 		if image is None:
-			plt.xlim(self.xmin, self.xmax)
-			plt.ylim(self.ymin, self.ymax)
-			return
-		cmap, norm, ticks = self._cmap_norm_ticks(image)
+			timelabel = ''
+		else:
+			# pull out the cmap, normalization, and suggested ticks
+			cmap, norm, ticks = self._cmap_norm_ticks(image)
 
-		# display the image for this frame
-		extent = [0, image.shape[1], 0, image.shape[0]]
-		imshowed = self.ax.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
+			# display the image for this frame
+			extent = [0, image.shape[1], 0, image.shape[0]]
+			self.plotted['imshow'] = self.ax.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 
-		# pull the title from the cube object (it can do some math)
+			# define the timelabel
+			timelabel = self._timestring(self._gettimes()[timestep])
+
+			# add the colorbar
+			self._ensure_colorbar_exists(self.plotted['imshow'])
+
+
+		# add a time label
+		self.plotted['text'] = self.ax.text(0.02, -0.02, timelabel, va='top', zorder=1e6, transform=self.ax.transAxes)
+
+
+		# pull the title for this frame
 		plt.title(self.titlefordisplay)
 
 		# turn the axes lines off
 		plt.axis('off')
-
-		# add a colorbar
-		neednewcolorbar = True
-		if self.illustration is not None:
-			if self.illustration.sharecolorbar:
-				try:
-					colorbarred = self.illustration.colorbar
-					neednewcolorbar = False
-				except AttributeError:
-					pass
-		if neednewcolorbar:
-			try:
-				assert(self.illustration.sharecolorbar)
-				axes = [f.ax for f in self.illustration.frames.values() if f.ax is not None]
-			except (AttributeError, AssertionError):
-				axes = self.ax
-			colorbarred = plt.colorbar(imshowed, ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.07, ticks=ticks)
-			colorbarred.ax.set_xticklabels(['{:.0f}'.format(v) for v in ticks])
-			colorbarred.outline.set_visible(False)
-			self.illustration.colorbar = colorbarred
-
-		# add a time label
-		texted = self.ax.text(0.02, -0.02, self._timestring(self._gettimes()[timestep]), va='top', zorder=1e6, transform=self.ax.transAxes)
-
-		# store the things that were plotted, so they can be updated
-		self.plotted = dict(imshow=imshowed, text=texted)#, colorbar=colorbarred)
 
 		# keep track of the current plotted timestep
 		self.currenttimestep = timestep

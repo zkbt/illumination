@@ -66,31 +66,37 @@ class LocalStampFrame(imshowFrame):
 
 	def position_center(self):
 		return self.data.col_cent
+
 	def plot(self, timestep=0, **kwargs):
 
+		self.plotted = {}
+
+		# pull out the array to work on
 		image, actual_time = self._get_image()
+
+		# pull out the cmap, normalization, and suggested ticks
 		cmap, norm, ticks = self.source._cmap_norm_ticks(image)
 
-		# KLUDGE! ZOOM AND STAMP SHOULD BE CONSISTENT!
 		# these are in the rotated camera frame
-		x, y = self.position #self.cutout.center_original
+		x, y = self.position
 		ysize, xsize = self.data[0].shape
 
+		# set up the extent for the zoomed stamp
 		left, right = x - xsize*self.zoom/2, x + xsize*self.zoom/2
 		bottom, top = y - ysize*self.zoom/2, y + ysize*self.zoom/2
-
 		extent = [left, right, bottom, top]
 
-		# THIS IS ANOTHER DIFFERENCE!
+		# figure out the zorder for the stamps
 		zooms = [self.illustration.frames[k] for k in self.illustration.frames.keys() if 'stamp' in k]
 		zorder = zooms.index(self)
 
-		imshowed = self.source.ax.imshow(image,
-						extent=extent,
-						interpolation='nearest',
-						origin='lower',
-						norm=norm, cmap=cmap,
-						zorder=zorder)
+		# draw the imshow
+		self.plotted['imshow'] = self.source.ax.imshow(image,
+									extent=extent,
+									interpolation='nearest',
+									origin='lower',
+									norm=norm, cmap=cmap,
+									zorder=zorder)
 
 		# Create a Rectangle patch
 		rect = Rectangle((left, bottom), xsize*self.zoom,ysize*self.zoom,
@@ -98,13 +104,18 @@ class LocalStampFrame(imshowFrame):
 				zorder=zorder+0.5, clip_on=True)
 
 		# Add the patch to the Axes
-		boxonzoom = self.source.ax.add_patch(rect)
+		self.plotted['boxonzoom']  = self.source.ax.add_patch(rect)
 
+		# make the axes clip
 		self.source.ax.set_clip_on(True)
+
 		# add a box to the source image (cutout must have ben created, if plot has happened)
 		#boxonoriginal = self.cutout.plot_on_original(ax=self.source.ax, clip_on=True)
 
-		self.plotted = dict(imshow=imshowed, boxonzoom=boxonzoom)
+		# make sure there's a colorbar
+		self.source._ensure_colorbar_exists(self.plotted['imshow'])
+
+		# keep track of the current timestep
 		self.currenttimestep = timestep
 
 	def update(self, time):

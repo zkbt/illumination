@@ -1,6 +1,8 @@
 from .IllustrationBase import *
 from ..frames import CameraFrame, cameras
 
+__all__ = ['FourCameras']
+
 class FourCameras(IllustrationBase):
     '''
     For displaying a single Camera.

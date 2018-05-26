@@ -1,6 +1,8 @@
 # still a WIP!
 from .FourCameras import *
 
+
+'''
 class ZoomsIllustration(FourCameraIllustration):
 
     def __init__(self, stamps=[], **kw):
@@ -31,3 +33,4 @@ class ZoomsIllustration(FourCameraIllustration):
 
             key = 'STAMP{}'.format(i)
             self.frames[key] = imshowFrame(ax=ax, data=s, name=key)
+'''

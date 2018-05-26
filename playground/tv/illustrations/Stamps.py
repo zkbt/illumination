@@ -1,5 +1,7 @@
 from .IllustrationBase import *
 
+__all__ = ['Stamps']
+
 class Stamps(IllustrationBase):
 
     def __init__(self, cubes=[], names=[], aspectratio=np.inf, **kwargs):

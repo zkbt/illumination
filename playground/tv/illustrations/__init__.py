@@ -1,8 +1,9 @@
-from .IllustrationBase import IllustrationBase, Row
-from .Stamps import Stamps
-from .FourCameras import FourCameras
-from .SingleCamera import SingleCamera
-from .SingleCameraWithZoom import SingleCameraWithZoom
+from .IllustrationBase import *
+from .Stamps import *
+from .FourCameras import *
+from .SingleCamera import *
+from .SingleCameraWithZoom import *
+
 from ..utils import create_test_fits
 from ..animation import animate
 from ..zoom import *

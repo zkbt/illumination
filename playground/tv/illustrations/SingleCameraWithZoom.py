@@ -3,6 +3,8 @@ from ..frames import CameraFrame
 from ..frames import ZoomFrame
 from . import SingleCamera
 
+__all__ = ['SingleCameraWithZoom']
+
 class SingleCameraWithZoom(SingleCamera):
     '''
     For displaying a single Camera.
