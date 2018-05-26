@@ -94,13 +94,14 @@ class Stamp(Cube):
 		spatial = {}
 
 		# KLUDGE, to convert ccd1 and ccd2 to camaer coords
-		flip = static['COL_CENT'] < 4272/2
+		#flip = static['COL_CENT'] < 4272/2
+		flip = static['ROW_CENT'] < 4156/2
 
 		# make empty photon arrays
-		#if flip:
-		#	data = star.data.T
-		#else:
-		data = star.data
+		if flip:
+			data = star.data.T
+		else:
+			data = star.data
 		photons = np.empty((N, data.shape[0], data.shape[1]))
 
 		# populate each time point
@@ -121,7 +122,7 @@ class Stamp(Cube):
 			# the 1st extension contains the data for this star
 			h, d = hdu[extension].header, hdu[extension].data
 			if flip:
-				photons[i,:,:] = d[::-1, ::-1]
+				photons[i,:,:] = d.T[::-1, ::-1]
 			else:
 				photons[i,:,:] = d
 

@@ -138,7 +138,7 @@ class imshowFrame(FrameBase):
 
 		# pull out the array to work on
 		image, actual_time = self._get_image()
-		if image is None:
+		if actual_time is None:
 			timelabel = ''
 		else:
 			# pull out the cmap, normalization, and suggested ticks

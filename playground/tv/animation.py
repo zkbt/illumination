@@ -51,7 +51,7 @@ def animate(illustration, filename='test.mp4',
 
 		for i, t in enumerate(times):
 			print('  {}/{} at {}'.format(i+1, len(times), Time.now().iso), end='\r')
-
+			
 			# update the illustration to a new time
 			illustration.update(t)
 
