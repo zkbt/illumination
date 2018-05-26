@@ -185,7 +185,7 @@ class imshowFrame(FrameBase):
 			print('no illustration times found!')
 			offset=0
 
-		return 't={}{:+.3f}'.format(offset, time-offset)
+		return 't={:.2f}{:+.2f}'.format(offset, time-offset)
 
 	def _get_image(self, time=None):
 		'''

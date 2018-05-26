@@ -83,6 +83,8 @@ class Stamp(Cube):
 		for key in ['TIC_ID', 'COL_CENT', 'ROW_CENT']:
 			static[key] = star.header[key]
 
+
+
 		temporal = {}
 		for key in ['QUAL_BIT', 'TIME', 'CADENCE']:
 			temporal[key] = np.empty(N)
@@ -91,8 +93,14 @@ class Stamp(Cube):
 		# nothing (yet) that acts as a spatial image
 		spatial = {}
 
+		# KLUDGE, to convert ccd1 and ccd2 to camaer coords
+		flip = static['COL_CENT'] < 4272/2:
+
 		# make empty photon arrays
-		data = star.data
+		if flip:
+			data = star.data.T
+		else:
+			data = star.data
 		photons = np.empty((N, data.shape[0], data.shape[1]))
 
 		# populate each time point
@@ -112,8 +120,13 @@ class Stamp(Cube):
 
 			# the 1st extension contains the data for this star
 			h, d = hdu[extension].header, hdu[extension].data
-			photons[i,:,:] = d
-
+			if flip:
+				photons[i,:,:] = d.T
+			else:
+				photons[i,:,:] = d
+		if flip:
+			self.speak('applied a KLUDGE to CCD1 + CCD2 (COL_CENT<2136?)')
+		
 		self.__init__(self, photons=photons, temporal=temporal, spatial=spatial, static=static)
 		self.speak('populated {}'.format(self))
 
