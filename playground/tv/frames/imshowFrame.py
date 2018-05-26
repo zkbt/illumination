@@ -106,7 +106,7 @@ class imshowFrame(FrameBase):
 		x, y = self._transformxy(*origin)
 		arrow_kw = dict(zorder=10, color='black', width=length*0.03, head_width=length*0.3, head_length=length*0.2, clip_on=False, edgecolor='none', length_includes_head=True)
 		text_kw = dict(va='center', color='black', ha='center', fontsize=7, fontweight='bold', clip_on=False)
-		buffer = 1.25
+		buffer = 1.4
 
 		# +x arrow
 		dx, dy = np.asarray(self._transformxy(unrotatedx+length, unrotatedy)) - np.asarray(self._transformxy(unrotatedx, unrotatedy))
@@ -156,7 +156,7 @@ class imshowFrame(FrameBase):
 
 
 		# add a time label
-		self.plotted['text'] = self.ax.text(0.02, -0.02, timelabel, va='top', zorder=1e6, transform=self.ax.transAxes)
+		self.plotted['text'] = self.ax.text(0.0, -0.02, timelabel, va='top', zorder=1e6, transform=self.ax.transAxes)
 
 
 		# pull the title for this frame
@@ -202,6 +202,19 @@ class imshowFrame(FrameBase):
 			return None, None
 		return image, actual_time
 
+	def _get_alternate_time(self, time=None):
+		'''
+		The time are still a little kludgy.
+		(Maybe this isn't even necessary?)
+		'''
+		for f in self.includes:
+			try:
+				timestep = f._find_timestep(time)
+				actual_time = self._gettimes()[timestep]
+				break
+			except IndexError:
+				pass
+		return actual_time
 
 	def update(self, time):
 		'''
@@ -215,4 +228,6 @@ class imshowFrame(FrameBase):
 
 		if timestep != self.currenttimestep:
 			self.plotted['imshow'].set_data(image)
+
+
 			self.plotted['text'].set_text(self._timestring(actual_time))

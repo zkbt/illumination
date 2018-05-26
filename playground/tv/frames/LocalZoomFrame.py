@@ -31,7 +31,10 @@ class LocalZoomFrame(imshowFrame):
 
 		FrameBase.__init__(self,  **kwargs)
 
+		#
 		self.source = source
+		self.source.includes.append(self)
+
 		self.position = position
 		self.size = size
 		self.zoom =zoom
@@ -126,4 +129,4 @@ class LocalZoomFrame(imshowFrame):
 
 		if timestep != self.currenttimestep:
 			self.plotted['imshow'].set_data(image)
-			#self.plotted['text'].set_text(self._timestring(actual_time))
+			self.source.plotted['text'].set_text(self.source._timestring(actual_time))

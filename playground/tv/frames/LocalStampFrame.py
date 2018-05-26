@@ -41,6 +41,8 @@ class LocalStampFrame(imshowFrame):
 		imshowFrame.__init__(self,  data=data, **kwargs)
 
 		self.source = source
+		self.source.includes.append(self)
+
 		self.position = position
 		self.zoom = zoom
 
@@ -130,4 +132,4 @@ class LocalStampFrame(imshowFrame):
 
 		if timestep != self.currenttimestep:
 			self.plotted['imshow'].set_data(image)
-			#self.plotted['text'].set_text(self._timestring(actual_time))
+			self.source.plotted['text'].set_text(self.source._timestring(actual_time))
