@@ -15,6 +15,7 @@ class imshowFrame(FrameBase):
 
 		# if there's an image, use it to set the size
 		try:
+			self.xmin, self.ymin = 0,0
 			self.ymax, self.xmax = self.data[0].shape
 		except IndexError:
 			pass
@@ -85,7 +86,43 @@ class imshowFrame(FrameBase):
 			# create a colorbar for this illustration
 			self.illustration._add_colorbar(image, self.ax, ticks=self.ticks)
 
-	def plot(self, timestep=0, clean=True, **kwargs):
+
+	def draw_arrows(self, origin=(0,0), ratio=0.05):
+		'''
+		Draw arrows on this Frame, to indicate
+		the +x and +y directions.
+		'''
+
+		try:
+			xspan = np.abs(self.xmax - self.xmin)
+			yspan = np.abs(self.ymax - self.ymin)
+			length = ratio*np.maximum(xspan, yspan)
+		except:
+			length = 50
+
+		arrows = {}
+		# rotate into the display coordinates
+		unrotatedx, unrotatedy = origin
+		x, y = self._transformxy(*origin)
+		arrow_kw = dict(zorder=10, color='black', width=length*0.03, head_width=length*0.3, head_length=length*0.2, clip_on=False, edgecolor='none', length_includes_head=True)
+		text_kw = dict(va='center', color='black', ha='center', fontsize=7, fontweight='bold', clip_on=False)
+		buffer = 1.25
+
+		# +x arrow
+		dx, dy = np.asarray(self._transformxy(unrotatedx+length, unrotatedy)) - np.asarray(self._transformxy(unrotatedx, unrotatedy))
+		arrows['xarrow'] = self.ax.arrow(x, y, dx, dy, **arrow_kw)
+		xtextx, xtexty = self._transformxy(unrotatedx + length*buffer, unrotatedy)
+		arrows['xarrowlabel'] = self.ax.text(xtextx, xtexty, 'x', **text_kw)
+
+		# +y arrow
+		dx, dy = np.asarray(self._transformxy(unrotatedx, unrotatedy+length)) - np.asarray(self._transformxy(unrotatedx, unrotatedy))
+		arrows['yarrow'] = self.ax.arrow(x, y, dx, dy, **arrow_kw)
+		ytextx, ytexty = self._transformxy(unrotatedx, unrotatedy + length*buffer)
+		arrows['yarrowlabel'] = self.ax.text(ytextx, ytexty, 'y', **text_kw)
+
+		return arrows
+
+	def plot(self, timestep=0, clean=False, **kwargs):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''
@@ -133,6 +170,10 @@ class imshowFrame(FrameBase):
 
 		plt.xlim(self.xmin, self.xmax)
 		plt.ylim(self.ymin, self.ymax)
+
+		self.plotted['arrow'] = self.draw_arrows()
+		self.ax.set_facecolor('black')
+
 
 	def _timestring(self, time):
 		'''

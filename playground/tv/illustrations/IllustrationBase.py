@@ -7,7 +7,7 @@ class IllustrationBase:
 	This contains the basic layout and organization
 	for a linked visualization of images.
 	'''
-    illustrationtype = 'Base'
+	illustrationtype = 'Base'
 	def __init__(self, nrows=1, ncols=1, figkw=dict(figsize=None, dpi=None), sharecolorbar=True, **kwargs):
 		'''
 		Initialize an Illustration,

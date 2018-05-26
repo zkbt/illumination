@@ -175,8 +175,8 @@ def populate(sparse_subarray_directory='/pdo/ramp/zkbt/orbit-8193/', stamps_dire
 
 def organize(**kw):
 	for cam in [1,2,3,4]:
-		for spm in [3,2,1]:
-			populate(spm=spm, cam=cam, extensions=10, **kw)
+		for spm in [1, 2, 3]:
+			populate(spm=spm, cam=cam, **kw)
 
 
 def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, spm=1, tic_id=1234567890, **kw):
@@ -198,7 +198,6 @@ def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, spm=1, tic_
 	temporal['QUAL_BIT'] = np.zeros(N).astype(np.int)
 
 	return Stamp(spatial=spatial, photons=photons, temporal=temporal, static=static)
-
 
 
 def example():
