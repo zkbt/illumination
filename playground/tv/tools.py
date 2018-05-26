@@ -95,6 +95,9 @@ def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filenam
         if len(data[k]) == 0:
             data.pop(k)
 
+
+    illustration = FourCameras(**data)
+    
     # figure out how to display them
     if len(data) == 1:
         cam = list(data.keys())[0]

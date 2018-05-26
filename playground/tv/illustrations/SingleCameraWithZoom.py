@@ -8,7 +8,7 @@ class SingleCameraWithZoom(SingleCamera):
     For displaying a single Camera.
     '''
 
-    def __init__(self, data, zoomposition=(0,0), zoomsize=(10,10), **kwargs):
+    def __init__(self, data=[], zoomposition=(0,0), zoomsize=(10,10), **kwargs):
 
         SingleCamera.__init__(self,  data, cols=2, **kwargs)
 

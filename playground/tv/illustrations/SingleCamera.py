@@ -6,7 +6,7 @@ class SingleCamera(IllustrationBase):
     For displaying a single Camera.
     '''
 
-    def __init__(self, data, rows=1, cols=1, orientation='horizontal', sizeofcamera = 4, **kwargs):
+    def __init__(self, data=[], rows=1, cols=1, orientation='horizontal', sizeofcamera = 4, **kwargs):
 
         # set up the basic geometry of the main axes
         self.orientation = orientation

@@ -18,7 +18,7 @@ class imshowFrame(FrameBase):
 			self.ymax, self.xmax = self.data[0].shape
 		except IndexError:
 			pass
-			
+
 		try:
 			self.titlefordisplay =  self.data.titlefordisplay
 		except AttributeError:

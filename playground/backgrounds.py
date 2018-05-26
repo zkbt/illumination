@@ -277,18 +277,18 @@ def test(**kw):
     #plot_fit(xsmall, ysmall, zsmall, truth)
     plot_fit(x, y, z, ok, models=[fitted, initial, truth], colors=['darkorchid', 'gray', 'hotpink'])
 
-def fit_camera(filename, 
-               binby=200, 
-               constrain_theta='clockhands', 
+def fit_camera(filename,
+               binby=200,
+               constrain_theta='clockhands',
                constrain_size=(100, 3000),
                visualize=True,
                label=None):
     '''
     Fit an image from a full camera.
-    
+
     Parameters
     ----------
-    
+
     filename : str
         Path to the FITS file for a full-camera stitched image.
     binby : int
@@ -300,11 +300,11 @@ def fit_camera(filename,
         The min and max values for the widths of the blobs
     label : str
         How should files be saved?
-        
+
     Returns:
     table : an astropy Table
         a single-row table of parameters for diffuse light fit
-        
+
     '''
 
     # load an image from a FITS file
@@ -326,15 +326,15 @@ def fit_camera(filename,
             b, g = initial
             return np.arctan2(g.y_mean, g.x_mean)
         gauss.theta.tied = tiedtheta
-    
+
     # should we set a typical size for the blob?
     if constrain_size:
         gauss.x_stddev.bounds = constrain_size
         gauss.y_stddev.bounds = constrain_size
-    
+
     # fit it (binning by 100)
     fitted = fit_model(x, y, z, ok, model=initial, imagebinning=binby)
-    
+
     if label is None:
         label = os.path.basename(filename).replace('.fits', '')
     if visualize:
@@ -344,8 +344,8 @@ def fit_camera(filename,
         plt.suptitle(label)
         plotfilename = os.path.join('plots', 'fit_{}.png'.format(label))
         plt.savefig(plotfilename, dpi=400)
-    
-    
+
+
     b, g = fitted
     binitial, ginitial = initial
     imtype, camera, spm, time = os.path.basename(filename).split('.')[0].split('_')
@@ -364,10 +364,10 @@ def fit_camera(filename,
              spm=spm,
              spacecrafttime=time,
              filename=os.path.basename(filename))
-    
+
     row = Table([d], names=['baseline', 'amplitude', 'x', 'y', 'radius', 'theta', 'radial_width', 'theta_width', 'moment_x', 'moment_y', 'imtype', 'camera', 'spm', 'spacecrafttime', 'filename'])
-    
+
     fitfilename = 'fits/fit_{}.txt'.format(label)
     row.write(fitfilename, format='ascii.fixed_width', delimiter='|', bookend=False, overwrite=True)
-    
+
     return row

@@ -3,7 +3,7 @@ from .FourCameras import *
 
 class ZoomsIllustration(FourCameraIllustration):
 
-    def __init__(self, stamps, **kw):
+    def __init__(self, stamps=[], **kw):
 
         # first, initialize the base FourCamera
         FourCameraIllustration.__init__(self, **kw)

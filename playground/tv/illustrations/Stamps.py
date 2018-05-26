@@ -2,7 +2,7 @@ from .IllustrationBase import *
 
 class Stamps(IllustrationBase):
 
-    def __init__(self, cubes, names=[], aspectratio=np.inf, **kwargs):
+    def __init__(self, cubes=[], names=[], aspectratio=np.inf, **kwargs):
 
         each = 3.2
         N = len(cubes)

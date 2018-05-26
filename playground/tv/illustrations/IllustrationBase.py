@@ -7,7 +7,7 @@ class IllustrationBase:
 	for a linked visualization of images.
 	'''
 	name = ''
-	def __init__(self, nrows, ncols, figkw=dict(figsize=None, dpi=None), sharecolorbar=True, **kwargs):
+	def __init__(self, nrows=1, ncols=1, figkw=dict(figsize=None, dpi=None), sharecolorbar=True, **kwargs):
 		'''
 		Initialize an Illustration,
 		setting up its figure and basic layout.
@@ -22,7 +22,7 @@ class IllustrationBase:
 		for k, f in self.frames.items():
 			alltimes.extend(f._gettimes())
 		return alltimes
-		
+
 	def _timesandcadence(self, round=None):
 		'''
 		Get all the unique times available across all the frames,
