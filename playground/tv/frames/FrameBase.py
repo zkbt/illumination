@@ -36,6 +36,9 @@ class FrameBase:
 		# is there another overarching frame this one should be aware of?
 		self.illustration = illustration
 
+	def __repr__(self):
+		return '<{} Frame | {}>'.format(self.frametype, self.data)
+		
 	def plot(self):
 		'''
 		This should be redefined in a class that inherits from FrameBase.

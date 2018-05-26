@@ -9,6 +9,7 @@ class SingleCameraWithZoom(SingleCamera):
     '''
     For displaying a single Camera.
     '''
+    illustrationtype = 'SingleCameraWithZoom'
 
     def __init__(self, data=[], zoomposition=(0,0), zoomsize=(10,10), **kwargs):
 

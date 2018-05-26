@@ -7,7 +7,7 @@ class IllustrationBase:
 	This contains the basic layout and organization
 	for a linked visualization of images.
 	'''
-	name = ''
+    illustrationtype = 'Base'
 	def __init__(self, nrows=1, ncols=1, figkw=dict(figsize=None, dpi=None), sharecolorbar=True, **kwargs):
 		'''
 		Initialize an Illustration,
@@ -17,6 +17,9 @@ class IllustrationBase:
 		self.grid = gs.GridSpec(nrows, ncols, **kwargs)
 		self.sharecolorbar = sharecolorbar
 		self.frames = {}
+
+	def __repr__(self):
+		return '<{} Illustration | ({} Frames) >'.format(self.illustrationtype, len(self.frames))
 
 	def _gettimes(self):
 		alltimes = []

@@ -1,6 +1,9 @@
 from ..imports import *
 from .illustrations import SingleCamera, FourCameras
 from .utils import *
+from playground.cosmics.stamps import *
+
+__all__ = ['illustratefits', 'illustratestamps']
 
 def camera_from_filename(f):
     try:
@@ -56,7 +59,7 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
 
     return illustration
 
-def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filename, **kw):
+def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filename, zoom=50, **kw):
     '''
     Make an Illustration from a group of Stamps.
 
@@ -96,13 +99,23 @@ def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filenam
             data.pop(k)
 
 
-    illustration = FourCameras(**data)
-    
+    singlecamera = len(data) == 1
     # figure out how to display them
-    if len(data) == 1:
-        cam = list(data.keys())[0]
-        illustration = SingleCamera(data[cam], **kw)
+    if singlecamera:
+        cam = 'camera'
+        illustration = SingleCamera(**kw)
     elif len(data) > 1:
-        illustration = FourCameras(**data, **kw)
+        cam = None
+        illustration = FourCameras(**kw)
+    else:
+        return
 
+    for k in data.keys():
+        stamps = [Stamp(f) for f in data[k]]
+        for s in stamps:
+            if singlecamera:
+                camera = 'camera'
+            else:
+                camera = 'cam{}'.format(s.cam)
+            frame = add_stamp(illustration, s, zoom=zoom, camera=camera)
     return illustration
