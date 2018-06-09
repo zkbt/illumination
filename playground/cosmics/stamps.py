@@ -98,10 +98,10 @@ class Stamp(Cube):
 		flip = static['ROW_CENT'] < 4156/2
 
 		# make empty photon arrays
-		if flip:
-			data = star.data.T
-		else:
-			data = star.data
+		#if flip:
+		#	data = star.data.T
+		#else:
+		data = star.data
 		photons = np.empty((N, data.shape[0], data.shape[1]))
 
 		# populate each time point
@@ -121,10 +121,10 @@ class Stamp(Cube):
 
 			# the 1st extension contains the data for this star
 			h, d = hdu[extension].header, hdu[extension].data
-			if flip:
-				photons[i,:,:] = d.T[::-1, ::-1]
-			else:
-				photons[i,:,:] = d
+			#if flip:
+			#	photons[i,:,:] = d.T[::-1, ::-1]
+			#else:
+			photons[i,:,:] = d
 
 		self.__init__(self, photons=photons, temporal=temporal, spatial=spatial, static=static)
 		self.speak('populated {}'.format(self))

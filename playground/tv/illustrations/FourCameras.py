@@ -7,7 +7,7 @@ class FourCameras(IllustrationBase):
     '''
     For displaying a single Camera.
     '''
-
+    illustrationtype = 'FourCamera'
     def __init__(self, cam1=[], cam2=[], cam3=[], cam4=[], orientation='horizontal', sizeofcamera = 4, **kwargs):
 
         # set up the basic geometry of the main axes

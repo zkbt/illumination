@@ -40,6 +40,7 @@ class Sequence(Talker):
 	def __repr__(self):
 		return '<{} of {} images>'.format(self.nametag, self.N)
 
+
 class FITS_Sequence(Sequence):
 
 	def __init__(self, initial, ext_image=1, ext_primary=0, name='FITS', **kwargs):
@@ -60,26 +61,34 @@ class FITS_Sequence(Sequence):
 		'''
 		Sequence.__init__(self, name=name)
 
-		self.hdulists = []
+		# we keep the HDUs out of memory, until we need them
+		# (this should probably be rewritten as an iterator?)
+		self._hdulists = None
 
 		# we want to make a list of HDULists
 		if type(initial) == fits.HDUList:
-			self.hdulists = [initial]
+			self._hdulists = [initial]
 		elif type(initial) == str:
 			# a search string
 			if '*' in initial:
-				self.hdulists = [fits.open(f) for f in glob.glob(initial)]
+				self.filenames = glob.glob(initial)
+				#self.hdulists = [fits.open(f) for f in glob.glob(initial)]
 			# a single file
 			elif 'fit' in initial.lower():
-				self.hdulists = [fits.open(initial)]
+				self.filenames = [initial]
+				#self.hdulists = [fits.open(initial)]
 		elif type(initial) == list:
 			# a list of filenames
 			if np.all([type(s) == str for s in initial]):
 				if np.all(['fit' in f.lower() for f in initial]):
-					self.hdulists = [fits.open(f) for f in initial]
+					self.filenames = initial
+					#self.hdulists = [fits.open(f) for f in initial]
 			elif np.all([type(hdu) == fits.HDUList for hdu in initial]):
-				self.hdulists = initial
+				self._hdulists = initial
 
+		# if we're starting frmo hdulists, then get their filenames
+		if self._hdulists is not None:
+			self.filenames = [h.filename() for h in self._hdulists]
 
 		self.ext_primary = ext_primary
 		self.ext_image = ext_image
@@ -98,24 +107,37 @@ class FITS_Sequence(Sequence):
 
 	@property
 	def N(self):
-		return len(self.hdulists)
+		'''
+		How many elements are in this sequence?
+		'''
+		return len(self.filenames)
 
-	@property
-	def filenames(self):
-		return [h.filename() for h in self.hdulists]
+	def _get_hdulist(self, i):
+		'''
+		Return an HDUlist for the ith element in the sequence.
+		'''
+		if self._hdulists is not None:
+			return self._hdulists[0]
+		else:
+			return fits.open(self.filenames[i])
 
 	def _populate_from_headers(self):
 		'''
 		Attempt to populate the sequence from the headers.
 		'''
 
-		first = self.hdulists[0]
-		pri, img = first[self.ext_primary].header, first[self.ext_image].header
+		first = self._get_hdulist(0)
+		try:
+			first[self.ext_image]
+		except IndexError:
+			print('image extension {} not found, switching to 0'.format(self.ext_image))
+			self.ext_image[0]
 
+		pri, img = first[self.ext_primary].header, first[self.ext_image].header
 
 		# if only a single image, everything is static (but can be viewed as temporal)
 
-		if len(self.hdulists) == 1:
+		if self.N == 1:
 			for h in [pri, img]:
 				for k in h.keys():
 					self.static[k] = h[k]
@@ -128,7 +150,8 @@ class FITS_Sequence(Sequence):
 					self.temporal[k] = []
 
 			# compile all values from the headers
-			for hdulist in self.hdulists:
+			for i in range(self.N):
+				hdulist = self._get_hdulist(i)
 				for e in extensions:
 					h = hdulist[e].header
 					for k in h.keys():
@@ -152,7 +175,7 @@ class FITS_Sequence(Sequence):
 		'''
 		Return the image data for a given timestep.
 		'''
-		return self.hdulists[timestep][self.ext_image].data
+		return self._get_hdulist(timestep)[self.ext_image].data
 
 class Stamp_Sequence(Sequence):
 	def __init__(self, initial, name='Stamp', **kwargs):
@@ -261,3 +284,21 @@ def test_FITS():
 	e = FITS_Sequence([hdulist], ext_image=ext_image)
 
 	return a,b,c,d,e
+
+def test_many_FITS(N=30):
+	'''
+	Run a test of the FITS_Sequence.
+	'''
+
+	mkdir()
+	for i in range(N):
+
+		filename = 'temporarytest_{:04}.fits'.format(i)
+		pattern = 'temporarytest_*.fits'
+		hdulist = create_test_fits(rows=4, cols=6)
+		hdulist.writeto(filename, overwrite=True)
+		ext_image = 1
+		print('saved {}'.format(filename))
+		a = FITS_Sequence(pattern, ext_image=ext_image)
+
+	return a
