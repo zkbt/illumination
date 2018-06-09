@@ -119,7 +119,7 @@ class FITS_Sequence(Sequence):
 		if self._hdulists is not None:
 			return self._hdulists[0]
 		else:
-			return fits.open(self.filenames[i])
+			return fits.open(self.filenames[i], memmap=False)
 
 	def _populate_from_headers(self):
 		'''
