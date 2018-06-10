@@ -20,7 +20,7 @@ def get_writer(filename, fps=30):
 
 def animate(illustration, filename='test.mp4',
 			mintime=None, maxtimespan=None,
-			fps=10, dpi=None, round=2, **kw):
+			fps=10, dpi=None, round=1, **kw):
 	'''
 	Create an animation from an Illustration,
 	using the time axes associated with each frame.
@@ -51,7 +51,7 @@ def animate(illustration, filename='test.mp4',
 
 		for i, t in enumerate(times):
 			print('  {}/{} at {}'.format(i+1, len(times), Time.now().iso), end='\r')
-			
+
 			# update the illustration to a new time
 			illustration.update(t)
 

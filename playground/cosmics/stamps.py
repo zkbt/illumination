@@ -63,10 +63,16 @@ class Stamp(Cube):
 		# default to some particular view
 		self.consider('counts')
 
+
 	def _fromSparseSubarrays(self, filenames, extension=1):
 		'''
 		Create a stamp object, from one extension of a group
 		of FITS files make by faus' sparse_subarray code.
+
+		This can be slow, if you need to keep reading the entire
+		subarray file every time you want to load each extension.
+
+		For faster,
 		'''
 
 		# open the first one, to get some basic info
@@ -95,7 +101,7 @@ class Stamp(Cube):
 
 		# KLUDGE, to convert ccd1 and ccd2 to camaer coords
 		#flip = static['COL_CENT'] < 4272/2
-		flip = static['ROW_CENT'] < 4156/2
+		#flip = static['ROW_CENT'] < 4156/2
 
 		# make empty photon arrays
 		#if flip:
@@ -128,13 +134,14 @@ class Stamp(Cube):
 
 		self.__init__(self, photons=photons, temporal=temporal, spatial=spatial, static=static)
 		self.speak('populated {}'.format(self))
-		if flip:
-			self.speak('applied a KLUDGE to CCD1 + CCD2 (COL_CENT<2136?)')
+		#if flip:
+		#	self.speak('applied a KLUDGE to CCD1 + CCD2 (COL_CENT<2136?)')
 
 	def filename(self, directory='.'):
 		'''The base filename for this stamp.'''
 
-		return os.path.join(directory, 'tic{TIC_ID}_{ROW_CENT}-{COL_CENT}_cam{CAM}_spm{SPM}_{INT_TIME}s.npy'.format(**self.static))
+		#return os.path.join(directory, 'tic{TIC_ID}_{ROW_CENT}-{COL_CENT}_cam{CAM}_spm{SPM}_{INT_TIME}s.npy'.format(**self.static))
+		return os.path.join(directory, 'cam{CAM}/cam{CAM}_spm{SPM}_tic{TIC_ID}_col{COL_CENT}_row{ROW_CENT}_{INT_TIME}s.npy'.format(**self.static))
 
 	def load(self, filename):
 		'''
@@ -162,6 +169,156 @@ class Stamp(Cube):
 		np.save(filename, tosave)
 		self.speak('saved to {} at {}'.format(filename, Time.now().iso))
 
+
+def split_times_to_stars(pattern, stamps_directory='stamps', ntimes=None, nstars=None):
+	'''
+	Take a group of sparse subarray FITS files,
+	and split them up into directories for stars,
+	each filled with individual time points.
+
+	These can then be reassembled into Stamps.
+
+	Parameters
+	----------
+
+	pattern : str
+		A search string pattern for sparse subarray files.
+
+	stamps_directory : str
+		Directory into which all the stamps will be stored (organized by camera).
+
+	ntimes : int
+		How many times should be included? (defaults to all)
+
+	nstars : int
+		How many stars should be included? (defaults to all)
+
+	Returns
+	-------
+
+	directories_pattern : str
+		A search string pattern that will capture all the directories just created.
+	'''
+
+	# make sure the stamps directory exists
+	mkdir(stamps_directory)
+	for cam in [1,2,3,4]:
+		mkdir(os.path.join(stamps_directory, 'cam{}'.format(cam)))
+
+	# make a list of sparse subarray files
+	sparse_files = glob.glob(pattern)[:ntimes]
+
+	# loop over the files (times)
+	for i, f in enumerate(sparse_files):
+
+		# open this file (time)
+		hdus = fits.open(f, memmap=False)[:nstars]
+
+		# this is the whole frame
+		frame = hdus[0]
+
+		# loop over extensions (aka stars)
+		for e in range(len(hdus)):
+
+			# this is the one specific star
+			star = hdus[e]
+
+			# create the static dictionary for this star
+			static = {}
+
+			# store the items that are static to this star
+			for key in ['SPM', 'CAM', 'INT_TIME']:
+				static[key] = frame.header[key]
+			for key in ['TIC_ID', 'COL_CENT', 'ROW_CENT']:
+				static[key] = star.header[key]
+
+			temporal = {}
+			for key in ['QUAL_BIT', 'TIME', 'CADENCE']:
+				temporal[key] = frame.header[key]
+
+			# where should the timestamps be stored
+			directory = os.path.join(stamps_directory, 'cam{CAM}/cam{CAM}_spm{SPM}_tic{TIC_ID}'.format(**static))
+
+			# save the static information once
+			if i == 0:
+				mkdir(directory)
+				static_filename = os.path.join(directory, 'static.npy')
+				#print('saved static information to {}'.format(static_filename))
+				np.save(static_filename, static)
+
+			# save the individual timestamp for this star
+			timestamp_filename = os.path.join(directory, 'img-{:08}.npy'.format(i))
+			np.save(timestamp_filename, (star.data, temporal))
+
+		print('saved {} stars from file {}/{} \r'.format(len(hdus), i+1, len(sparse_files)))
+	return os.path.join(stamps_directory, 'cam*/cam*_spm*_tic*')
+
+def combine_times_to_stamps(directories_pattern, stamps_directory='stamps', ntimes=None, nstars=None):
+	'''
+	Convert a group of directories into Stamps.
+
+	Parameters
+	----------
+	directories_pattern : str
+		A search string for directories that contain a static.npy, and img-*.npy files.
+
+	ntimes : int
+		How many times should be included? (defaults to all)
+
+	nstars : int
+		How many stars should be included? (defaults to all)
+
+	'''
+	stamps_directories = glob.glob(directories_pattern)[:nstars]
+
+	# pull up all the stamp directories
+	for star, d in enumerate(stamps_directories):
+		static_file = os.path.join(d, 'static.npy')
+		static = np.load(static_file)[()]
+		img_files = glob.glob(os.path.join(d, 'img-*.npy'))[:ntimes]
+
+		N = len(img_files)
+		for i, f in enumerate(img_files):
+			image, temp = np.load(f)
+			if i == 0:
+				temporal = dict(**temp)
+				for k in temporal.keys():
+					temporal[k] = np.empty(N).astype(type(temporal[k]))
+				photons = np.zeros((N, image.shape[0], image.shape[1]))
+			for k in temporal.keys():
+				temporal[k][i] = temp[k]
+			photons[i,:,:] = image
+			print('{}/{} -- {}/{}'.format(star, len(stamps_directories), i+1, N), end='\r')
+		s = Stamp(photons=photons, static=static, temporal=temporal)
+		directory = os.path.join(stamps_directory, 'cam{CAM}'.format(**static))
+		s.save(s.filename(directory))
+
+		print('removing all files in {}'.format(d))
+		shutil.rmtree(d)
+
+def process_sparse_into_stamps(sparse_pattern, stamps_directory, **kw):
+	'''
+	Construct a bunch of Stamps from a bunch of sparse subarray files.
+
+	Parameters
+	----------
+
+	sparse_pattern : str
+		A search string pattern for sparse subarray files.
+
+	stamps_directory : str
+		Directory into which all the stamps will be stored (organized by camera).
+
+	ntimes : int
+		How many times should be included? (defaults to all)
+
+	nstars : int
+		How many stars should be included? (defaults to all)
+	'''
+	directories_pattern = split_times_to_stars(sparse_pattern, stamps_directory=stamps_directory, **kw)
+	combine_times_to_stamps(directories_pattern, stamps_directory=stamps_directory, **kw)
+
+"""
 def populate(sparse_subarray_directory='/pdo/ramp/zkbt/orbit-8193/', stamps_directory='stamps/', cam=1, spm=1, extensions=3, limit=None):
 	'''
 	Populate a bunch of stamps, from a directory of sparse subarrays.
@@ -191,7 +348,7 @@ def organize(**kw):
 	for cam in [1,2,3,4]:
 		for spm in [1, 2, 3]:
 			populate(spm=spm, cam=cam, **kw)
-
+"""
 
 def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, spm=1, tic_id=1234567890, **kw):
 
