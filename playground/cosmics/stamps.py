@@ -251,7 +251,7 @@ def split_times_to_stars(pattern, stamps_directory='stamps', ntimes=None, nstars
 			np.save(timestamp_filename, (star.data, temporal))
 
 		print('saved {} stars from file {}/{} \r'.format(len(hdus), i+1, len(sparse_files)))
-	return os.path.join(stamps_directory, 'cam*/cam*_spm*_tic*')
+	return os.path.join(stamps_directory, 'cam*/cam*_spm*_tic*/')
 
 def combine_times_to_stamps(directories_pattern, stamps_directory='stamps', ntimes=None, nstars=None):
 	'''
