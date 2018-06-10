@@ -141,7 +141,7 @@ class Stamp(Cube):
 		'''The base filename for this stamp.'''
 
 		#return os.path.join(directory, 'tic{TIC_ID}_{ROW_CENT}-{COL_CENT}_cam{CAM}_spm{SPM}_{INT_TIME}s.npy'.format(**self.static))
-		return os.path.join(directory, 'cam{CAM}/cam{CAM}_spm{SPM}_tic{TIC_ID}_col{COL_CENT}_row{ROW_CENT}_{INT_TIME}s.npy'.format(**self.static))
+		return os.path.join(directory, 'cam{CAM}_spm{SPM}_tic{TIC_ID}_col{COL_CENT}_row{ROW_CENT}_{INT_TIME}s.npy'.format(**self.static))
 
 	def load(self, filename):
 		'''
