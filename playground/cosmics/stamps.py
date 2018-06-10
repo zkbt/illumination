@@ -288,7 +288,7 @@ def combine_times_to_stamps(directories_pattern, stamps_directory='stamps', ntim
 			for k in temporal.keys():
 				temporal[k][i] = temp[k]
 			photons[i,:,:] = image
-			print('{}/{} -- {}/{}'.format(star, len(stamps_directories), i+1, N), end='\r')
+		print('{}/{}'.format(star, len(stamps_directories)))
 		s = Stamp(photons=photons, static=static, temporal=temporal)
 		directory = os.path.join(stamps_directory, 'cam{CAM}'.format(**static))
 		s.save(s.filename(directory))
