@@ -56,7 +56,10 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
         cam = list(data.keys())[0]
         illustration = SingleCamera(data[cam], **kw)
     elif len(data) > 1:
-        illustration = FourCameras(**data, **kw)
+        inputs = dict(**data)
+        for k in kw.keys():
+            inputs[k] = kw[k]
+        illustration = FourCameras(**inputs)
 
     return illustration
 
