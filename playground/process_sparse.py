@@ -71,52 +71,53 @@ def split_times_to_stars(sparse_pattern, stamps_directory='stamps', ntimes=None,
 	# make a list of sparse subarray files
 	sparse_files = establish_file_lists(sparse_pattern, stamps_directory)#glob.glob(sparse_pattern)[:ntimes]
 	completed_filename = os.path.join(stamps_directory, 'completedfiles.txt')
-	with open(completed_filename, 'a') as complete:
-		# loop over the files (times)
-		for i, f in enumerate(sparse_files):
 
-			print(f)
-			# open this file (time)
-			hdus = fits.open(f, memmap=False)[:nstars]
+	# loop over the files (times)
+	for i, f in enumerate(sparse_files):
 
-			# this is the whole frame
-			frame = hdus[0]
+		print(f)
+		# open this file (time)
+		hdus = fits.open(f, memmap=False)[:nstars]
 
-			# loop over extensions (aka stars)
-			for e in np.arange(1, len(hdus)):
+		# this is the whole frame
+		frame = hdus[0]
 
-				# this is the one specific star
-				star = hdus[e]
+		# loop over extensions (aka stars)
+		for e in np.arange(1, len(hdus)):
 
-				# create the static dictionary for this star
-				static = {}
+			# this is the one specific star
+			star = hdus[e]
 
-				# store the items that are static to this star
-				for key in ['SPM', 'CAM', 'INT_TIME']:
-					static[key] = frame.header[key]
-				for key in ['TIC_ID', 'COL_CENT', 'ROW_CENT']:
-					static[key] = star.header[key]
+			# create the static dictionary for this star
+			static = {}
 
-				temporal = {}
-				for key in ['QUAL_BIT', 'TIME', 'CADENCE']:
-					temporal[key] = frame.header[key]
+			# store the items that are static to this star
+			for key in ['SPM', 'CAM', 'INT_TIME']:
+				static[key] = frame.header[key]
+			for key in ['TIC_ID', 'COL_CENT', 'ROW_CENT']:
+				static[key] = star.header[key]
 
-				# where should the timestamps be stored
-				directory = os.path.join(stamps_directory, 'cam{CAM}/cam{CAM}_spm{SPM}_tic{TIC_ID}'.format(**static))
+			temporal = {}
+			for key in ['QUAL_BIT', 'TIME', 'CADENCE']:
+				temporal[key] = frame.header[key]
 
-				# save the static information once
-				if i == 0:
-					mkdir(directory)
-					static_filename = os.path.join(directory, 'static.npy')
-					#print('saved static information to {}'.format(static_filename))
-					np.save(static_filename, static)
+			# where should the timestamps be stored
+			directory = os.path.join(stamps_directory, 'cam{CAM}/cam{CAM}_spm{SPM}_tic{TIC_ID}'.format(**static))
 
-				# save the individual timestamp for this star
-				timestamp_filename = os.path.join(directory, 'img-{:08}.npy'.format(i))
-				np.save(timestamp_filename, (star.data, temporal))
+			# save the static information once
+			if i == 0:
+				mkdir(directory)
+				static_filename = os.path.join(directory, 'static.npy')
+				#print('saved static information to {}'.format(static_filename))
+				np.save(static_filename, static)
 
-			print('saved {} stars from file {}/{} at {} \r'.format(len(hdus), i+1, len(sparse_files), Time.now().iso))
-			completed_files = complete.write(f + '\n')
+			# save the individual timestamp for this star
+			timestamp_filename = os.path.join(directory, 'img-{:08}.npy'.format(i))
+			np.save(timestamp_filename, (star.data, temporal))
+
+		print('saved {} stars from file {}/{} at {} \r'.format(len(hdus), i+1, len(sparse_files), Time.now().iso))
+		with open(completed_filename, 'a') as complete:
+				completed_files = complete.write(f + '\n')
 	return os.path.join(stamps_directory, 'cam*/cam*_spm*_tic*/')
 
 def combine_times_to_stamps(directories_pattern, stamps_directory='stamps', ntimes=None, nstars=None):
