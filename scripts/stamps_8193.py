@@ -8,4 +8,5 @@ orbit_directory = os.path.join('/pdo/ramp/zkbt', orbit)
 mkdir(orbit_directory)
 stamps_directory = os.path.join(orbit_directory, 'stamps')
 
-process_sparse_into_stamps(sparse_pattern=sparse_pattern, stamps_directory=stamps_directory, ntimes=None, nstars=None)
+split_times_to_stars(sparse_pattern, stamps_directory=stamps_directory, ntimes=None, nstars=None)
+#process_sparse_into_stamps(sparse_pattern=sparse_pattern, stamps_directory=stamps_directory, ntimes=5, nstars=None)
