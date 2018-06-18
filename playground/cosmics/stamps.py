@@ -45,9 +45,7 @@ class Stamp(Cube):
 				if type(path) == list:
 					filenames = path
 				elif '*' in path:
-					filenames = glob.glob(path)
-					if limit < len(filenames):
-						filenames = filenames[:limit]
+					filenames = glob.glob(path)[:limit]
 				else:
 					raise ValueError("{} can't be used to make a stamp.".format(path))
 				self._fromSparseSubarrays(filenames, extension)
