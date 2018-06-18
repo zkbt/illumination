@@ -7,7 +7,7 @@ def establish_file_lists(sparse_pattern, stamps_directory='stamps'):
 	total_filename = os.path.join(stamps_directory, 'everysinglefile.txt')
 	if os.path.exists(total_filename):
 		with open(total_filename, 'r') as total:
-			total_files = total.readlines()
+			total_files = total.read().splitlines()
 		print('{} lists {} sparse subarray files total.'.format(total_filename, len(total_files)))
 	else:
 		total_files = glob.glob(sparse_pattern)
@@ -18,7 +18,7 @@ def establish_file_lists(sparse_pattern, stamps_directory='stamps'):
 	completed_filename = os.path.join(stamps_directory, 'completedfiles.txt')
 	if os.path.exists(completed_filename):
 		with open(completed_filename, 'r') as complete:
-			completed_files = complete.readlines()
+			completed_files = complete.read().splitlines()
 	else:
 		completed_files = []
 	print("{} lists {} completed sparse subarray files.".format(completed_filename, len(completed_files)))
