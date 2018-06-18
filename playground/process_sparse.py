@@ -105,11 +105,10 @@ def split_times_to_stars(sparse_pattern, stamps_directory='stamps', ntimes=None,
 			directory = os.path.join(stamps_directory, 'cam{CAM}/cam{CAM}_spm{SPM}_tic{TIC_ID}'.format(**static))
 
 			# save the static information once
-			if i == 0:
-				mkdir(directory)
-				static_filename = os.path.join(directory, 'static.npy')
-				#print('saved static information to {}'.format(static_filename))
-				np.save(static_filename, static)
+			mkdir(directory)
+			static_filename = os.path.join(directory, 'static.npy')
+			#print('saved static information to {}'.format(static_filename))
+			np.save(static_filename, static)
 
 			# save the individual timestamp for this star
 			timestamp_filename = os.path.join(directory, 'img-{:08}.npy'.format(i))
