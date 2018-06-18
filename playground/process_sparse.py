@@ -83,7 +83,7 @@ def split_times_to_stars(sparse_pattern, stamps_directory='stamps', ntimes=None,
 		frame = hdus[0]
 
 		# loop over extensions (aka stars)
-		for e in np.arange(1, len(hdus)):
+		for e in np.arange(0, len(hdus)):
 
 			# this is the one specific star
 			star = hdus[e]
