@@ -11,7 +11,7 @@ def establish_file_lists(sparse_pattern, stamps_directory='stamps'):
 		print('{} lists {} sparse subarray files total.'.format(total_filename, len(total_files)))
 	else:
 		total_files = glob.glob(sparse_pattern)
-		print('Found {} sparse subarray files.'.format(len(all_files)))
+		print('Found {} sparse subarray files.'.format(len(total_files)))
 		with open(total_filename, 'w') as total:
 			total.writelines([name + '\n' for name in total_files])
 
