@@ -1,4 +1,4 @@
-from playground.tpfstamps import *
+from .stamps import *
 
 def establish_file_lists(sparse_pattern, stamps_directory='stamps', nstars=None):
 	print('Searching for "{}"...'.format(sparse_pattern))
