@@ -7,4 +7,4 @@ from .SingleCameraWithZoom import *
 from ..utils import create_test_fits
 from ..animation import animate
 from ..zoom import *
-from ...cosmics.stamps import create_test_stamp
+from ...tpfstamps import create_test_stamp

@@ -5,7 +5,6 @@ from .stackers import Central, Sum
 from .cartoon import *
 
 timeaxis = 0
-
 class Cube(Talker):
 	'''
 	Cube to handle simulated postage stamp pixel light curves;

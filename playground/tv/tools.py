@@ -2,7 +2,7 @@ from ..imports import *
 from .illustrations import SingleCamera, FourCameras
 from .utils import *
 from .zoom import *
-from playground.cosmics.stamps import *
+from playground.tpfstamps import *
 
 __all__ = ['illustratefits', 'illustratestamps']
 

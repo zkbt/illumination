@@ -1,5 +1,5 @@
 from ..imports import *
-from ..cosmics.stamps import Stamp, create_test_stamp
+from ..tpfstamps import Stamp, create_test_stamp
 from .utils import create_test_fits
 
 class Sequence(Talker):

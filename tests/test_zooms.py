@@ -1,7 +1,7 @@
 from playground.tv.illustrations import *
 from playground.tv.utils import create_test_fits
 from playground.tv.animation import animate
-from playground.cosmics.stamps import create_test_stamp
+from playground.tpfstamps import create_test_stamp
 from playground.imports import *
 
 directory = 'examples/'

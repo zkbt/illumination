@@ -1,4 +1,4 @@
-from playground.cosmics.stamps import *
+from playground.tpfstamps import *
 
 def establish_file_lists(sparse_pattern, stamps_directory='stamps', nstars=None):
 	print('Searching for "{}"...'.format(sparse_pattern))
@@ -126,7 +126,7 @@ def combine_times_to_stamps(directories_pattern, stamps_directory='stamps', ntim
 	Parameters
 	----------
 	directories_pattern : str
-		A search string for directories that contain a static.npy, and img-*.npy files.
+		A search string for directories that contain a static.npy, and lots of img-*.npy files.
 
 	ntimes : int
 		How many times should be included? (defaults to all)
@@ -158,9 +158,6 @@ def combine_times_to_stamps(directories_pattern, stamps_directory='stamps', ntim
 		s = Stamp(photons=photons, static=static, temporal=temporal)
 		directory = os.path.join(stamps_directory, 'cam{CAM}'.format(**static))
 		s.save(s.filename(directory))
-
-		print('removing all files in {}'.format(d))
-		shutil.rmtree(d)
 
 def process_sparse_into_stamps(sparse_pattern, stamps_directory, **kw):
 	'''

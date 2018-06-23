@@ -10,7 +10,7 @@ if sys.version_info[0] < 3:
 shortcuts = None
 line = np.inf
 
-class Talker(object):
+class Talker:
     '''
     Objects the inherit from Talker have "mute" and "pithy" attributes,
     a report('uh-oh!') method that prints when unmuted,

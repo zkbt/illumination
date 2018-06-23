@@ -8,10 +8,6 @@ from .cubes import Cube, create_test_array
 from astropy.time import Time
 
 
-path = '/pdo/ramp/zkbt/orbit-8193/'
-cam = 2
-spm = 1
-
 class Stamp(Cube):
 	"""
 	TESS postage stamp. Similar to a lightweight version of lightkurve.

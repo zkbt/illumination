@@ -1,5 +1,5 @@
 #tic = 248093171
-from playground.cosmics.stamps import *
+from playground.tpfstamps import *
 from playground.tv.illustrations import StampsIllustration
 from playground.tv.animation import animate
 
