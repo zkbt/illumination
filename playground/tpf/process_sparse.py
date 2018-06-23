@@ -139,7 +139,7 @@ def combine_times_to_stamps(directories_pattern, stamps_directory='stamps', ntim
 
 	# pull up all the stamp directories
 	for star, d in enumerate(stamps_directories):
-		print('   {}'.format(star))
+		print('   {} = {}'.format(star, d))
 		print('')
 		static_file = os.path.join(d, 'static.npy')
 		static = np.load(static_file)[()]
@@ -147,7 +147,7 @@ def combine_times_to_stamps(directories_pattern, stamps_directory='stamps', ntim
 
 		N = len(img_files)
 		for i, f in enumerate(img_files):
-			print(i, f)
+			#print(i, f)
 			image, temp = np.load(f)
 			if i == 0:
 				temporal = dict(**temp)
