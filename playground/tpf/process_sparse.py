@@ -139,7 +139,7 @@ def combine_times_to_stamps(directories_pattern, stamps_directory='stamps', ntim
 
 	# pull up all the stamp directories
 	for star, d in enumerate(stamps_directories):
-		print(star, d)
+		print('   {}'.format(star))
 		print('')
 		static_file = os.path.join(d, 'static.npy')
 		static = np.load(static_file)[()]
