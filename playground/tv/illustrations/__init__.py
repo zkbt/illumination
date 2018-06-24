@@ -1,10 +1,10 @@
 from .IllustrationBase import *
-from .Stamps import *
-from .FourCameras import *
-from .SingleCamera import *
-from .SingleCameraWithZoom import *
+from .StampsIllustration import *
+from .FourCameraIllustration import *
+from .SingleCameraIllustration import *
+from .SingleCameraWithZoomIllustration import *
 
 from ..utils import create_test_fits
 from ..animation import animate
 from ..zoom import *
-from ...tpfstamps import create_test_stamp
+from ...tpf.stamps import create_test_stamp

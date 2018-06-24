@@ -1,8 +1,8 @@
 from ..imports import *
-from .illustrations import SingleCamera, FourCameras
+from .illustrations import SingleCameraIllustration, FourCameraIllustration
 from .utils import *
 from .zoom import *
-from playground.tpfstamps import *
+from playground.tpf.stamps import *
 
 __all__ = ['illustratefits', 'illustratestamps']
 
@@ -17,10 +17,10 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
     Make an Illustration from a group of FITS files.
 
     If one (or fewer) cameras are found through
-    the 'cam{}' substring, a SingleCamera illustration is returned.
+    the 'cam{}' substring, a SingleCameraIllustration illustration is returned.
 
     If more than on cameras are found through
-    the 'cam{}' substring, a FourCameras illustration is returned.
+    the 'cam{}' substring, a FourCameraIllustration illustration is returned.
 
     Parameters
     ----------
@@ -54,12 +54,12 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
     # figure out how to display them
     if len(data) == 1:
         cam = list(data.keys())[0]
-        illustration = SingleCamera(data[cam], **kw)
+        illustration = SingleCameraIllustration(data[cam], **kw)
     elif len(data) > 1:
         inputs = dict(**data)
         for k in kw.keys():
             inputs[k] = kw[k]
-        illustration = FourCameras(**inputs)
+        illustration = FourCameraIllustration(**inputs)
 
     return illustration
 
@@ -68,10 +68,10 @@ def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filenam
     Make an Illustration from a group of Stamps.
 
     If one (or fewer) cameras are found through
-    the 'cam{}' substring, a SingleCamera illustration is returned.
+    the 'cam{}' substring, a SingleCameraIllustration illustration is returned.
 
     If more than on cameras are found through
-    the 'cam{}' substring, a FourCameras illustration is returned.
+    the 'cam{}' substring, a FourCameraIllustration illustration is returned.
 
     Parameters
     ----------
@@ -107,10 +107,10 @@ def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filenam
     # figure out how to display them
     if singlecamera:
         cam = 'camera'
-        illustration = SingleCamera(**kw)
+        illustration = SingleCameraIllustration(**kw)
     elif len(data) > 1:
         cam = None
-        illustration = FourCameras(**kw)
+        illustration = FourCameraIllustration(**kw)
     else:
         return
 

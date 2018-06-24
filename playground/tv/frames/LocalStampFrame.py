@@ -54,11 +54,11 @@ class LocalStampFrame(imshowFrame):
 		'''
 		return self.data._gettimes()
 
-	def _timestring(self, time):
-		'''
-		Return a string, given an input time (still in spacecraft time).
-		'''
-		return  't={}'.format(time)
+	#def _timestring(self, time):
+	#	'''
+	#	Return a string, given an input time (still in spacecraft time).
+	#	'''
+	#	return  't={}'.format(time)
 
 	def _find_timestep(self, time):
 		'''

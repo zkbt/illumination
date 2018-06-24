@@ -1,5 +1,5 @@
 # still a WIP!
-from .FourCameras import *
+from .FourCameraIllustration import *
 
 
 '''

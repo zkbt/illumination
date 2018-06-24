@@ -51,7 +51,7 @@ class IllustrationBase:
 			round = np.min(diffs[diffs > 0])
 
 		baseline = np.min(alltimes)
-		rounded = round*np.round(np.array(alltimes-baseline)/round) + baseline
+		rounded = round*np.round(((Time(alltimes)-baseline)/round).to('s')) + baseline
 		times = np.unique(rounded)
 		cadence = np.min(np.diff(times))
 		return times, cadence

@@ -144,7 +144,7 @@ class Stamp(Cube):
 
 		# make sure we're dealing with a npy saved file
 		assert('.npy' in filename)
-		loaded = np.load(filename)[()]
+		loaded = np.load(filename, encoding='latin1')[()]
 		self.__init__(self, **loaded)
 		self.speak('loaded from {}'.format(filename))
 
@@ -212,7 +212,7 @@ def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, spm=1, tic_
 	N = photons.shape[0]
 	temporal = {}
 	for k in ['TIME', 'CADENCE']:
-		temporal[k] = np.arange(N)*cadence
+		temporal[k] = Time('2018-01-01 00:00:00.000').gps + np.arange(N)*cadence
 	temporal['QUAL_BIT'] = np.zeros(N).astype(np.int)
 
 	return Stamp(spatial=spatial, photons=photons, temporal=temporal, static=static)

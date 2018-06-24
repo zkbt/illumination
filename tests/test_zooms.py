@@ -1,18 +1,18 @@
 from playground.tv.illustrations import *
 from playground.tv.utils import create_test_fits
 from playground.tv.animation import animate
-from playground.tpfstamps import create_test_stamp
+from playground.tpf.stamps import create_test_stamp
 from playground.imports import *
 
 directory = 'examples/'
 mkdir(directory)
 
 
-def test_SingleCameraWithZoom(position=(250, 50), size=(50,50)):
+def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50,50)):
     print("\nTesting a Single Camera with a Zoom.")
 
     # create the illustration
-    illustration = SingleCameraWithZoom(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1,
+    illustration = SingleCameraWithZoomIllustration(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1,
                     zoomposition=position, zoomsize=size)
 
     # plot and animate
@@ -23,7 +23,7 @@ def test_SingleCameraWithZoom(position=(250, 50), size=(50,50)):
     return illustration
 
 
-def test_SingleCameraLocalZoom(N=3, testgeometry=False, zoom=10, size=(10,10)):
+def test_SingleCameraIllustrationLocalZoom(N=3, testgeometry=False, zoom=10, size=(10,10)):
     '''
     Test the local zoom windows on a Single Camera.
     '''
@@ -32,7 +32,7 @@ def test_SingleCameraLocalZoom(N=3, testgeometry=False, zoom=10, size=(10,10)):
 
     # create the illustration
     nrows, ncols = 300, 300
-    illustration = SingleCamera(data=[create_test_fits(rows=nrows, cols=ncols) for _ in range(10)], ext_image=1)
+    illustration = SingleCameraIllustration(data=[create_test_fits(rows=nrows, cols=ncols) for _ in range(10)], ext_image=1)
 
     # some options for where to add the stamps (corners, or random?)
     if testgeometry:
@@ -64,7 +64,7 @@ def test_FourCameraLocalZoom(N=3, zoom=3, size=(50,50)):
     print("\nTesting a FourCamera illustration with local zooms.")
     nrows, ncols = 300, 300
     data ={'cam{}'.format(i+1):[create_test_fits(rows=300, cols=300) for _ in range(10)] for i in range(4)}
-    illustration = FourCameras(**data, ext_image=1)
+    illustration = FourCameraIllustration(**data, ext_image=1)
 
     # add some random zoom to it
     for i in range(N):
@@ -80,11 +80,11 @@ def test_FourCameraLocalZoom(N=3, zoom=3, size=(50,50)):
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
-def test_SingleCameraWithStamps():
+def test_SingleCameraIllustrationWithStamps():
     print("\nTesting a Single Camera with some stamps.")
 
     # create illustration (of an empty camera)
-    illustration = SingleCamera()
+    illustration = SingleCameraIllustration()
 
     # make up some imaginary stamps
     camera = illustration.frames['camera']
@@ -108,7 +108,7 @@ def test_FourCameraWithStamps():
     print("\nTesting a Single Camera with some stamps.")
 
     # create empty four camera illustration
-    illustration = FourCameras()
+    illustration = FourCameraIllustration()
 
     # populate each camera with some stamps
     for c in [1,2,3,4]:

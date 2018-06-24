@@ -1,7 +1,7 @@
 from playground.tv.frames import *
 from playground.tv.utils import create_test_fits
 from playground.tv.animation import animate
-from playground.tpfstamps import create_test_stamp
+from playground.tpf.stamps import create_test_stamp
 from playground.imports import *
 
 

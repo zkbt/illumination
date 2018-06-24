@@ -1,8 +1,8 @@
 from .IllustrationBase import *
 
-__all__ = ['Stamps']
+__all__ = ['StampsIllustration']
 
-class Stamps(IllustrationBase):
+class StampsIllustration(IllustrationBase):
     illustrationtype = 'Stamps'
 
     def __init__(self, cubes=[], names=[], aspectratio=np.inf, **kwargs):

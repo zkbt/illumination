@@ -1,6 +1,21 @@
 from ..imports import *
-from ..tpfstamps import Stamp, create_test_stamp
-from .utils import create_test_fits
+from ..tpf.stamps import Stamp
+from ..tpf.tpf import EarlyTessTargetPixelFile
+
+def guess_time_format(t):
+	'''
+	For a given array of times,
+	make a guessa about its time format.
+	'''
+	ranges = dict(	gps=[0.1e9, 2e9], # valid between 1983-03-08 09:46:59.000 and 2043-05-23 03:33:39.000
+					jd=[2.4e6, 3e6], # valid between 1858-11-16 12:00:00.000 and 3501-08-15 12:00:00.000
+					mjd=[4e4, 8e4]) # valid between 1968-05-24 00:00:00.000 and 2077-11-28 00:00:00.000
+
+	for k in ranges.keys():
+		if np.min(t) >= ranges[k][0] and np.max(t) <= ranges[k][1]:
+			return k
+
+	return None
 
 class Sequence(Talker):
 	'''
@@ -24,12 +39,19 @@ class Sequence(Talker):
 		'''
 
 		diff = time - self._gettimes()
-		try:
-			step = np.flatnonzero(np.abs(diff)<=(self.cadence()/2.0))
-			assert(len(step) == 1)
-			return step[0]
-		except (IndexError, AssertionError):
-			return 0
+		if len(diff) == 0:
+			return None
+		else:
+			step = np.argmin(abs(diff))
+			return step
+		#try:
+			#step = np.argmin(abs(diff))#
+			#step = np.flatnonzero(abs(diff)<=(self.cadence()/2.0))
+			#print(self.cadence())
+			#assert(len(step) == 1)
+			#return step[0]
+		#except (IndexError, AssertionError):
+		#	return 0
 
 	def _gettimes(self):
 		'''
@@ -99,7 +121,8 @@ class FITS_Sequence(Sequence):
 		self.static = {}
 		self.spatial = {}
 
-		self.time = np.arange(self.N)
+		# make up an imaginary GPS time
+		self.time = Time(np.arange(self.N), format='gps')
 		try:
 			self._populate_from_headers()
 		except:
@@ -117,11 +140,11 @@ class FITS_Sequence(Sequence):
 		Return an HDUlist for the ith element in the sequence.
 		'''
 		if self._hdulists is not None:
-			return self._hdulists[0]
+			return self._hdulists[i]
 		else:
 			return fits.open(self.filenames[i], memmap=False)
 
-	def _populate_from_headers(self):
+	def _populate_from_headers(self, timeformat=None):
 		'''
 		Attempt to populate the sequence from the headers.
 		'''
@@ -166,7 +189,8 @@ class FITS_Sequence(Sequence):
 		# try to pull a time axis from these
 		for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB']:
 			try:
-				self.time = np.asarray(self.temporal[k])
+				t = self.temporal[k]
+				self.time = Time(np.asarray(t), format=timeformat or guess_time_format(t))
 				self.speak('using {} as the time axis'.format(k))
 			except KeyError:
 				break
@@ -175,7 +199,11 @@ class FITS_Sequence(Sequence):
 		'''
 		Return the image data for a given timestep.
 		'''
-		return self._get_hdulist(timestep)[self.ext_image].data
+		if timestep is None:
+			return None
+		else:
+			return self._get_hdulist(timestep)[self.ext_image].data
+
 
 class Stamp_Sequence(Sequence):
 	def __init__(self, initial, name='Stamp', **kwargs):
@@ -209,13 +237,16 @@ class Stamp_Sequence(Sequence):
 
 		# set up the basic sequence
 		self.stamp = stamp
-		self.time = self.stamp.time
+		self.time = Time(self.stamp.time, format=guess_time_format(self.stamp.time))
 
 	def __getitem__(self, timestep):
 		'''
 		Return the image data for a given timestep.
 		'''
-		return self.stamp.todisplay[timestep, :, :]
+		if timestep is None:
+			return None
+		else:
+			return self.stamp.todisplay[timestep, :, :]
 
 	@property
 	def N(self):
@@ -229,6 +260,50 @@ class Stamp_Sequence(Sequence):
 	def colorbarlabelfordisplay(self):
 		return self.stamp.colorbarlabelfordisplay
 
+class TPF_Sequence(Sequence):
+	def __init__(self, initial, name='TPF', **kwargs):
+		'''
+		Initialize a Sequence from a Target Pixel File
+		(see lightkurve).
+
+
+		Parameters
+		----------
+		initial :
+			-a TargetPixelFile object
+			-a filename of a TargetPixelFile
+
+		**kwargs : dict
+			Keyword arguments are stored in self.keywords.
+		'''
+
+
+		# make sure we have a TPF as imput
+		if type(initial) == str:
+			tpf = EarlyTessTargetPixelFile.from_fits(initial)
+		else:
+			tpf = initial
+
+		# create a sequence out of that stamp
+		Sequence.__init__(self, name=name)
+
+		# set up the basic sequence
+		self.tpf = tpf
+		self.time = Time(self.tpf.time, format='jd')
+		self.titlefordisplay = 'TIC{}\nCAM{}|({},{})'.format(tpf.ticid, tpf.camera, tpf.col_cent, tpf.row_cent)
+
+	def __getitem__(self, timestep):
+		'''
+		Return the image data for a given timestep.
+		'''
+		if timestep is None:
+			return None
+		else:
+			return self.tpf.flux[timestep, :, :]
+
+	@property
+	def N(self):
+		return len(self.time)
 
 def make_sequence(initial, *args, **kwargs):
 	'''
@@ -252,53 +327,7 @@ def make_sequence(initial, *args, **kwargs):
 	elif type(initial) == Stamp:
 		return Stamp_Sequence(initial, *args, **kwargs)
 	else:
-		return FITS_Sequence(initial, *args, **kwargs)
-
-def test_Stamps():
-	'''
-	Run a test of Stamps_Sequence
-	'''
-
-	filename = 'temporarystamp.npy'
-	stamp = create_test_stamp()
-	stamp.save(filename)
-	a = Stamp_Sequence(stamp)
-	b = Stamp_Sequence(filename)
-	return a, b
-
-def test_FITS():
-	'''
-	Run a test of the FITS_Sequence.
-	'''
-	filename = 'temporarytest.fits'
-	pattern = 'tempo*arytest.fits'
-	hdulist = create_test_fits()
-	hdulist.writeto(filename, overwrite=True)
-	ext_image = 1
-
-	a = FITS_Sequence(pattern, ext_image=ext_image)
-	files = glob.glob(pattern)
-	b = FITS_Sequence(files, ext_image=ext_image)
-	c = FITS_Sequence(hdulist, ext_image=ext_image)
-	d = FITS_Sequence(filename, ext_image=ext_image)
-	e = FITS_Sequence([hdulist], ext_image=ext_image)
-
-	return a,b,c,d,e
-
-def test_many_FITS(N=30):
-	'''
-	Run a test of the FITS_Sequence.
-	'''
-
-	mkdir()
-	for i in range(N):
-
-		filename = 'temporarytest_{:04}.fits'.format(i)
-		pattern = 'temporarytest_*.fits'
-		hdulist = create_test_fits(rows=4, cols=6)
-		hdulist.writeto(filename, overwrite=True)
-		ext_image = 1
-		print('saved {}'.format(filename))
-		a = FITS_Sequence(pattern, ext_image=ext_image)
-
-	return a
+		try:
+			return TPF_Sequence(initial, *args, **kwargs)
+		except:
+			return FITS_Sequence(initial, *args, **kwargs)

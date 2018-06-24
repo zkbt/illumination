@@ -5,6 +5,8 @@ notebooks/
 *.mov
 *.fits
 *.npy
+*.pdf
+*.gz
 .pytest_cache/
 
 

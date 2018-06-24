@@ -1,13 +1,13 @@
 from .IllustrationBase import *
 from ..frames import CameraFrame
 
-__all__ = ['SingleCamera']
+__all__ = ['SingleCameraIllustration']
 
-class SingleCamera(IllustrationBase):
+class SingleCameraIllustration(IllustrationBase):
     '''
     For displaying a single Camera.
     '''
-    illustrationtype = 'SingleCamera'
+    illustrationtype = 'SingleCameraIllustration'
 
     def __init__(self, data=[], rows=1, cols=1, orientation='horizontal', sizeofcamera = 4, **kwargs):
 

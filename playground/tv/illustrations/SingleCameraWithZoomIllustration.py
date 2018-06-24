@@ -1,19 +1,19 @@
 from .IllustrationBase import *
 from ..frames import CameraFrame
 from ..frames import ZoomFrame
-from . import SingleCamera
+from . import SingleCameraIllustration
 
-__all__ = ['SingleCameraWithZoom']
+__all__ = ['SingleCameraWithZoomIllustration']
 
-class SingleCameraWithZoom(SingleCamera):
+class SingleCameraWithZoomIllustration(SingleCameraIllustration):
     '''
     For displaying a single Camera.
     '''
-    illustrationtype = 'SingleCameraWithZoom'
+    illustrationtype = 'SingleCameraWithZoomIllustration'
 
     def __init__(self, data=[], zoomposition=(0,0), zoomsize=(10,10), **kwargs):
 
-        SingleCamera.__init__(self,  data, cols=2, **kwargs)
+        SingleCameraIllustration.__init__(self,  data, cols=2, **kwargs)
 
 
         ax = plt.subplot(self.grid[0,1])

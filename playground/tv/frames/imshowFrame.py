@@ -185,7 +185,7 @@ class imshowFrame(FrameBase):
 			print('no illustration times found!')
 			offset=0
 
-		return 't={:.2f}{:+.2f}'.format(offset, time-offset)
+		return 't={:.5f}{:+.5f}'.format(offset.jd, (time-offset).to('day'))
 
 	def _get_image(self, time=None):
 		'''
@@ -196,9 +196,13 @@ class imshowFrame(FrameBase):
 			if time is None:
 				time = self._gettimes()[0]
 			timestep = self._find_timestep(time)
-			image = self._transformimage(self.data[timestep])
+			rawimage = self.data[timestep]
+			assert(rawimage is not None)
+			image = self._transformimage(rawimage)
 			actual_time = self._gettimes()[timestep]
-		except IndexError:
+			#print(" ")
+			#print(time, timestep)
+		except (IndexError, AssertionError, ValueError):
 			return None, None
 		return image, actual_time
 

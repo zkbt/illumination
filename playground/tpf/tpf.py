@@ -110,7 +110,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
         """
         ax = KeplerTargetPixelFile.plot(self, *args, **kwargs)
         ax.set_title('TIC: {}'.format(self.ticid))
-
+        
     def to_lightcurve(self, aperture_mask='pipeline'):
         """
         FIXME -- switch to an EarlyTessLightCurve object?
@@ -244,7 +244,9 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
         factory.flux = stamp.photons
 
         # set some variables in the time dimension
-        factory.time = stamp.temporal['TIME']
+
+        gpstime = stamp.temporal['TIME']
+        factory.time = Time(gpstime, format='gps').jd
         factory.cadenceno = stamp.temporal['CADENCE']
         factory.quality = stamp.temporal['QUAL_BIT']
 

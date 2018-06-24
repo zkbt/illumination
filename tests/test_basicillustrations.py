@@ -1,43 +1,43 @@
 from playground.tv.illustrations import *
 from playground.tv.utils import create_test_fits
 from playground.tv.animation import animate
-from playground.tpfstamps import create_test_stamp
+from playground.tpf.stamps import create_test_stamp
 from playground.imports import *
 
 directory = 'examples/'
 mkdir(directory)
-def test_SingleCamera():
+def test_SingleCameraIllustration(N=10):
     print("\nTesting a Single Camera illustration.")
-    illustration = SingleCamera(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1)
+    illustration = SingleCameraIllustration(data=[create_test_fits(rows=300, cols=300) for _ in range(N)], ext_image=1)
     illustration.plot()
     filename = os.path.join(directory, 'single-camera-animation.mp4')
     animate(illustration, filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
-def test_FourCameras():
+def test_FourCameraIllustration():
     print("\nTesting the Four Camera illustration.")
     data = {'cam{}'.format(i+1):[create_test_fits(rows=300, cols=300) for _ in range(10)] for i in range(4)}
-    illustration = FourCameras(**data)
+    illustration = FourCameraIllustration(**data)
     illustration.plot()
     filename = os.path.join(directory, 'four-camera-animation.mp4')
     animate(illustration, filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
-def test_Stamps():
+def test_StampsIllustration():
     print("\nTesting the Stamps illustration.")
     data = [create_test_stamp(cadence=120, n=25, xsize=10, ysize=10) for _ in range(4)]
-    illustration = Stamps(data, sharecolorbar=False)
+    illustration = StampsIllustration(data, sharecolorbar=False)
     illustration.plot()
     filename = os.path.join(directory, 'stamps-animation.mp4')
     animate(illustration, filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
-def test_SingleCameraWithZoom(position=(250, 50), size=(50,50)):
+def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50,50)):
     print("\nTesting a Single Camera with a Zoom.")
-    illustration = SingleCameraWithZoom(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1,
+    illustration = SingleCameraWithZoomIllustration(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1,
                     zoomposition=position, zoomsize=size)
 
     illustration.plot()
@@ -46,9 +46,9 @@ def test_SingleCameraWithZoom(position=(250, 50), size=(50,50)):
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
-def test_SingleCameraWithStamps():
+def test_SingleCameraIllustrationWithStamps():
     print("\nTesting a Single Camera with some stamps.")
-    illustration = SingleCamera(data=[])
+    illustration = SingleCameraIllustration(data=[])
     camera = illustration.frames['camera']
     xmax, ymax = camera.xmax, camera.ymax
 

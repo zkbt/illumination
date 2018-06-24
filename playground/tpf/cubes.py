@@ -50,11 +50,13 @@ class Cube(Talker):
 
 		# store the other diagnostics (including time)
 		self.temporal = temporal
+
+		# these times are all in seconds! (probably GPS?)
 		try:
 			self.time = self.temporal['TIME']
 		except KeyError:
 			self.speak('making up imaginary times')
-			self.time = np.arange(self.n)*self.cadence
+			self.time = Time('2018-01-01 00:00:00.000').gps + np.arange(self.n)*self.cadence
 		self.spatial = spatial
 		self.static = static
 
@@ -86,13 +88,13 @@ class Cube(Talker):
 		array = strategy(self.photons, nsubexposures)
 
 		temporal = {}
-		for k in temporal.keys():
-			temporal[k] = strategy.average1d(self.temporal[k])
+		for k in self.temporal.keys():
+			temporal[k] = strategy.average1d(self.temporal[k], nsubexposures)
 
 		static = dict(**self.static)
 		# return the stacked array
 
-		binned = Cube(array, cadence, temporal=temporal, spatial=self.spatial, static=self)
+		binned = Cube(array, cadence, temporal=temporal, spatial=self.spatial, static=self.static)
 
 		return binned
 

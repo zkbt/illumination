@@ -16,12 +16,12 @@ class Stacker(Talker):
     def __repr__(self):
         return "<{}>".format(self.name)
 
-    def average1d(self):
+    def average1d(self, array, nsubexposures=1):
         subexposures,  = array.shape
         exposures = subexposures//nsubexposures
 
         trim = exposures*nsubexposures
-        trimmed = array[:trim, :, :]
+        trimmed = array[:trim]
 
         # reshape into something more convenient for summing
         splitintosubexposures = trimmed.reshape(exposures, nsubexposures)
@@ -35,7 +35,7 @@ class Sum(Stacker):
     def __init__(self, **kwargs):
         self.name = 'Sum'
 
-    def __call__(self, array, nsubexposures=None):
+    def __call__(self, array, nsubexposures=1):
         '''
         Parameters:
         -----------
