@@ -1,8 +1,8 @@
-from playground.tv.illustrations import *
-from playground.tv.utils import create_test_fits
-from playground.tv.animation import animate
-from playground.tpf.stamps import create_test_stamp
 from playground.imports import *
+from playground.tv.illustrations import *
+from playground.tv.zoom import *
+from playground.cartoons import *
+from playground.tv.animation import animate
 
 directory = 'examples/'
 mkdir(directory)
@@ -104,7 +104,7 @@ def test_SingleCameraIllustrationWithStamps():
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
-def test_FourCameraWithStamps():
+def test_FourCameraWithStamps(N=3):
     print("\nTesting a Single Camera with some stamps.")
 
     # create empty four camera illustration
@@ -116,7 +116,7 @@ def test_FourCameraWithStamps():
         xmax, ymax = camera.xmax, camera.ymax
         stamps = [create_test_stamp(col_cent=np.random.randint(1, xmax),
                                     row_cent=np.random.randint(1, ymax), n=10)
-                        for i in range(10)]
+                        for i in range(N)]
 
         for s in stamps:
             f = add_stamp(illustration, s, zoom=100, camera='cam{}'.format(c))

@@ -1,8 +1,7 @@
 from ..imports import *
-from .illustrations import SingleCameraIllustration, FourCameraIllustration
-from .utils import *
 from .zoom import *
-from playground.tpf.stamps import *
+from .illustrations import SingleCameraIllustration, FourCameraIllustration
+from playground.postage.stamps import *
 
 __all__ = ['illustratefits', 'illustratestamps']
 

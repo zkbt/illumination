@@ -1,6 +1,6 @@
 from ..imports import *
-from ..tpf.stamps import Stamp
-from ..tpf.tpf import EarlyTessTargetPixelFile
+from ..postage.stamps import Stamp
+from ..postage.tpf import EarlyTessTargetPixelFile
 
 def guess_time_format(t):
 	'''
@@ -32,6 +32,7 @@ class Sequence(Talker):
 
 	def cadence(self):
 		return np.median(np.diff(self.time))
+
 
 	def _find_timestep(self, time):
 		'''

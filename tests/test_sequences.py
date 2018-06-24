@@ -1,6 +1,5 @@
 from playground.tv.sequence import *
-from playground.tv.utils import create_test_fits
-from playground.tpf.stamps import create_test_stamp
+from playground.cartoons import *
 
 def test_Stamps():
 	'''

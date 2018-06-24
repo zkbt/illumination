@@ -1,8 +1,6 @@
 '''Generate TESS pixel lightcurve cubes with dimensions (xpix)x(ypix)x(time).'''
 from ..imports import *
-#from Strategies import *
 from .stackers import Central, Sum
-from .cartoon import *
 
 timeaxis = 0
 class Cube(Talker):
@@ -198,43 +196,6 @@ class Cube(Talker):
 				# save this snapshot to a movie frame
 				writer.grab_frame()
 
-
-	"""
-	@property
-	def directory(self):
-		'''
-		Return path to a directory where this cube's data can be stored.
-		'''
-		dir = self.ccd.directory + 'cubes/'
-		craftroom.utils.mkdir(dir)
-		return dir
-
-	@property
-	def filename(self):
-		'''Return a filename for saving/loading this cube.'''
-
-		return self.directory + 'cube_{n:.0f}exp_at{cadence:.0f}s_{stacker}.npy'.format(n=self.n, cadence=self.cadence, stacker=self.stacker.name.replace(' ', ''))
-
-
-
-	def save(self):
-		'''Save this cube a 3D numpy array (as opposed to a series of FITS images).'''
-		self.speak( "Saving cube to " + self.filename)
-		np.save(self.filename, (self.photons, self.cosmics, self.noiseless, self.unmitigated, self.background, self.noise, self.catalog))
-
-	def load(self, remake=False):
-		'''Load this cube from a 3D numpy array, assuming one exists with the appropriate size, for this field, at this cadence, with the right number of exposures.'''
-		self.speak("Trying to load simulated cube from " + self.filename)
-		try:
-			assert(remake==False)
-			self.photons, self.cosmics, self.noiseless, self.unmitigated, self.background, self.noise, self.catalog = np.load(self.filename)
-			self.speak( 'Loaded cube from ' + self.filename)
-		except:
-			self.speak('No saved cube was found; generating a new one.\n          (looked in {0})'.format( self.filename))
-			self.simulate()
-			self.save()
-	"""
-
 	def cubify(self, image):
 		'''
 		Slightly reshape an image by adding an extra dimension,
@@ -333,7 +294,7 @@ class Cube(Talker):
 
 		# make a directory for the normalization used
 		dir = self.directory + normalization + '/'
-		craftroom.utils.mkdir(dir)
+		mkdir(dir)
 
 		if normalization == 'none':
 			flux = self.photons
@@ -426,18 +387,3 @@ class Cube(Talker):
 		ax[(i,j)].set_ylim(*ylim)
 
 		return ax
-
-def test_cube(normalization='none', **kw):
-	'''
-	Make a plot of the cube.
-	'''
-	a = create_test_array(n=600, **kw)
-	unbinned = Cube(a, cadence=2)
-	central = unbinned.stack(cadence=120, strategy=Central(10))
-	summed = unbinned.stack(cadence=120, strategy=Sum())
-	ax = unbinned.plot(normalization=normalization, alpha=0.5)
-	central.plot(ax=ax, normalization=normalization, color='black', zorder=100, marker='o')
-	summed.plot(ax=ax, normalization=normalization, color='red', zorder=100, marker='.', alpha=0.5)
-
-	plt.show()
-	return unbinned, central, summed

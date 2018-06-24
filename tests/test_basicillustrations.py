@@ -1,11 +1,12 @@
-from playground.tv.illustrations import *
-from playground.tv.utils import create_test_fits
-from playground.tv.animation import animate
-from playground.tpf.stamps import create_test_stamp
 from playground.imports import *
+from playground.tv.illustrations import *
+from playground.cartoons import *
+from playground.tv.zoom import *
+from playground.tv.animation import animate
 
 directory = 'examples/'
 mkdir(directory)
+
 def test_SingleCameraIllustration(N=10):
     print("\nTesting a Single Camera illustration.")
     illustration = SingleCameraIllustration(data=[create_test_fits(rows=300, cols=300) for _ in range(N)], ext_image=1)

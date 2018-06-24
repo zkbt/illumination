@@ -6,6 +6,8 @@ so that they can be better optimized for 2D images).
 
 from ..imports import *
 
+__all__ = ['Central', 'Sum']
+
 class Stacker(Talker):
     '''Stack a cube of images, using some filter.'''
 

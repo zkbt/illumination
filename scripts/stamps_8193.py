@@ -1,5 +1,5 @@
 from playground.imports import *
-from playground.tpf.stamps import *
+from playground.postage.stamps import *
 
 orbit = 'orbit-8193'
 sparse_pattern = '/pdo/ramp/zkbt/orbit-8193/cam*/*subarrays.fits'
