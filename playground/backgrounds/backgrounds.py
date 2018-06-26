@@ -48,15 +48,15 @@ def showimage(x, y, z, ok, **kw):
                     extent=[np.min(x), np.max(x), np.min(y), np.max(y)],
                     interpolation='nearest', **kw)
 
-    # show the image
-    plt.imshow( z, **imshowkw)
-
     # mask out the neglected pixels
-    imshowkw['cmap'] = okcmap
-    imshowkw['vmin'] = 0
-    imshowkw['vmax'] = 1
+    maskkw = dict(**imshowkw)
+    maskkw['cmap'] = okcmap
+    maskkw['vmin'] = 0
+    maskkw['vmax'] = 1
+    plt.imshow(ok, zorder=100, **maskkw)
 
-    plt.imshow(ok, **imshowkw)
+    # show the image
+    plt.imshow( z, zorder=-100, **imshowkw)
     plt.axis('scaled')
 
 def bin_image(image, binning=100, visualize=False):
