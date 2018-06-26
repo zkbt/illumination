@@ -6,6 +6,9 @@ from matplotlib.patches import Ellipse
 from craftroom.cmaps import one2another
 from astropy.io import fits
 from astropy.table import Table, vstack
+from astropy.stats import SigmaClip
+from photutils import Background2D, MedianBackground, SExtractorBackground
+
 
 okcmap = one2another('red', 'red', alphabottom=0.3, alphatop=0)
 
@@ -277,12 +280,47 @@ def test(**kw):
     #plot_fit(xsmall, ysmall, zsmall, truth)
     plot_fit(x, y, z, ok, models=[fitted, initial, truth], colors=['darkorchid', 'gray', 'hotpink'])
 
+
+def remove_stars_from_image(withstars, ok, box=100, filter=3, visualize=True):
+    sigma_clip = SigmaClip(sigma=3., iters=10)
+    bkg_estimator = SExtractorBackground()#MedianBackground()
+    bkg = Background2D(withstars, box_size=(box,box), filter_size=(filter,filter), mask=ok==False,
+                        sigma_clip=sigma_clip, bkg_estimator=bkg_estimator)
+
+
+    withoutstars = bkg.background*ok
+    if visualize:
+
+        fi, ax = plt.subplots(1, 3, figsize=(8,2.5), sharex=True, sharey=True)
+        vmax = np.percentile(withstars, 98)
+        vmin = np.percentile(withoutstars, 2)
+
+        plt.sca(ax[0])
+        plt.imshow(withstars, vmin=vmin, vmax=vmax)
+        plt.title('original')
+        plt.axis('off')
+        plt.sca(ax[1])
+        plt.imshow(withoutstars,  vmin=vmin,  vmax=vmax)
+        plt.title('background')
+        plt.axis('off')
+
+        plt.sca(ax[2])
+        plt.imshow(withstars - withoutstars, vmin=vmin,  vmax=vmax)
+        plt.title('subtracted')
+        plt.axis('off')
+
+        plt.colorbar(ax=ax)
+
+    return withoutstars
+
+
 def fit_camera(filename,
                binby=200,
                constrain_theta='clockhands',
                constrain_size=(100, 3000),
                visualize=True,
-               label=None):
+               label=None,
+               removestars=False, **kw):
     '''
     Fit an image from a full camera.
 
@@ -309,6 +347,13 @@ def fit_camera(filename,
 
     # load an image from a FITS file
     x, y, z, ok = load_camera(filename)
+
+    # do we need to remove the stars from this image?
+    if removestars:
+        z = remove_stars_from_image(z, ok, visualize=visualize, **kw)
+        if visualize:
+            plotfilename = os.path.join('plots', 'background_{}.png'.format(label))
+            plt.savefig(plotfilename, dpi=400)
 
     # throw out the corners
     r = np.sqrt(x**2 + y**2)

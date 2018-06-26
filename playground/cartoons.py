@@ -26,15 +26,15 @@ def create_test_array(n=100, xsize=5, ysize=5, nstars=None, single=False):
 	stars = np.zeros_like(x)
 
 	# create N random position for stars
-	if nstars is None:
-		if single:
-			nstars = 1
-			sx = np.random.normal(xsize/2.0, 1)
-			sy = np.random.normal(ysize/2.0, 1)
-		else:
+	if single:
+		nstars = 1
+		sx = np.random.normal(xsize/2.0, 1)
+		sy = np.random.normal(ysize/2.0, 1)
+	else:
+		if nstars is None:
 			nstars = np.minimum(int(xsize*ysize/4), 1000)
-			sx = np.random.uniform(0, xsize, N)
-			sy = np.random.uniform(0, ysize, N)
+		sx = np.random.uniform(0, xsize, nstars)
+		sy = np.random.uniform(0, ysize, nstars)
 
 	# set some background level
 	bg = 30
