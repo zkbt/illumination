@@ -282,7 +282,9 @@ def test(**kw):
     plot_fit(x, y, z, ok, models=[fitted, initial, truth], colors=['darkorchid', 'gray', 'hotpink'])
 
 
-def remove_stars_from_image(withstars, ok, box=100, filter=3, visualize=True):
+def remove_stars_from_image(x, y, z, ok, box=100, filter=3, visualize=True):
+
+    withstars = z
     sigma_clip = SigmaClip(sigma=3., iters=10)
     bkg_estimator = MedianBackground()#SExtractorBackground()#
     bkg = Background2D(withstars, box_size=(box,box), filter_size=(filter,filter), mask=ok==False,
@@ -298,16 +300,18 @@ def remove_stars_from_image(withstars, ok, box=100, filter=3, visualize=True):
                         interpolation='nearest', cmap='gray')
 
         plt.sca(ax[0])
+        showimage(x, y, z, ok, **kw)
         plt.imshow(withstars, **kw)
         plt.title('original')
         plt.axis('off')
+
         plt.sca(ax[1])
-        plt.imshow(withoutstars,  **kw)
+        showimage(x, y, withoutstars, ok, **kw)
         plt.title('background')
         plt.axis('off')
 
         plt.sca(ax[2])
-        plt.imshow(withstars - withoutstars,  **kw)
+        showimage(x, y, withstars - withoutstars, ok, **kw)
         plt.title('subtracted')
         plt.axis('off')
 
@@ -350,16 +354,16 @@ def fit_camera(filename,
     # load an image from a FITS file
     x, y, z, ok = load_camera(filename)
 
-    # do we need to remove the stars from this image?
-    if removestars:
-        z = remove_stars_from_image(z, ok, visualize=visualize, **kw)
-        if visualize:
-            plotfilename = os.path.join('plots', 'background_{}.png'.format(label))
-            plt.savefig(plotfilename, dpi=400)
-
     # throw out the corners
     r = np.sqrt(x**2 + y**2)
     ok *= r < np.max(x)
+
+    # do we need to remove the stars from this image?
+    if removestars:
+        z = remove_stars_from_image(x, y, z, ok, visualize=visualize, **kw)
+        if visualize:
+            plotfilename = os.path.join('plots', 'background_{}.png'.format(label))
+            plt.savefig(plotfilename, dpi=400)
 
     # make an initial guess model
     initial = guess_2d_gaussian(x,y,z)
