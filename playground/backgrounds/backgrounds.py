@@ -348,7 +348,7 @@ def fit_camera(filename,
 
     b, g = fitted
     binitial, ginitial = initial
-    imtype, camera, spm, time = os.path.basename(filename).split('.')[0].split('_')
+    imtype, camera, spm, time = label.split('_')#os.path.basename(filename).split('.')[0].split('_')
     d = dict(baseline=b.amplitude.value,
              amplitude=g.amplitude.value,
              x=g.x_mean.value,

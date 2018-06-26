@@ -2,10 +2,21 @@ from .imports import *
 from .postage.stamps import Stamp
 from .postage.tpf import EarlyTessTargetPixelFile
 
-def create_test_array(xsize=5, ysize=5, n=100):
+def create_test_array(n=100, xsize=5, ysize=5, single=False):
 	'''
 	Create a fake stack of images of stars
 	(with no cosmics injected, no jitter, Gaussian PDF).
+
+	Parameters:
+	-----------
+	xsize : int
+		The number of columns.
+	ysize : int
+		The number of rows.
+	n : int
+		The number of time points.
+	single : bool
+		Should this be just a single star, or should it be many?
 	'''
 
 	# create images of x, y, and an empty one to fill with stars
@@ -15,15 +26,24 @@ def create_test_array(xsize=5, ysize=5, n=100):
 	stars = np.zeros_like(x)
 
 	# create N random position for stars
-	N = int(xsize*ysize/4)
-	sx = np.random.uniform(0, xsize, N)
-	sy = np.random.uniform(0, ysize, N)
+	if single:
+		N = 1
+		sx = np.random.normal(xsize/2.0, 1)
+		sy = np.random.normal(ysize/2.0, 1)
+	else:
+		N = int(xsize*ysize/4)
+		sx = np.random.uniform(0, xsize, N)
+		sy = np.random.uniform(0, ysize, N)
 
 	# set some background level
 	bg = 30
 
 	# create a semi-reasonable magnitude distribution for stars
-	sf = 10000*10**(-0.4*np.random.triangular(0, 10, 10, N))
+	if single:
+		topmag = 5
+	else:
+		topmag = 10
+	sf = 10000*10**(-0.4*np.random.triangular(0, topmag, topmag, N))
 
 	# define the cartoon PSF for the stars
 	sigma = 1.0
@@ -64,7 +84,7 @@ def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, spm=1, tic_
 
 
 def create_test_tpf(**kwargs):
-	
+
 	return EarlyTessTargetPixelFile.from_stamp(create_test_stamp(**kwargs))
 
 def create_test_fits(rows=400, cols=600, circlescale=100, visualize=False, noise=0.2, seed=None):

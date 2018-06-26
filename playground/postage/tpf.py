@@ -257,6 +257,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
 
         # a stamp already exists, so we can add everything all at once
         factory.keywords = fits.Header(stamp.static)
+        factory.raw_cnts = stamp.photons
         factory.flux = stamp.photons
 
         # set some variables in the time dimension
