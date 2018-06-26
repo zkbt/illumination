@@ -292,20 +292,22 @@ def remove_stars_from_image(withstars, ok, box=100, filter=3, visualize=True):
     if visualize:
 
         fi, ax = plt.subplots(1, 3, figsize=(8,2.5), sharex=True, sharey=True)
-        vmax = np.percentile(withstars, 98)
-        vmin = np.percentile(withoutstars, 2)
+
+        kw = dict(origin='lower', vmin=np.percentile(withoutstars, 2), vmax=np.percentile(withstars, 98),
+                extent=[np.min(x), np.max(x), np.min(y), np.max(y)],
+                interpolation='nearest', **kw)
 
         plt.sca(ax[0])
-        plt.imshow(withstars, vmin=vmin, vmax=vmax)
+        plt.imshow(withstars, **kw)
         plt.title('original')
         plt.axis('off')
         plt.sca(ax[1])
-        plt.imshow(withoutstars,  vmin=vmin,  vmax=vmax)
+        plt.imshow(withoutstars,  **kw)
         plt.title('background')
         plt.axis('off')
 
         plt.sca(ax[2])
-        plt.imshow(withstars - withoutstars, vmin=vmin,  vmax=vmax)
+        plt.imshow(withstars - withoutstars,  **kw)
         plt.title('subtracted')
         plt.axis('off')
 
