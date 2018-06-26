@@ -209,14 +209,14 @@ def plot_fit(x, y, z, ok, models=None, colors=None, cmap='gray', **kw):
         plot_2d_gaussian(m, color=c)
     plt.axis('off')
     textkw = dict(color='white', alpha=0.5, weight='bold')
-    plt.text(0.05, 0.05, 'Data', transform=plt.gca().transAxes, **textkw)
+    plt.text(0.05, 0.05, 'data', transform=plt.gca().transAxes, **textkw)
 
     plt.sca(ax[1])
     showimage(x, y, fitted(x,y), ok, vmin=vmin, vmax=vmax, cmap=cmap, **kw)
     for m, c in zip(models, colors):
         plot_2d_gaussian(m, color=c)
     plt.axis('off')
-    plt.text(0.05, 0.05, 'Model', transform=plt.gca().transAxes, **textkw)
+    plt.text(0.05, 0.05, 'model', transform=plt.gca().transAxes, **textkw)
 
 
     plt.sca(ax[2])
@@ -224,7 +224,7 @@ def plot_fit(x, y, z, ok, models=None, colors=None, cmap='gray', **kw):
     for m, c in zip(models, colors):
         plot_2d_gaussian(m, color=c)
     plt.axis('off')
-    plt.text(0.05, 0.05, 'Residual', transform=plt.gca().transAxes, **textkw)
+    plt.text(0.05, 0.05, 'residual', transform=plt.gca().transAxes, **textkw)
 
     plt.colorbar(ax=ax)
 
@@ -282,7 +282,7 @@ def test(**kw):
     plot_fit(x, y, z, ok, models=[fitted, initial, truth], colors=['darkorchid', 'gray', 'hotpink'])
 
 
-def remove_stars_from_image(x, y, z, ok, box=100, filter=3, visualize=True):
+def remove_stars_from_image(x, y, z, ok, box=100, filter=3, visualize=True, label=''):
 
     withstars = z
     sigma_clip = SigmaClip(sigma=3., iters=10)
@@ -300,19 +300,20 @@ def remove_stars_from_image(x, y, z, ok, box=100, filter=3, visualize=True):
 
         plt.sca(ax[0])
         showimage(x, y, z, ok, **kw)
-        plt.title('original')
+        plt.text(0.05, 0.05, 'original', transform=plt.gca().transAxes, **textkw)
         plt.axis('off')
 
         plt.sca(ax[1])
         showimage(x, y, withoutstars, ok, **kw)
-        plt.title('background')
+        plt.text(0.05, 0.05, 'background', transform=plt.gca().transAxes, **textkw)
         plt.axis('off')
 
         plt.sca(ax[2])
         showimage(x, y, withstars - withoutstars, ok, **kw)
-        plt.title('subtracted')
+        plt.text(0.05, 0.05, 'subtracted', transform=plt.gca().transAxes, **textkw)
         plt.axis('off')
 
+        plt.suptitle(label)
         plt.colorbar(ax=ax)
 
     return withoutstars
@@ -349,6 +350,9 @@ def fit_camera(filename,
 
     '''
 
+    if label is None:
+        label = os.path.basename(filename).replace('.fits', '')
+
     # load an image from a FITS file
     x, y, z, ok = load_camera(filename)
 
@@ -358,7 +362,7 @@ def fit_camera(filename,
 
     # do we need to remove the stars from this image?
     if removestars:
-        z = remove_stars_from_image(x, y, z, ok, visualize=visualize, **kw)
+        z = remove_stars_from_image(x, y, z, ok, visualize=visualize, label=label, **kw)
         if visualize:
             plotfilename = os.path.join('plots', 'background_{}.png'.format(label))
             plt.savefig(plotfilename, dpi=400)
@@ -384,8 +388,7 @@ def fit_camera(filename,
     # fit it (binning by 100)
     fitted = fit_model(x, y, z, ok, model=initial, imagebinning=binby)
 
-    if label is None:
-        label = os.path.basename(filename).replace('.fits', '')
+
     if visualize:
 
         #plot_fit(xsmall, ysmall, zsmall, truth)
