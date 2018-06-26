@@ -2,7 +2,7 @@ from .imports import *
 from .postage.stamps import Stamp
 from .postage.tpf import EarlyTessTargetPixelFile
 
-def create_test_array(n=100, xsize=5, ysize=5, single=False):
+def create_test_array(n=100, xsize=5, ysize=5, nstars=None, single=False):
 	'''
 	Create a fake stack of images of stars
 	(with no cosmics injected, no jitter, Gaussian PDF).
@@ -26,14 +26,15 @@ def create_test_array(n=100, xsize=5, ysize=5, single=False):
 	stars = np.zeros_like(x)
 
 	# create N random position for stars
-	if single:
-		N = 1
-		sx = np.random.normal(xsize/2.0, 1)
-		sy = np.random.normal(ysize/2.0, 1)
-	else:
-		N = int(xsize*ysize/4)
-		sx = np.random.uniform(0, xsize, N)
-		sy = np.random.uniform(0, ysize, N)
+	if nstars is None:
+		if single:
+			nstars = 1
+			sx = np.random.normal(xsize/2.0, 1)
+			sy = np.random.normal(ysize/2.0, 1)
+		else:
+			nstars = np.minimum(int(xsize*ysize/4), 1000)
+			sx = np.random.uniform(0, xsize, N)
+			sy = np.random.uniform(0, ysize, N)
 
 	# set some background level
 	bg = 30
@@ -43,7 +44,7 @@ def create_test_array(n=100, xsize=5, ysize=5, single=False):
 		topmag = 5
 	else:
 		topmag = 10
-	sf = 10000*10**(-0.4*np.random.triangular(0, topmag, topmag, N))
+	sf = 10000*10**(-0.4*np.random.triangular(0, topmag, topmag, nstars))
 
 	# define the cartoon PSF for the stars
 	sigma = 1.0
