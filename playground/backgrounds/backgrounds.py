@@ -282,7 +282,7 @@ def test(**kw):
     plot_fit(x, y, z, ok, models=[fitted, initial, truth], colors=['darkorchid', 'gray', 'hotpink'])
 
 
-def remove_stars_from_image(x, y, z, ok, box=100, filter=3, visualize=True, label=''):
+def remove_stars_from_image(x, y, z, ok, box=150, filter=3, visualize=True, label=''):
 
     withstars = z
     sigma_clip = SigmaClip(sigma=3., iters=10)
