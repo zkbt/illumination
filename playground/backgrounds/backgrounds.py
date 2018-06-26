@@ -300,7 +300,6 @@ def remove_stars_from_image(x, y, z, ok, box=100, filter=3, visualize=True):
 
         plt.sca(ax[0])
         showimage(x, y, z, ok, **kw)
-        plt.imshow(withstars, **kw)
         plt.title('original')
         plt.axis('off')
 
