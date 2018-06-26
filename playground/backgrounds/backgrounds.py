@@ -283,7 +283,7 @@ def test(**kw):
 
 def remove_stars_from_image(withstars, ok, box=100, filter=3, visualize=True):
     sigma_clip = SigmaClip(sigma=3., iters=10)
-    bkg_estimator = SExtractorBackground()#MedianBackground()
+    bkg_estimator = MedianBackground()#SExtractorBackground()#
     bkg = Background2D(withstars, box_size=(box,box), filter_size=(filter,filter), mask=ok==False,
                         sigma_clip=sigma_clip, bkg_estimator=bkg_estimator)
 
