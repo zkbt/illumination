@@ -296,8 +296,7 @@ def remove_stars_from_image(x, y, z, ok, box=100, filter=3, visualize=True):
 
         fi, ax = plt.subplots(1, 3, figsize=(10,2.5), sharex=True, sharey=True)
 
-        kw = dict(origin='lower', vmin=np.percentile(withoutstars, 2), vmax=np.percentile(withstars, 98),
-                        interpolation='nearest', cmap='gray')
+        kw = dict(vmin=np.percentile(withoutstars, 2), vmax=np.percentile(withstars, 98), cmap='gray')
 
         plt.sca(ax[0])
         showimage(x, y, z, ok, **kw)
