@@ -1,10 +1,8 @@
-import warnings, os, glob
-import numpy as np
-import matplotlib.pyplot as plt
+from ..imports import *
+
 from astropy.modeling import models, fitting
 from matplotlib.patches import Ellipse
 from craftroom.cmaps import one2another
-from astropy.io import fits
 from astropy.table import Table, vstack
 from astropy.stats import SigmaClip
 from photutils import Background2D, MedianBackground, SExtractorBackground
