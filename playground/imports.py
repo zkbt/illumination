@@ -1,5 +1,5 @@
 from __future__ import print_function
-import os, copy, subprocess, glob, shutil
+import os, copy, subprocess, glob, shutil, warnings
 import numpy as np, matplotlib.pyplot as plt
 
 import matplotlib.animation as ani
