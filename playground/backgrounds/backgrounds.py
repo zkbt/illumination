@@ -354,6 +354,12 @@ def fit_camera(filename,
     if label is None:
         label = os.path.basename(filename).replace('.fits', '')
 
+    fitfilename = 'fits/fit_{}.txt'.format(label)
+    if os.path.exists(fitfilename):
+        print("{} already exists -- not refitting.")
+        row = ascii.read(fitfilename)
+        return row
+
     # load an image from a FITS file
     x, y, z, ok = load_camera(filename)
 
@@ -420,7 +426,6 @@ def fit_camera(filename,
 
     row = Table([d], names=['baseline', 'amplitude', 'x', 'y', 'radius', 'theta', 'radial_width', 'theta_width', 'moment_x', 'moment_y', 'imtype', 'camera', 'spm', 'spacecrafttime', 'filename'])
 
-    fitfilename = 'fits/fit_{}.txt'.format(label)
     row.write(fitfilename, format='ascii.fixed_width', delimiter='|', bookend=False, overwrite=True)
 
     return row

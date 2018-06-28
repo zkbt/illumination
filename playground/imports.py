@@ -5,7 +5,7 @@ import numpy as np, matplotlib.pyplot as plt
 import matplotlib.animation as ani
 import matplotlib.gridspec as gs
 
-from astropy.io import fits
+from astropy.io import fits, ascii
 from astropy.time import Time
 
 from .talker import Talker
