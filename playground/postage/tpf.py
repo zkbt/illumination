@@ -1,4 +1,4 @@
-from lightkurve.targetpixelfile import KeplerTargetPixelFile, KeplerTargetPixelFileFactory, KeplerQualityFlags
+from lightkurve.targetpixelfile import TargetPixelFile, KeplerTargetPixelFile, KeplerTargetPixelFileFactory, KeplerQualityFlags
 from lightkurve import KeplerLightCurve, TessLightCurve
 from ..imports import *
 import datetime, warnings
@@ -9,9 +9,9 @@ TESSTPFDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class EarlyTessLightCurve(KeplerLightCurve):
-    def __init__(self, *args, ticid=None, camera=None, spm=None, col_cent=None, row_cent=None, mission='TESS', **kwargs):
-        self.ticid = ticid
-        self.camera = camera
+    def __init__(self, *args, tic_id=None, cam=None, spm=None, col_cent=None, row_cent=None, mission='TESS', **kwargs):
+        self.tic_id = tic_id
+        self.cam = cam
         self.spm = spm
         self.col_cent = col_cent
         self.row_cent = row_cent
@@ -21,7 +21,11 @@ class EarlyTessLightCurve(KeplerLightCurve):
         self.time_scale = 'tdb'
 
     def plot(self, *args, xlabel='Time (days)', **kwargs):
-        KeplerLightCurve.plot(self, *args, **kwargs, xlabel=xlabel)
+        return KeplerLightCurve.plot(self, *args, **kwargs, xlabel=xlabel)
+
+    @property
+    def cadence(self):
+        return np.median(np.diff(self.time))*u.day
 
 
 class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
@@ -35,6 +39,47 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
     Enables extraction of raw lightcurves and centroid positions,
     and some nice simple visualizations.
     """
+
+    @property
+    def raw_cnts(self):
+        return self.hdu[1].data['RAW_CNTS']
+
+    @property
+    def cadence(self):
+        return np.median(np.diff(self.time))*u.day
+
+    def filelabel(self, label=None):
+        '''
+        TESS-specific file label.
+        '''
+        s = 'cam{}_spm{}_tic{}_col{}_row{}_{:.0f}s'.format(self.cam, self.spm, self.tic_id, self.col_cent, self.row_cent, self.cadence.to('s').value)
+        if label is not None:
+            s = label + '_' + s
+        return s
+
+    def to_fits(self, output_fn=None, overwrite=False, directory='.', label=None, zip=True):
+        """Writes the TPF to a FITS file on disk."""
+
+        # set the output filename
+        if output_fn is None:
+            output_fn = os.path.join(directory, "{}-targ.fits".format(self.filelabel(label=label)))
+
+        # skip writing the file, if a zipped one already exists
+        if zip:
+            if overwrite == False:
+                zipped_fn = output_fn + '.gz'
+                if os.path.exists(zipped_fn):
+                    print('{} already exists! not overwriting!'.format(zipped_fn))
+                    return
+
+        # write the fits file
+        try:
+            self.hdu.writeto(output_fn, overwrite=overwrite, checksum=True)
+        except OSError:
+            print('(I think) {} already exists! not overwriting!'.format(output_fn))
+        if zip:
+            os.system('gzip -v {}'.format(output_fn))
+
 
     def to_lightcurve(self, aperture_mask='pipeline'):
         """Performs aperture photometry.
@@ -62,16 +107,47 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
                 'quality': self.quality,
                 'mission': self.mission,
                 'cadenceno': self.cadenceno,
-                'camera':self.camera,
+                'cam':self.cam,
                 'spm':self.spm,
                 'col_cent':self.col_cent,
                 'row_cent':self.row_cent,
-                'ticid':self.ticid}
+                'tic_id':self.tic_id}
 
         return EarlyTessLightCurve( time=self.time,
                                     flux=np.nansum(self.flux[:, aperture_mask], axis=1),
                                     flux_err=np.nansum(self.flux_err[:, aperture_mask]**2, axis=1)**0.5,
                                     **keys)
+
+    def differences(self, **kwargs):
+        '''
+        NEW!
+
+        Calculate the differences between subsequent images,
+        and return a new TPF.
+        '''
+        n_cadences, n_rows, n_cols = self.shape
+        tic_id = self.tic_id
+
+
+        print('making TPF from the differences of {}'.format(self))
+        # create a factory to populate with pixels
+        factory = EarlyTessTargetPixelFileFactory(n_cadences=n_cadences-1,
+                                                   n_rows=n_rows,
+                                                   n_cols=n_cols,
+                                                   target_id=tic_id)
+
+        # a stamp already exists, so we can add everything all at once
+        factory.keywords = fits.Header(self.hdu[0].header)
+        #factory.raw_cnts = np.diff(self.raw_cnts, axis=0)
+        factory.flux = np.diff(self.flux, axis=0)
+        #factory.flux_bkg = np.diff(self.flux_bkg, axis=0)
+
+        # set some variables in the time dimension
+        factory.time = 0.5*(self.time[1:] + self.time[:-1])
+        factory.cadenceno = np.arange(len(factory.time))
+        factory.quality = self.quality[1:] | self.quality[:-1]
+
+        return factory.get_tpf(**kwargs)
 
     @staticmethod
     def from_archive(target, cadence='long', quarter=None, month=None,
@@ -82,7 +158,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
         raise ValueError("There's no TESS archive yet!")
 
     def __repr__(self):
-        return('EarlyTessTPF Object (TIC{})'.format(self.ticid))
+        return('EarlyTessTPF Object (TIC{})'.format(self.tic_id))
 
     def get_prf_model(self):
         """
@@ -108,11 +184,11 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
         return Time(self.time, format='jd', scale='tdb')
 
     @property
-    def ticid(self):
+    def tic_id(self):
         return self.header()['TIC_ID']
 
     @property
-    def camera(self):
+    def cam(self):
         return self.header()['CAM']
 
     @property
@@ -162,8 +238,8 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
             The matplotlib axes object.
         """
         ax = KeplerTargetPixelFile.plot(self, *args, **kwargs)
-        ax.set_title('TIC: {}'.format(self.ticid))
-
+        ax.set_title('TIC: {}'.format(self.tic_id))
+        return ax
 
     @staticmethod
     def from_fits_images(images, position=None, size=(10, 10), extension=None,
@@ -451,7 +527,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
             title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
                 self.keplerid, self.quarter)
         elif self.mission == 'TESS':
-            title = "Quicklook lightcurve for TIC{}".format(self.ticid)
+            title = "Quicklook lightcurve for TIC{}".format(self.tic_id)
 
         # Figure 1 shows the lightcurve with steps, tooltips, and vertical line
         fig1 = figure(title=title, plot_height=300, plot_width=600,
@@ -486,7 +562,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
         fig2 = figure(plot_width=300, plot_height=300,
                       tools="pan,wheel_zoom,box_zoom,save,reset",
                       title='Pixel data | CAM{} | {}'.format(
-                          self.camera, (self.col_cent, self.row_cent)))
+                          self.cam, (self.col_cent, self.row_cent)))
         fig2.yaxis.axis_label = 'Pixel Row Number'
         fig2.xaxis.axis_label = 'Pixel Column Number'
 
@@ -673,7 +749,7 @@ class EarlyTessTargetPixelFileFactory(KeplerTargetPixelFileFactory):
                                 array=self.cosmic_rays))
         cols.append(fits.Column(name='QUALITY', format='J',
                                 array=self.quality))
-        cols.append(fits.Column(name='POS_CORR1', format='E', unit='pi xels',
+        cols.append(fits.Column(name='POS_CORR1', format='E', unit='pixels',
                                 array=self.pos_corr1))
         cols.append(fits.Column(name='POS_CORR2', format='E', unit='pixels',
                                 array=self.pos_corr2))

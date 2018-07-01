@@ -6,6 +6,7 @@ sparse_subaray files.
 from ..imports import *
 from .cubes import Cube
 from astropy.time import Time
+from lightkurve.targetpixelfile import TargetPixelFile
 
 class Stamp(Cube):
 	"""
@@ -18,7 +19,7 @@ class Stamp(Cube):
 
 		Parameters
 		----------
-		path : str, list of strings, list of HDULists
+		path : str, list of strings, list of HDULists, a TPF object
 			A filename for a '.npy' file.
 			A list of FITS sparse_subarray files.
 			A search path of FITS sparse_subarray files (e.g. containing *.fits)
@@ -34,7 +35,9 @@ class Stamp(Cube):
 		if photons is not None:
 			Cube.__init__(self, photons=photons, spatial=spatial, static=static, temporal=temporal)
 		else:
-			if '.npy' in path:
+			if isinstance(path, TargetPixelFile):
+				self._fromTPF(path)
+			elif '.npy' in path:
 				self.load(path)
 			else:
 				if type(path) == list:
@@ -45,7 +48,7 @@ class Stamp(Cube):
 					raise ValueError("{} can't be used to make a stamp.".format(path))
 				self._fromSparseSubarrays(filenames, extension)
 
-		self.ticid = self.static['TIC_ID']
+		self.tic_id = self.static['TIC_ID']
 		self.cadence = self.static['INT_TIME']
 		self.spm = self.static['SPM']
 		self.cam = self.static['CAM']
@@ -129,6 +132,54 @@ class Stamp(Cube):
 		self.speak('populated {}'.format(self))
 		#if flip:
 		#	self.speak('applied a KLUDGE to CCD1 + CCD2 (COL_CENT<2136?)')
+
+	def _fromTPF(self, tpf):
+		'''
+		Make a Stamp from a TPF file.
+		'''
+
+		# open the first one, to get some basic info
+		static = {}
+		for k in ['SPM', 'CAM', 'INT_TIME'] + ['TIC_ID', 'COL_CENT', 'ROW_CENT'] + ['QUAL_BIT', 'TIME', 'CADENCE']:
+			try:
+				static[k] = tpf.hdu[0].header[k]
+			except KeyError:
+				pass
+		# make empty temporal arrays
+		N = len(tpf.time)
+
+
+		temporal = {}
+		temporal['QUAL_BIT'] = tpf.quality
+		temporal['TIME'] = tpf.astropy_time.gps
+		temporal['CADENCE'] = tpf.cadenceno
+
+		# nothing (yet) that acts as a spatial image
+		spatial = {}
+
+		# KLUDGE, to convert ccd1 and ccd2 to camaer coords
+		#flip = static['COL_CENT'] < 4272/2
+		#flip = static['ROW_CENT'] < 4156/2
+
+		# make empty photon arrays
+		#if flip:
+		#	data = star.data.T
+		#else:
+		photons = tpf.flux
+
+		self.__init__(self, photons=photons, temporal=temporal, spatial=spatial, static=static)
+		self.speak('populated {}'.format(self))
+		#if flip:
+		#	self.speak('applied a KLUDGE to CCD1 + CCD2 (COL_CENT<2136?)')
+
+
+	def calculate_differences(self):
+
+		difference = copy.deepcopy(self)
+		for k in self.temporal.keys():
+			difference.temporal[k] = 0.5*(self.temporal[1:] + self.temporal[:-1])
+
+		difference.photons = np.diff(self.photons, )
 
 	def filename(self, directory='.'):
 		'''The base filename for this stamp.'''

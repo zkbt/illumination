@@ -81,16 +81,24 @@ class FrameBase:
 			will be considered identical.
 		'''
 
+		# store this calculation with the illustration, so it doesn't need repeating
+		try:
+			self._precaculatedtimesandcadence
+		except AttributeError:
+			self._precaculatedtimesandcadence = {}
+		try:
+			times, cadence = self._precaculatedtimesandcadence[round]
+		except KeyError:
+			alltimes = self._gettimes()
 
-		alltimes = self._gettimes()
-
-		if round is None:
-			diffs = np.diff(np.sort(alltimes))
-			round = np.min(diffs[diffs > 0])
-		baseline = np.min(alltimes)
-		rounded = round*np.round(np.array(alltimes-baseline)/round) + baseline
-		times = np.unique(rounded)
-		cadence = np.min(np.diff(times))
+			if round is None:
+				diffs = np.diff(np.sort(alltimes))
+				round = np.min(diffs[diffs > 0])
+			baseline = np.min(alltimes)
+			rounded = round*np.round(np.array(alltimes-baseline)/round) + baseline
+			times = np.unique(rounded)
+			cadence = np.min(np.diff(times))
+			self._precaculatedtimesandcadence[round] = times, cadence
 		return times, cadence
 
 	def _transformimage(self, image):

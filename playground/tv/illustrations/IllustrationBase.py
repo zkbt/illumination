@@ -22,12 +22,15 @@ class IllustrationBase:
 		return '<{} Illustration | ({} Frames) >'.format(self.illustrationtype, len(self.frames))
 
 	def _gettimes(self):
-		alltimes = []
-		for k, f in self.frames.items():
-			alltimes.extend(f._gettimes())
-		return alltimes
+		gps = [f._gettimes().gps for f in self.frames.values()]
+		return Time(np.hstack(gps), format='gps')
 
-	def _timesandcadence(self, round=None):
+		#alltimes = []
+		#for k, f in self.frames.items():
+		#	alltimes.extend(f._gettimes())
+		#return alltimes
+
+	def _timesandcadence(self, round=1):
 		'''
 		Get all the unique times available across all the frames,
 		along with a suggested cadence set by the minimum
@@ -39,21 +42,38 @@ class IllustrationBase:
 			All times will be rounded to this value.
 			Times separated by less than this value
 			will be considered identical.
+
+			It is in units of seconds.
 		'''
 
+		try:
+			self._precaculatedtimesandcadence
+		except AttributeError:
+			self._precaculatedtimesandcadence = {}
+		try:
+			times, cadence = self._precaculatedtimesandcadence[round]
+		except KeyError:
 
-		alltimes = []
-		for k, f in self.frames.items():
-			alltimes.extend(f._gettimes())
+			gps = np.hstack([f._gettimes().gps for f in self.frames.values()])
+			#alltimes =  Time(np.hstack(gps), format='gps')
+			#alltimes = []
+			#for k, f in self.frames.items():
+			#	alltimes.extend(f._gettimes())
 
-		if round is None:
-			diffs = np.diff(np.sort(alltimes))
-			round = np.min(diffs[diffs > 0])
+			if round is None:
+				diffs = np.diff(np.sort(gps))
+				round = np.min(diffs[diffs > 0])
 
-		baseline = np.min(alltimes)
-		rounded = round*np.round(((Time(alltimes)-baseline)/round).to('s')) + baseline
-		times = np.unique(rounded)
-		cadence = np.min(np.diff(times))
+
+			baseline = np.min(gps)
+			rounded = round*np.round((gps-baseline)/round) + baseline
+			uniquegpstimes = np.unique(rounded)
+			cadence = np.min(np.diff(uniquegpstimes))*u.s
+			#plt.figure('cadence!')
+			#plt.plot(uniquegpstimes[:-1], np.diff(uniquegpstimes), '.')
+			#plt.show()
+			times = Time(uniquegpstimes, format='gps')
+			self._precaculatedtimesandcadence[round] = times, cadence
 		return times, cadence
 
 

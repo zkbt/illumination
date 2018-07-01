@@ -7,8 +7,11 @@ import matplotlib.gridspec as gs
 
 from astropy.io import fits, ascii
 from astropy.time import Time
+from astropy.stats import mad_std
+import astropy.units as u
 
 from .talker import Talker
+from craftroom.oned import binto
 
 def mkdir(path):
         '''

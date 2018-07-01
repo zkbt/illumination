@@ -1,4 +1,6 @@
 from ..imports import *
+from .visualize import *
+from ..postage import *
 
 def change_pipeline_aperture(tpf, aperture, backgroundaperture):
     tpf.hdu[-1].data = np.maximum(3*aperture, 2*backgroundaperture)
@@ -27,31 +29,59 @@ def define_apertures(tpf,  apertureradius=3, searchradius=5, backgroundpercentil
     # actually apply the changes to the tpf
     change_pipeline_aperture(tpf, aperture, backgroundaperture)
 
-    if visualize:
-        fi, ax = plt.subplots(1,3,figsize=(10, 2), sharex=True,sharey=True)
-        frame = int(len(tpf.time)/2)
-        tpf.plot(ax[0], frame=frame)
-        tpf.plot(ax[1], aperture_mask=tpf.hdu[-1].data == 3, frame=frame)
-        ax[1].set_title('target')
-        tpf.plot(ax[2], aperture_mask=tpf.hdu[-1].data == 2, frame=frame)
-        ax[2].set_title('background')
-
-        #plt.imshow(image)
-        #plt.colorbar()
-        plt.scatter(ccentroid, rcentroid, zorder=100)
-
-
     return aperture, backgroundaperture
 
 def subtract_background(tpf):
 
     backgroundaperture = tpf.hdu[-1].data == 2
-    background1d = np.median(tpf.flux[:, backgroundaperture], 1)
+    background1d = np.median(tpf.hdu[1].data['RAW_CNTS'][:, backgroundaperture], 1)
 
     # store the background in the FITS
     tpf.hdu[1].data['FLUX_BKG'][:,:,:] = background1d[:, np.newaxis, np.newaxis]
     tpf.hdu[1].data['FLUX'] = tpf.hdu[1].data['RAW_CNTS'] - tpf.hdu[1].data['FLUX_BKG']
 
+    #if visualize:
+    #    pass
+    #    #ax = tpf.to_lightcurve().plot(normalize=False, label='target')
+    #    plt.plot(background1d*np.sum(tpf.pipeline_mask), label='background')
+    #    plt.plot(np.sum(tpf.hdu[1].data['RAW_CNTS'][:, tpf.pipeline_mask], 1), label='total')
+
+        #plt.legend()
+        #plt.show()
+
+def stamps_to_tpfs(files, tpfdirectory='.', **kw):
+    '''
+    Take a list of .npy stamp files,
+    and convert them to TPFs.
+    '''
+    for f in files:
+        print('converting {} into a proper TPF'.format(f))
+        s = Stamp(f)
+        tpf = EarlyTessTargetPixelFile.from_stamp(s)
+        print('saving {} to {}'.format(tpf, tpfdirectory))
+        tpf.to_fits(directory=tpfdirectory, **kw)
+
+
+def photometer(tpf, **kw):
+
+    # set the apertures
+    define_apertures(tpf, **kw)
+
+    # subtract the background from the flux array
+    subtract_background(tpf)
+
+    lc = tpf.to_lightcurve('pipeline')
+    return lc
+
+def calculate_differences(tpf, **kw):
+    differenced = copy.deepcopy(tpf)
+
+    differenced.hdu[1].data['FLUX'][:-1,:,:] = np.diff(tpf.flux, axis=0)
+    differenced.hdu[1].data['FLUX'][-1,:,:] = 0
+
+    #differenced.hdu[1].data['FLUX'][0,:,:] = 0#np.nan
+
+    return differenced
 
 # NEXT STEPS
 # -compare light curves with/without CRM

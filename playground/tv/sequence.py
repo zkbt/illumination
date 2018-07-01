@@ -291,7 +291,7 @@ class TPF_Sequence(Sequence):
 		# set up the basic sequence
 		self.tpf = tpf
 		self.time = Time(self.tpf.time, format='jd')
-		self.titlefordisplay = 'TIC{}\nCAM{}|({},{})'.format(tpf.ticid, tpf.camera, tpf.col_cent, tpf.row_cent)
+		self.titlefordisplay = 'TIC{}\nCAM{} | ({},{}) | {:.0f}s'.format(tpf.tic_id, tpf.cam, tpf.col_cent, tpf.row_cent, tpf.cadence.to('s').value)
 
 	def __getitem__(self, timestep):
 		'''

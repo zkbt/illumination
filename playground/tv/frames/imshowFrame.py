@@ -50,6 +50,7 @@ class imshowFrame(FrameBase):
 
 				# make a colorbar attached to the frame
 				#	axes = [f.ax for f in self.illustration.frames.values() if f.ax is not None]
+				'''
 				self.colorbar = plt.matplotlib.colorbar.ColorbarBase(
 									ax=self.ax,
 									cmap=self.cmap,
@@ -64,6 +65,7 @@ class imshowFrame(FrameBase):
 				self.colorbar.ax.set_xticklabels(['{:.0f}'.format(v) for v in self.ticks])
 				self.colorbar.outline.set_visible(False)
 				self.plotted['colorbar'] = self.colorbar
+				'''
 				return self.cmap, self.norm, self.ticks
 
 	def _ensure_colorbar_exists(self, image):
@@ -83,8 +85,11 @@ class imshowFrame(FrameBase):
 			except AttributeError:
 				self.illustration.colorbar = self.illustration._add_colorbar(image, ticks=self.ticks)
 		else:
-			# create a colorbar for this illustration
-			self.illustration._add_colorbar(image, self.ax, ticks=self.ticks)
+			try:
+				self.colorbar
+			except:
+				# create a colorbar for this illustration
+				self.colorbar = self.illustration._add_colorbar(image, self.ax, ticks=self.ticks)
 
 
 	def draw_arrows(self, origin=(0,0), ratio=0.05):
@@ -146,7 +151,7 @@ class imshowFrame(FrameBase):
 
 			# display the image for this frame
 			extent = [0, image.shape[1], 0, image.shape[0]]
-			self.plotted['imshow'] = self.ax.imshow(image, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
+			self.plotted['imshow'] = self.ax.imshow(image, extent=extent, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 
 			# define the timelabel
 			timelabel = self._timestring(self._gettimes()[timestep])

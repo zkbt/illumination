@@ -354,7 +354,7 @@ def fit_camera(filename,
 
     fitfilename = 'fits/fit_{}.txt'.format(label)
     if os.path.exists(fitfilename):
-        print("{} already exists -- not refitting.")
+        print("{} already exists -- not refitting.".format(fitfilename))
         row = ascii.read(fitfilename)
         return row
 

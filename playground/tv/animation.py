@@ -19,8 +19,8 @@ def get_writer(filename, fps=30):
 	return writer
 
 def animate(illustration, filename='test.mp4',
-			mintime=None, maxtimespan=None,
-			fps=10, dpi=None, round=1, **kw):
+			mintime=None, maxtimespan=None, cadence=2*u.s,
+			fps=30, dpi=None, **kw):
 	'''
 	Create an animation from an Illustration,
 	using the time axes associated with each frame.
@@ -30,14 +30,21 @@ def animate(illustration, filename='test.mp4',
 
 
 	# figure out the times to display
-	actualtimes, cadence = illustration._timesandcadence(round=round)
+	if mintime is None:
+		actualtimes, actualcadence = illustration._timesandcadence(round=cadence.to('s').value)
+		lower, upper = min(actualtimes.gps), max(actualtimes.gps) + actualcadence.to('s').value
+	else:
+		lower = mintime.gps
+		upper = lower + maxtimespan.to('s').value
 
-	lower, upper = min(actualtimes), max(actualtimes) + cadence
+	if cadence is None:
+		cadence = actualcadence.to('s').value
+	else:
+		cadence = cadence.to('s').value#np.maximum(cadence.to('s').value, actualcadence.to('s').value)
 
-	if mintime is not None:
-		lower = mintime
+
 	if maxtimespan is not None:
-		upper = lower + maxtimespan
+		upper = lower + np.minimum(upper-lower, maxtimespan.to('s').value)
 
 	times = np.arange(lower, upper, cadence)
 	print('animating {} times at {}s cadence for {}'.format(len(times), cadence, illustration))
@@ -53,6 +60,6 @@ def animate(illustration, filename='test.mp4',
 			print('  {}/{} at {}'.format(i+1, len(times), Time.now().iso), end='\r')
 
 			# update the illustration to a new time
-			illustration.update(t)
+			illustration.update(Time(t, format='gps'))
 
 			writer.grab_frame()
