@@ -213,6 +213,5 @@ def visualize_strategy(tpfs, lcs, summary, **kw):
     plot_aperture_definition(tpfs['nocrm'])
     plt.savefig(os.path.join(d, 'apertures.pdf'))
 
-    animate_cosmics(tpfs, maxtimespan=0.2*u.day, filename=os.path.join(d, 'mitigated_cosmics.mp4'), **kw)
-
-    animate_both_cadences(tpfs, maxtimespan=0.04*u.day, filename=os.path.join(d, 'both_cadences.mp4'), **kw)
+    animate_cosmics(tpfs, maxtimespan=5*u.hour, filename=os.path.join(d, 'mitigated_cosmics.mp4'), **kw)
+    animate_both_cadences(tpfs, maxtimespan=10*u.minute, filename=os.path.join(d, 'both_cadences.mp4'), **kw)
