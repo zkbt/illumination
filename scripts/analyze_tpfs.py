@@ -17,10 +17,11 @@ print('splitting {} days {} ways leaves {:.0f}/{:.0f} (30min/2min) cadences per 
 stampfiles = glob.glob('/scratch2/zkbt/orbit-8196/stamps/*/*.npy')
 stampfiles
 
-starts = list(starts) + [-np.inf]
-ends = list(ends) + [np.inf]
+starts = [-np.inf] + list(starts)
+ends = [np.inf] + list(ends)
 for start, end in zip(starts, ends):
     for s in stampfiles:
-        tpf = EarlyTessTargetPixelFile.from_stamp(Stamp(s))
-        tpfs, lcs, summary = evaluate_strategy(tpf, directory='/scratch2/zkbt/orbit-8196/analyses', cadence=120, strategy=Central(10), start=start, end=end)
-        visualize_strategy(tpfs, lcs, summary, animation=False);
+        for cadence in [120, 1800]:
+            tpf = EarlyTessTargetPixelFile.from_stamp(Stamp(s))
+            tpfs, lcs, summary = evaluate_strategy(tpf, directory='/scratch2/zkbt/orbit-8196/analyses', cadence=cadence, strategy=Central(10), start=start, end=end)
+            visualize_strategy(tpfs, lcs, summary);
