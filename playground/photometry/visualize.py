@@ -203,7 +203,7 @@ def plot_lcs(lcs, summary, xlim=[None, None], title='', nsigma=5):
         ax[0,0].set_title(title)
         ax[-1,0].set_xlabel('Time - {:.5f} (days)'.format(o))
 
-def visualize_strategy(tpfs, lcs, summary, **kw):
+def visualize_strategy(tpfs, lcs, summary, animation=False, **kw):
     d = summary['directory']
     mkdir(d)
 
@@ -213,5 +213,6 @@ def visualize_strategy(tpfs, lcs, summary, **kw):
     plot_aperture_definition(tpfs['nocrm'])
     plt.savefig(os.path.join(d, 'apertures.pdf'))
 
-    animate_cosmics(tpfs, maxtimespan=5*u.hour, filename=os.path.join(d, 'mitigated_cosmics.mp4'), **kw)
-    animate_both_cadences(tpfs, maxtimespan=10*u.minute, filename=os.path.join(d, 'both_cadences.mp4'), **kw)
+    if animation:
+        animate_cosmics(tpfs, maxtimespan=5*u.hour, filename=os.path.join(d, 'mitigated_cosmics.mp4'), **kw)
+        animate_both_cadences(tpfs, maxtimespan=10*u.minute, filename=os.path.join(d, 'both_cadences.mp4'), **kw)

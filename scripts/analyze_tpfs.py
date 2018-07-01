@@ -23,4 +23,4 @@ for start, end in zip(starts, ends):
     for s in stampfiles:
         tpf = EarlyTessTargetPixelFile.from_stamp(Stamp(s))
         tpfs, lcs, summary = evaluate_strategy(tpf, directory='/scratch2/zkbt/orbit-8196/analyses', cadence=120, strategy=Central(10), start=start, end=end)
-        visualize_strategy(tpfs, lcs, summary);
+        visualize_strategy(tpfs, lcs, summary, animation=False);
