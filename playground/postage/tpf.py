@@ -410,9 +410,6 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
         for idx, img in enumerate(images):
 
             # allow us to send hdu lists or filenames
-            #if isinstance(img, fits.ImageHDU):
-            #    hdu = img
-            #el
             if isinstance(img, fits.HDUList):
                 hdus = img
             else:
@@ -423,7 +420,13 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
 
 
             if idx == 0:  # Get default keyword values from the first image
-                factory.keywords = hdu.header
+                factory.keywords = stamphdu.header
+
+            # original times are in GPS seconds
+            gpstime = framehdu['TIME']
+
+            # let's convert them to jd
+            framehdu['TIME'] = Time(gpstime, format='gps').jd
 
             # add this cadence to the TOP
             factory.add_cadence(frameno=idx, flux=stamphdu.data, header=framehdu.header)
