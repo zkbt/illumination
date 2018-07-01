@@ -9,14 +9,14 @@ TESSTPFDIR = os.path.abspath(os.path.dirname(__file__))
 
 
 class EarlyTessLightCurve(KeplerLightCurve):
-    def __init__(self, *args, tic_id=None, cam=None, spm=None, col_cent=None, row_cent=None, mission='TESS', **kwargs):
+    def __init__(self, time, flux=None, flux_err=None,  tic_id=None, cam=None, spm=None, col_cent=None, row_cent=None, mission='TESS', **kwargs):
         self.tic_id = tic_id
         self.cam = cam
         self.spm = spm
         self.col_cent = col_cent
         self.row_cent = row_cent
         self.mission = mission
-        KeplerLightCurve.__init__(self, *args, **kwargs)
+        KeplerLightCurve.__init__(self, time=time, flux=flux, flux_err=flux_err,  **kwargs)
         self.time_format = 'jd'
         self.time_scale = 'tdb'
 
