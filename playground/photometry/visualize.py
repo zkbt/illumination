@@ -18,7 +18,7 @@ def animate_temporal_differences(tpf, maxtimespan=0.02*u.day, cadence=None,share
     i.plot()
     animate(i, maxtimespan=maxtimespan, cadence=cadence, **kw)
 
-def animate_both_cadences(tpfs, filename='both_cadences.mp4', maxtimespan=30*u.minutes, **kw):
+def animate_both_cadences(tpfs, filename='both_cadences.mp4', maxtimespan=30*u.minute, **kw):
 
     raw = tpfs['raw']
     crm = tpfs['crm']
