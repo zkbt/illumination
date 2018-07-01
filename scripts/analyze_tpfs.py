@@ -18,7 +18,7 @@ stampfiles = glob.glob('/scratch2/zkbt/orbit-8196/stamps/*/*.npy')
 stampfiles
 
 starts = list(starts) + [-np.inf]
-ends = list(starts) + [np.inf]
+ends = list(ends) + [np.inf]
 for start, end in zip(starts, ends):
     for s in stampfiles:
         tpf = EarlyTessTargetPixelFile.from_stamp(Stamp(s))
