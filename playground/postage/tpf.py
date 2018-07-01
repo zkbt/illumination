@@ -21,7 +21,7 @@ class EarlyTessLightCurve(KeplerLightCurve):
         self.time_scale = 'tdb'
 
     def plot(self, ax=None, xlabel='Time (days)', **kwargs):
-        return KeplerLightCurve.plot(self, ax=None, **kwargs, xlabel=xlabel)
+        return KeplerLightCurve.plot(self, ax=None,  xlabel=xlabel, **kwargs)
 
     @property
     def cadence(self):
