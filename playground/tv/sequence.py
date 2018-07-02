@@ -348,7 +348,7 @@ class Timeseries_Sequence(Sequence):
 
 		# create a sequence out of that stamp
 		Sequence.__init__(self, name=name)
-		cadence = np.round(np.median(np.diff(self.time)).to('s').value)
+		cadence = np.round(np.median(np.diff(self.time.gps)))
 
 		# set a rough title for this plot
 		self.titlefordisplay = '{}'.format(self.name)
