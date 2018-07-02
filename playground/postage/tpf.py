@@ -421,7 +421,9 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
 
 
             if idx == 0:  # Get default keyword values from the first image
-                factory.keywords = stamphdu.header
+                factory.keywords = framehdu.header
+                for k in stamphdu.header.keys():
+                    factory.keywords[k] = stamphdu[k]
 
             # original times are in GPS seconds
             gpstime = framehdu.header['TIME']
