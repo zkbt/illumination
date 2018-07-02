@@ -30,7 +30,7 @@ def ok_jitter(lc, threshold=0.15, visualize=False):
 
     return ok
 
-def evaluate_strategy(tpf2s, directory='.', strategy=Central(10), cadence=1800, start=-np.inf, end=np.inf):
+def evaluate_strategy(tpf2s, directory='.', strategy=Central(10), cadence=1800, start=-np.inf, end=np.inf, **kw):
     '''
     Evaluate a cosmic ray mitigation strategy on a TPF.
 
@@ -62,7 +62,7 @@ def evaluate_strategy(tpf2s, directory='.', strategy=Central(10), cadence=1800, 
     tpfs['nocrm'] = EarlyTessTargetPixelFile.from_stamp(s.stack(cadence, strategy=Sum()))
 
     # define the apertures for photometry and background subtraction
-    aperture, backgroundaperture = define_apertures(tpfs['nocrm'])
+    aperture, backgroundaperture = define_apertures(tpfs['nocrm'], **kw)
     for k in tpfs.keys():
         # use the same aperture for all of them
         change_pipeline_aperture(tpfs[k], aperture, backgroundaperture)
