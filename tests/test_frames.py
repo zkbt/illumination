@@ -1,7 +1,15 @@
 from playground.imports import *
-from playground.tv.frames import *
+from playground.tv import *
 from playground.cartoons import *
-from playground.tv.animation import animate
+
+def test_timeseries():
+    x = (np.linspace(0, 1)*u.day + Time.now()).jd
+    y = np.random.normal(0, 1, len(x))
+    seq = make_sequence(x, y)
+    f = TimeseriesFrame(ax=plt.gca(), data=seq)
+    f.plot()
+    return f
+
 
 
 '''

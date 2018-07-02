@@ -1,5 +1,6 @@
 from playground.tv.sequence import *
 from playground.cartoons import *
+from playground.imports import *
 
 def test_Stamps():
 	'''
@@ -31,6 +32,28 @@ def test_FITS():
 	e = FITS_Sequence([hdulist], ext_image=ext_image)
 
 	return a,b,c,d,e
+
+
+def test_TPF():
+	'''
+	Run a test of the TPF_Sequence.
+	'''
+	tpf = create_test_tpf()
+	a = make_sequence(tpf)
+	assert(isinstance(a, TPF_Sequence))
+	return a
+
+
+
+def test_timeseries():
+	'''
+	Run a test of the Timeseries_Sequence.
+	'''
+	x = (np.linspace(0, 1)*u.day + Time.now()).jd
+	y = np.random.normal(0, 1, len(x))
+	a = make_sequence(x, y)
+	assert(isinstance(a, Timeseries_Sequence))
+	return a
 
 """
 def test_many_FITS(N=30):

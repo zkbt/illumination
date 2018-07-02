@@ -86,7 +86,7 @@ def plot_histogram(y, bins=None, binwidth=0.1, ax=None, **kwargs):
     ax.plot(yhist, xhist, **kwargs)
 
     ax.set_xscale('log')
-    ax.set_xlim(1.9/binwidth/len(y), 100*1.0/np.sqrt(2*np.pi)/binwidth)#np.max(yhist)*2)
+    ax.set_xlim(5.0/binwidth/len(y), 100*1.0/np.sqrt(2*np.pi)/binwidth)#np.max(yhist)*2)
     plt.axis('off')
 
 

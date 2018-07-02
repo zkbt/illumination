@@ -6,7 +6,7 @@ class FrameBase:
 	plotted = None
 	frametype = 'base'
 
-	def __init__(self, ax=None, data=None, framename='', illustration=None, **kwargs):
+	def __init__(self, ax=None, data=None, framename='', illustration=None, aspectratio=1, **kwargs):
 		'''
 		Initialize this frame,
 		choosing the Axes in which it will display,
@@ -36,10 +36,31 @@ class FrameBase:
 		# is there another overarching frame this one should be aware of?
 		self.illustration = illustration
 
+		# what is the intrinsic aspect ratio of this frame?
+		self.aspectratio = aspectratio
+
 		# keep track of a list of frames included in this one
 		self.includes = []
 
 		self._currenttimestring = None
+
+	@property
+	def offset(self):
+		try:
+			return self._offset
+		except AttributeError:
+			try:
+				self._offset = np.min(self.illustration._gettimes().jd)
+			except AttributeError:
+				self._offset = np.min(self._gettimes().jd)#Time(0, format='jd')
+			return self._offset
+
+	def _timestring(self, time):
+		'''
+		Return a string, given an input time (still in spacecraft time).
+		'''
+		return 't={:.5f}{:+.5f}'.format(self.offset, time.jd-self.offset)
+
 	def __repr__(self):
 		return '<{} Frame | {}>'.format(self.frametype, self.data)
 

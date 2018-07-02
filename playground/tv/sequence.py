@@ -1,6 +1,13 @@
 from ..imports import *
 from ..postage.stamps import Stamp
 from ..postage.tpf import EarlyTessTargetPixelFile
+from lightkurve.lightcurve import LightCurve
+from lightkurve.targetpixelfile import TargetPixelFile
+
+timescale = 'tdb'
+# by default, assume all times are TDB
+# this is ahead of TAI by about 31.184s
+# and it differs from UTC by additional leap seconds
 
 def guess_time_format(t):
 	'''
@@ -32,7 +39,6 @@ class Sequence(Talker):
 
 	def cadence(self):
 		return np.median(np.diff(self.time))
-
 
 	def _find_timestep(self, time):
 		'''
@@ -123,7 +129,7 @@ class FITS_Sequence(Sequence):
 		self.spatial = {}
 
 		# make up an imaginary GPS time
-		self.time = Time(np.arange(self.N), format='gps')
+		self.time = Time(np.arange(self.N), format='gps', scale=timescale)
 		try:
 			self._populate_from_headers()
 		except:
@@ -191,7 +197,7 @@ class FITS_Sequence(Sequence):
 		for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB']:
 			try:
 				t = self.temporal[k]
-				self.time = Time(np.asarray(t), format=timeformat or guess_time_format(t))
+				self.time = Time(np.asarray(t), format=timeformat or guess_time_format(t), scale=timescale)
 				self.speak('using {} as the time axis'.format(k))
 			except KeyError:
 				break
@@ -238,7 +244,7 @@ class Stamp_Sequence(Sequence):
 
 		# set up the basic sequence
 		self.stamp = stamp
-		self.time = Time(self.stamp.time, format=guess_time_format(self.stamp.time))
+		self.time = Time(self.stamp.time, format=guess_time_format(self.stamp.time), scale=timescale)
 
 	def __getitem__(self, timestep):
 		'''
@@ -290,7 +296,7 @@ class TPF_Sequence(Sequence):
 
 		# set up the basic sequence
 		self.tpf = tpf
-		self.time = Time(self.tpf.time, format='jd')
+		self.time = Time(self.tpf.time, format='jd', scale=timescale)
 		self.titlefordisplay = 'TIC{}\nCAM{} | ({},{}) | {:.0f}s'.format(tpf.tic_id, tpf.cam, tpf.col_cent, tpf.row_cent, tpf.cadence.to('s').value)
 
 	def __getitem__(self, timestep):
@@ -305,6 +311,61 @@ class TPF_Sequence(Sequence):
 	@property
 	def N(self):
 		return len(self.time)
+
+class Timeseries_Sequence(Sequence):
+	def __init__(self, initial, y=None, yuncertainty=None, name='timeseries', **kwargs):
+		'''
+		Initialize a Sequence from some 1D timeseries.
+
+		Parameters
+		----------
+		initial : LightCruve object, or array of times (either astropy times, or in JD)
+			The time values, to be plotted on the x-axis
+		y : array
+			The values to be plotted on the y-axis
+		yuncertainty : array
+			The errorbars on y (optional).
+		**kwargs are passed to plt.plot()
+		'''
+
+		try:
+			# is it a lightkurve?
+			time = initial.time
+			y = initial.flux
+		except:
+			time = initial
+
+		# make sure we have a TPF as imput
+		# set up the basic sequence
+		if isinstance(time, Time):
+			self.time = time
+		else:
+			self.time = Time(time, format=guess_time_format(time), scale=timescale)
+
+		# store the dependent values
+		self.y = y
+		self.yuncertainty = yuncertainty
+
+		# create a sequence out of that stamp
+		Sequence.__init__(self, name=name)
+		cadence = np.round(np.median(np.diff(self.time)).to('s').value)
+
+		# set a rough title for this plot
+		self.titlefordisplay = '{}'.format(self.name)
+
+	def __getitem__(self, timestep):
+		'''
+		Return the image data for a given timestep.
+		'''
+		if timestep is None:
+			return None
+		else:
+			return self.y[timestep, :, :]
+
+	@property
+	def N(self):
+		return len(self.time)
+
 
 def make_sequence(initial, *args, **kwargs):
 	'''
@@ -329,6 +390,12 @@ def make_sequence(initial, *args, **kwargs):
 		return Stamp_Sequence(initial, *args, **kwargs)
 	else:
 		try:
-			return TPF_Sequence(initial, *args, **kwargs)
-		except:
-			return FITS_Sequence(initial, *args, **kwargs)
+			# is initial a 1D thing?
+			assert(len(np.shape(initial))==1 or isinstance(initial, LightCurve))
+			return Timeseries_Sequence(initial, *args, **kwargs)
+		except AssertionError:
+			try:
+				assert(isinstance, TargetPixelFile)
+				return TPF_Sequence(initial, *args, **kwargs)
+			except AssertionError:
+				return FITS_Sequence(initial, *args, **kwargs)

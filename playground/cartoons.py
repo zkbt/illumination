@@ -1,8 +1,14 @@
 from .imports import *
 from .postage.stamps import Stamp
-from .postage.tpf import EarlyTessTargetPixelFile
+from .postage.tpf import EarlyTessTargetPixelFile, EarlyTessLightCurve
 
-def create_test_array(n=100, xsize=5, ysize=5, nstars=None, single=False):
+def create_test_times(N=100, cadence=2):
+	'''
+	Create a fake array of times.
+	'''
+	return Time('2018-01-01 00:00:00.000', scale='tdb') + np.arange(N)*cadence*u.s
+
+def create_test_array(N=100, xsize=5, ysize=5, nstars=None, single=False):
 	'''
 	Create a fake stack of images of stars
 	(with no cosmics injected, no jitter, Gaussian PDF).
@@ -55,7 +61,7 @@ def create_test_array(n=100, xsize=5, ysize=5, nstars=None, single=False):
 	stars = (sf*gauss(x[:,:,np.newaxis], y[:,:,np.newaxis], x0=sx, y0=sy)).sum(2)
 
 	# create a model images
-	model = (bg + stars)[np.newaxis,:,:]*np.ones(n).reshape((n, 1, 1))
+	model = (bg + stars)[np.newaxis,:,:]*np.ones(N).reshape((N, 1, 1))
 
 	# add some noise to it
 	image = np.random.normal(model, np.sqrt(model))
@@ -64,7 +70,6 @@ def create_test_array(n=100, xsize=5, ysize=5, nstars=None, single=False):
 
 
 def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, spm=1, tic_id=1234567890, **kw):
-
 	static = {'CAM': cam,
 	 'COL_CENT': col_cent,
 	 'INT_TIME': cadence,
@@ -77,15 +82,27 @@ def create_test_stamp(col_cent=3900, row_cent=913, cadence=2, cam=1, spm=1, tic_
 	photons = create_test_array(**kw)
 	N = photons.shape[0]
 	temporal = {}
-	for k in ['TIME', 'CADENCE']:
-		temporal[k] = Time('2018-01-01 00:00:00.000').gps + np.arange(N)*cadence
+	temporal['TIME'] = create_test_times(N=N, cadence=cadence)
+	temporal['CADENCE'] = np.arange(N)
 	temporal['QUAL_BIT'] = np.zeros(N).astype(np.int)
 
 	return Stamp(spatial=spatial, photons=photons, temporal=temporal, static=static)
 
+def create_test_lightcurve(N=100, cadence=2, **kwargs):
+	'''
+	Create a test lightkurve LightCurve object.
+	'''
+	time = create_test_times(N=N, cadence=cadence).jd
+	flux = np.random.normal(1, 0.001, len(time))
+	return EarlyTessLightCurve(time, flux)
 
 def create_test_tpf(**kwargs):
+	'''
+	Create a test TargetPixelFile.
 
+	Parameters
+	----------
+	'''
 	return EarlyTessTargetPixelFile.from_stamp(create_test_stamp(**kwargs))
 
 def create_test_fits(rows=400, cols=600, circlescale=100, visualize=False, noise=0.2, seed=None):
@@ -111,7 +128,6 @@ def create_test_fits(rows=400, cols=600, circlescale=100, visualize=False, noise
 	#hdulist[0].header['TIME'] = 42.0
 
 	if visualize:
-
 		plt.subplot(131)
 		plt.imshow(x, origin='lower')
 		plt.title('x')

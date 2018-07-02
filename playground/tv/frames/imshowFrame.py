@@ -179,7 +179,7 @@ class imshowFrame(FrameBase):
 		self.plotted['arrow'] = self.draw_arrows()
 		self.ax.set_facecolor('black')
 
-
+	"""
 	def _timestring(self, time):
 		'''
 		Return a string, given an input time (still in spacecraft time).
@@ -191,7 +191,8 @@ class imshowFrame(FrameBase):
 			offset=0
 
 		return 't={:.5f}{:+.5f}'.format(offset.jd, (time-offset).to('day'))
-
+	"""
+	
 	def _get_image(self, time=None):
 		'''
 		Get the image at a given time (defaulting to the first time).

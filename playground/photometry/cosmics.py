@@ -16,7 +16,6 @@ def create_tpfs(s, stacker=Central(10), cadences=[2, 120,1800]):
 
 
 def ok_jitter(lc, threshold=0.15, visualize=False):
-
     def off(x):
         return (x-np.median(x))
 

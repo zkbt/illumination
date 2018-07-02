@@ -3,6 +3,6 @@ from .StampsIllustration import *
 from .FourCameraIllustration import *
 from .SingleCameraIllustration import *
 from .SingleCameraWithZoomIllustration import *
-
+from .HybridIllustration import HybridIllustration
 from ..animation import animate
 from ..zoom import *

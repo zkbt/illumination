@@ -41,6 +41,12 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
     and some nice simple visualizations.
     """
 
+    def __init__(self, *args, **kwargs):
+        # KLUDGE, to make sure a flux gets defined, even for uncalibrated data
+        KeplerTargetPixelFile.__init__(self, *args, **kwargs)
+        if np.sum(np.isfinite(self.flux)) == 0:
+            self.hdu[1].data['FLUX'] = self.raw_cnts
+
     @property
     def raw_cnts(self):
         return self.hdu[1].data['RAW_CNTS']
@@ -432,7 +438,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
             framehdu.header['TIME'] = Time(gpstime, format='gps').jd
 
             # add this cadence to the TOP
-            factory.add_cadence(frameno=idx, raw_cnts=stamphdu.data, header=framehdu.header)
+            factory.add_cadence(frameno=idx, raw_cnts=stamphdu.data, flux=stamphdu.data, header=framehdu.header)
 
         return factory.get_tpf(**kwargs)
 
