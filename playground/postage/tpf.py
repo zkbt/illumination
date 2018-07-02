@@ -430,7 +430,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
             framehdu.header['TIME'] = Time(gpstime, format='gps').jd
 
             # add this cadence to the TOP
-            factory.add_cadence(frameno=idx, flux=stamphdu.data, header=framehdu.header)
+            factory.add_cadence(frameno=idx, raw_cnts=stamphdu.data, header=framehdu.header)
 
         return factory.get_tpf(**kwargs)
 
