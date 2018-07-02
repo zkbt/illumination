@@ -423,10 +423,10 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
                 factory.keywords = stamphdu.header
 
             # original times are in GPS seconds
-            gpstime = framehdu['TIME']
+            gpstime = framehdu.header['TIME']
 
             # let's convert them to jd
-            framehdu['TIME'] = Time(gpstime, format='gps').jd
+            framehdu.header['TIME'] = Time(gpstime, format='gps').jd
 
             # add this cadence to the TOP
             factory.add_cadence(frameno=idx, flux=stamphdu.data, header=framehdu.header)
