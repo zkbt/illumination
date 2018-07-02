@@ -405,9 +405,9 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
         factory = EarlyTessTargetPixelFileFactory(n_cadences=len(images),
                                                    n_rows=singleimage.shape[0],
                                                    n_cols=singleimage.shape[1],
-                                                   target_id=target_id)
+                                                   target_id=tic_id)
 
-        for idx, img in enumerate(images):
+        for idx, img in enumerate(tqdm(images)):
 
             # allow us to send hdu lists or filenames
             if isinstance(img, fits.HDUList):
