@@ -2,7 +2,7 @@ from playground.imports import *
 from playground.postage import *
 
 
-files = glob.glob('/scratch2/zkbt/orbit-8196/subarrays/cam4/cam*.fits')
+files = np.sort(glob.glob('/scratch2/zkbt/orbit-8196/subarrays/cam4/cam*.fits'))
 
 # this is the bright star Chelsea and Andrew were looking at
 ext = 418
