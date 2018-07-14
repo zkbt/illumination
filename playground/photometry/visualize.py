@@ -2,6 +2,10 @@ from ..tv import *
 from ..imports import *
 
 def plot_aperture_definition(tpf):
+    '''
+    For a given TPF, visualize its aperture definitions.
+    '''
+    
     fi, ax = plt.subplots(1,3,figsize=(10, 2), sharex=True,sharey=True)
     frame = int(len(tpf.time)/2)
     tpf.plot(ax[0], frame=frame, bkg=True, clabel='')

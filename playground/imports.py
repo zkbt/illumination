@@ -7,7 +7,7 @@ import matplotlib.gridspec as gs
 
 from astropy.io import fits, ascii
 from astropy.time import Time
-from astropy.stats import mad_std
+from astropy.stats import mad_std, sigma_clip
 import astropy.units as u
 
 from .talker import Talker
