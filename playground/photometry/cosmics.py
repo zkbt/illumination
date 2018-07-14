@@ -190,7 +190,7 @@ def evaluate_strategy(tpf2s,
         summary['{}-std-{:.0f}m'.format(k, cadence/60)] = np.std(lc.flux)
         clipped = sigma_clip(lc.flux, sigma=3)
         fnotclipped = 1- np.sum(clipped.mask)/summary['ntotal']
-        summary['{}-fractionclipped-{:.0f}m'.format(k, cadence/60)] = fnotclipped
+        summary['{}-fractionnotclipped-{:.0f}m'.format(k, cadence/60)] = fnotclipped
         summary['{}-clippedstd-{:.0f}m'.format(k, cadence/60)] = np.std(clipped)/np.sqrt(fnotclipped)
 
         # calculate the equivalent for 30 minutes
@@ -200,7 +200,7 @@ def evaluate_strategy(tpf2s,
             summary['{}-std-30m'.format(k)] = np.std(by)
             clipped = sigma_clip(by, sigma=3)
             fnotclipped = 1 - np.sum(clipped.mask)/summary['ntotal']
-            summary['{}-fractionclipped-30m'.format(k)] = fnotclipped
+            summary['{}-fractionnotclipped-30m'.format(k)] = fnotclipped
             summary['{}-clippedstd-30m'.format(k)] = np.std(clipped)/np.sqrt(fnotclipped)
 
         # calculate mad-std of binned differences
