@@ -64,7 +64,10 @@ def plot_timeseries(x, y, ax, ylim, ylabel='', color='black', alpha=1, **kw):
     '''
     Plot a single timeseries (with both 1D series and a collapsed histogram).
     '''
-    plt.sca(ax[0])
+    try:
+        plt.sca(ax[0])
+    except IndexError:
+        plt.sca(ax)
     # plot the timeseries
     plt.plot(x, y, color=color, alpha=alpha, **kw)
 
@@ -85,10 +88,13 @@ def plot_timeseries(x, y, ax, ylim, ylabel='', color='black', alpha=1, **kw):
 
 
     # plot the histogram
-    plt.sca(ax[1])
-    nbins = np.sqrt(len(y))
-    plot_histogram(y, bins='auto', color=color, alpha=alpha) #bins=np.linspace(np.min(ylim), np.max(ylim), nbins)
-    plt.ylim(*ylim)
+    try:
+        plt.sca(ax[1])
+        nbins = np.sqrt(len(y))
+        plot_histogram(y, bins='auto', color=color, alpha=alpha) #bins=np.linspace(np.min(ylim), np.max(ylim), nbins)
+        plt.ylim(*ylim)
+    except IndexError:
+        pass
 
 def plot_lcs(lcs, summary, xlim=[None, None], title='', nsigma=5):
     '''
@@ -209,7 +215,7 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
         f = i.frames[mode]
         for c in ['nocrm', 'crm']:
             lc = lcs['{}-{}'.format(c, mode)]
-            plot_timeseries(lc.time - f.offset, lc.flux, [f.ax, f.ax_hist], ylim, color=colors[c], **lckw)
+            plot_timeseries(lc.time - f.offset, lc.flux, [f.ax, f.ax_hist], ylim, color=colors[c], alpha=1, **lckw)
             f.ax_hist.text(0.995, 1 - (1.0 + 5*(c=='crm'))/7,
                               '{}: {:.0f}ppm'.format(c.upper(), 1e6*summary['{}-{}-madstd-{:.0f}m'.format(c, mode, lc.cadence.to('min').value)]),
                               color=colors[c], ha='right', va='center', transform=f.ax.transAxes )
@@ -219,8 +225,7 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     centroid_ylim = [-centroid_scale, centroid_scale]
     for cen in ['column', 'row']:
         f = i.frames[cen]
-        f.ax.plot(jitter['time']-f.offset, jitter[cen],  color='black', **lckw)
-        f.ax.set_ylim(centroid_ylim)
+        plot_timeseries(jitter['time']-f.offset, jitter[cen], [f.ax], centroid_ylim, color='dimgray', **lckw)
 
         for c in ['nocrm', 'crm']:
             lc = lcs['{}-original'.format(c)]
@@ -228,11 +233,12 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
                 y = lc.centroid_col
             elif cen == 'row':
                 y = lc.centroid_row
-            f.ax.plot(lc.time-f.offset, y-np.median(y), color=colors[c], alpha=0.5, **lckw)
+            plot_timeseries(lc.time-f.offset, y-np.median(y), [f.ax], centroid_ylim, color=colors[c], alpha=0.5, **lckw)
 
+    ylim =  [0, nsigma*mad_std(jitter['intraexposure']) + np.median(jitter['intraexposure'])]
     f = i.frames['intraexposure']
-    f.ax.plot(jitter['time']-f.offset, jitter['intraexposure'],  color='black', **lckw)
-    f.ax.set_ylim(0, None)
+    plot_timeseries(jitter['time']-f.offset, jitter['intraexposure'],  [f.ax], ylim, color='dimgray', **lckw)
+    #f.ax.set_ylim(0, None)
 
 
     # calculate the net gains and losses
@@ -246,7 +252,7 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     lc_diff['losses'] = losses.to_lightcurve().flux/normalization
 
     #lc_diff['net'] = lc_diff['gains'] + lc_diff['losses']
-    colors_diff = dict(gains='royalblue', losses='firebrick', net='black')
+    colors_diff = dict(gains='royalblue', losses='firebrick', net='dimgray')
     f = i.frames['fluxdiff']
     t = gains.time - f.offset
     ylim = [np.percentile(lc_diff['losses'], 1), np.percentile(lc_diff['gains'], 99)]
@@ -259,7 +265,7 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     plot_timeseries(t, lc_diff['gains'] + lc_diff['losses'],
                     ax=[f.ax, f.ax_hist],
                     ylim=ylim,
-                    color='black',
+                    color='dimgray',
                     **lckw)
     for a in [f.ax, f.ax_hist]:
         a.axhline(0, color='gray', alpha=0.3)
@@ -272,3 +278,4 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     plt.savefig(os.path.join(d, filename+'.pdf'))
     if animation:
         animate(i, cadence=tpfs['crm'].cadence, filename=os.path.join(d, filename+'.mp4'), **kw)
+    return i

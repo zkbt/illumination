@@ -152,7 +152,13 @@ class imshowFrame(FrameBase):
 
 			# display the image for this frame
 			extent = [0, image.shape[1], 0, image.shape[0]]
-			self.plotted['imshow'] = self.ax.imshow(image, extent=extent, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
+
+			# make a stacked image
+			s = np.zeros_like(image)
+			for i in range(self.data.N):
+				s += self.data[i]
+
+			self.plotted['imshow'] = self.ax.imshow(s/self.data.N, extent=extent, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 
 			# define the timelabel
 			timelabel = self._timestring(self._gettimes()[timestep])
@@ -162,7 +168,7 @@ class imshowFrame(FrameBase):
 
 
 		# add a time label
-		self.plotted['text'] = self.ax.text(0.0, -0.02, timelabel, va='top', zorder=1e6, transform=self.ax.transAxes)
+		self.plotted['text'] = self.ax.text(0.0, -0.02, timelabel, va='top', zorder=1e6, color='gray', transform=self.ax.transAxes)
 
 
 		# pull the title for this frame
