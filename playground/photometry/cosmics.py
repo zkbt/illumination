@@ -147,7 +147,6 @@ def evaluate_strategy(tpf2s,
 
 
 
-        lcs = {}
 
         # create light curve from the raw 2-s cadence
         raw = tpfs['raw'].to_lightcurve()
@@ -155,6 +154,29 @@ def evaluate_strategy(tpf2s,
         # keep track of some summary statistics
         summary = {}
         summary['medflux'] = np.median(raw.flux)/raw.cadence.to('s').value
+
+        ########################
+        # KLUDGE (for bright stars)
+        if summary['medflux'] > 5e4:
+            # define the apertures for photometry and background subtraction
+            aperturekw['apertureradius'] = 5 + np.sqrt(summary['medflux']/5e4)
+            aperture, backgroundaperture = define_apertures(tpfs['nocrm'], **aperturekw)
+            for k in tpfs.keys():
+
+                # use the same aperture for all of them
+                change_pipeline_aperture(tpfs[k], aperture, backgroundaperture)
+
+                # subtract the background, redefining "flux" in each of these tpfs
+                subtract_background(tpfs[k])
+
+            # create light curve from the raw 2-s cadence
+            raw = tpfs['raw'].to_lightcurve()
+
+            # keep track of some summary statistics
+            summary = {}
+            summary['medflux'] = np.median(raw.flux)/raw.cadence.to('s').value
+
+        lcs = {}
         lcs['raw'] = raw.normalize()
 
         # figure out an appropriate flatten window_length

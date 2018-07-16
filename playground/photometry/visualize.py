@@ -113,10 +113,7 @@ def plot_lcs(lcs, summary, xlim=[None, None], title='', nsigma=5):
     colors = dict(crm='mediumvioletred', nocrm='royalblue', raw='orange')
     lckw = dict(alpha=0.5, marker='o', linewidth=0, markeredgecolor='none')
 
-    # set the yscale for plotting light curves
-    scale = nsigma*np.maximum(mad_std(lcs['crm-flattened'].flux),
-                              mad_std(lcs['nocrm-flattened'].flux))
-    ylim = 1-scale, 1+scale
+
 
 
     #for k in lcs.keys():
@@ -127,6 +124,10 @@ def plot_lcs(lcs, summary, xlim=[None, None], title='', nsigma=5):
     for k in ['nocrm', 'crm']:
         for i, mode in enumerate(['original', 'flattened', 'corrected']):
             lc = lcs['{}-{}'.format(k, mode)]
+            # set the yscale for plotting light curves
+            scale = nsigma*np.maximum(mad_std(lcs['crm-{}'.format(mode)].flux),
+                                      mad_std(lcs['nocrm-{}}'.format(mode)].flux))
+            ylim = 1-scale, 1+scale
             plot_timeseries(lc.time-o, lc.flux, ax[i], ylim, ylabel=mode, color=colors[k], **lckw)
             ax[i, 1].text(0.8, 1 - (1.0 + (k=='crm'))/3,
                           '{}\n{:.0f}ppm'.format(k.upper(), 1e6*summary['{}-{}-madstd-{:.0f}m'.format(k, mode, lc.cadence.to('min').value)]),
@@ -236,7 +237,7 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
                 y = lc.centroid_row
             plot_timeseries(lc.time-f.offset, y-np.median(y), [f.ax], centroid_ylim, color=colors[c], alpha=0.5, **lckw)
 
-    ylim =  [0, nsigma*mad_std(jitter['intraexposure']) + np.median(jitter['intraexposure'])]
+    ylim =  [0, 2*nsigma*mad_std(jitter['intraexposure']) + np.median(jitter['intraexposure'])]
     f = i.frames['intraexposure']
     plot_timeseries(jitter['time']-f.offset, jitter['intraexposure'],  [f.ax], ylim, color='dimgray', **lckw)
     #f.ax.set_ylim(0, None)
