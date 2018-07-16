@@ -96,77 +96,6 @@ def plot_timeseries(x, y, ax, ylim, ylabel='', color='black', alpha=1, **kw):
     except IndexError:
         pass
 
-def plot_lcs(lcs, summary, xlim=[None, None], title='', nsigma=5):
-    '''
-    Make a comprehensive plot of LCs.
-    '''
-
-    # set up basic geometry
-    N_lc = 3
-    N_other = 3
-    fi, ax = plt.subplots(N_lc + N_other, 2, figsize=(15, 10), sharey='row', sharex='col',
-                          gridspec_kw=dict(hspace=0.1, wspace=0.0,
-                                           width_ratios=[1, 0.2],
-                                           height_ratios=[2]*N_lc+[2]*N_other))
-
-    # set up the basic plotting defaults
-    colors = dict(crm='mediumvioletred', nocrm='royalblue', raw='orange')
-    lckw = dict(alpha=0.5, marker='o', linewidth=0, markeredgecolor='none')
-
-
-
-
-    #for k in lcs.keys():
-    #    lcs[k].time -= timeoffset
-    #    lcs[k] = lcs[k][lcs[k].time < xspan]
-    o = np.min(lcs['raw'].time)
-
-    for k in ['nocrm', 'crm']:
-        for i, mode in enumerate(['original', 'flattened', 'corrected']):
-            lc = lcs['{}-{}'.format(k, mode)]
-            # set the yscale for plotting light curves
-            scale = nsigma*np.maximum(mad_std(lcs['crm-{}'.format(mode)].flux),
-                                      mad_std(lcs['nocrm-{}}'.format(mode)].flux))
-            ylim = 1-scale, 1+scale
-            plot_timeseries(lc.time-o, lc.flux, ax[i], ylim, ylabel=mode, color=colors[k], **lckw)
-            ax[i, 1].text(0.8, 1 - (1.0 + (k=='crm'))/3,
-                          '{}\n{:.0f}ppm'.format(k.upper(), 1e6*summary['{}-{}-madstd-{:.0f}m'.format(k, mode, lc.cadence.to('min').value)]),
-                          transform=ax[i,1].transAxes, color=colors[k],
-                          ha='left', va='center')
-
-    lc = lcs['raw']
-    jt, jc, jr, jce, jre = bin_jitter(lc, binwidth=lcs['nocrm-original'].cadence.to('day').value, robust=False)
-    centroid_scale = nsigma*np.maximum(mad_std(jc), mad_std(jr))
-    centroid_ylim = [-0.106, 0.106]#[-centroid_scale, centroid_scale]
-    plot_timeseries(jt-o, jc, ax[3], centroid_ylim, color='black', **lckw)
-    plot_timeseries(jt-o, jr, ax[4], centroid_ylim, color='black', **lckw)
-
-    for k in ['nocrm', 'crm']:
-        lc = lcs['{}-original'.format(k)]
-        plot_timeseries(lc.time-o, lc.centroid_col - np.median(lc.centroid_col), ax[3], centroid_ylim,  ylabel='column\n(pix)', color=colors[k], **lckw)
-        plot_timeseries(lc.time-o, lc.centroid_row - np.median(lc.centroid_row), ax[4], centroid_ylim,  ylabel='row\n(pix)', color=colors[k], **lckw)
-
-    plt.sca(ax[3,1])
-    plt.text(0.8, 0.5, '$\sigma=$\n{:.3f}px'.format(mad_std(jc)),
-                 transform=plt.gca().transAxes, color='black', alpha=0.5,
-                 ha='left', va='center')
-
-    plt.sca(ax[4,1])
-    plt.text(0.8, 0.5, '$\sigma=$\n{:.3f}px'.format(mad_std(jr)),
-                 transform=plt.gca().transAxes, color='black', alpha=0.5,
-                 ha='left', va='center')
-
-    plot_timeseries(jt-o, np.sqrt(jce**2 + jre**2), ax[5], [0, 0.5],  ylabel='intra-\nexposure\njitter (pix)', color='black', **lckw)
-    plt.sca(ax[5,1])
-    plt.text(0.8, 0.5, 'avg=\n{:.3f}px'.format(np.mean(np.sqrt(jce**2 + jre**2))),
-                 transform=plt.gca().transAxes, color='black', alpha=0.5,
-                 ha='left', va='center')
-
-    ax[0,0].set_xlim(*xlim)
-    ax[0,0].set_title(title)
-    ax[-1,0].set_xlabel('Time - {:.5f} (days)'.format(o))
-
-
 def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **kw):
 
     # create panels for the images we want to show
@@ -209,8 +138,8 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     colors = dict(crm='mediumvioletred', nocrm='royalblue', raw='orange')
     lckw = dict(marker='.', markersize=8, linewidth=0, markeredgecolor='none')
 
-    scale = nsigma*np.maximum(mad_std(lcs['crm-flattened'].flux),
-                              mad_std(lcs['nocrm-flattened'].flux))
+    scale = nsigma*np.maximum(mad_std(lcs['crm-original'].flux),
+                              mad_std(lcs['nocrm-original'].flux))
     ylim = 1-scale, 1+scale
 
     for mode in ['original', 'flattened', 'corrected']:
