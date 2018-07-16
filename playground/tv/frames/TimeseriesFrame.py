@@ -6,6 +6,7 @@ class TimeseriesFrame(FrameBase):
 	frametype = 'timeseries'
 	xmin, xmax = None, None
 	ymin, ymax = None, None
+	
 	def __init__(self, *args, **kwargs):
 		FrameBase.__init__(self, *args, **kwargs)
 

@@ -60,6 +60,6 @@ def animate(illustration, filename='test.mp4',
 			print('  {}/{} at {}'.format(i+1, len(times), Time.now().iso), end='\r')
 
 			# update the illustration to a new time
-			illustration.update(Time(t, format='gps'))
+			illustration.update(Time(t, format='gps', scale='tdb'))
 
 			writer.grab_frame()

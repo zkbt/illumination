@@ -6,7 +6,7 @@ class FrameBase:
 	plotted = None
 	frametype = 'base'
 
-	def __init__(self, ax=None, data=None, framename='', illustration=None, aspectratio=1, **kwargs):
+	def __init__(self, ax=None, data=None, name='', illustration=None, aspectratio=1, **kwargs):
 		'''
 		Initialize this frame,
 		choosing the Axes in which it will display,
@@ -23,7 +23,7 @@ class FrameBase:
 			or something else, depending on
 			what this actual Frame does with it
 			in `plot` and `update`.
-		framename : str
+		name : str
 			A name to give this Frame.
 		'''
 
@@ -42,6 +42,8 @@ class FrameBase:
 		# keep track of a list of frames included in this one
 		self.includes = []
 
+		# store a name for this frame, if there is one
+		self.name = name
 		self._currenttimestring = None
 
 	@property
@@ -51,8 +53,12 @@ class FrameBase:
 		except AttributeError:
 			try:
 				self._offset = np.min(self.illustration._gettimes().jd)
-			except AttributeError:
-				self._offset = np.min(self._gettimes().jd)#Time(0, format='jd')
+			except (AttributeError, ValueError):
+				try:
+					self._offset = np.min(self._gettimes().jd)
+				except ValueError:
+					self._offset = 0.0
+
 			return self._offset
 
 	def _timestring(self, time):
@@ -62,7 +68,7 @@ class FrameBase:
 		return 't={:.5f}{:+.5f}'.format(self.offset, time.jd-self.offset)
 
 	def __repr__(self):
-		return '<{} Frame | {}>'.format(self.frametype, self.data)
+		return '<{} Frame | data={}>'.format(self.frametype, self.data)
 
 	def plot(self):
 		'''
@@ -86,7 +92,10 @@ class FrameBase:
 		'''
 		Get the available times associated with this frame.
 		'''
-		return self.data.time
+		try:
+			return self.data.time
+		except AttributeError:
+			return Time([], format='gps')
 
 	def _timesandcadence(self, round=None):
 		'''

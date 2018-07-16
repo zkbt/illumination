@@ -7,8 +7,8 @@ class imshowFrame(FrameBase):
 	frametype = 'imshow'
 	xmin, xmax = None, None
 	ymin, ymax = None, None
-	def __init__(self, *args, **kwargs):
-		FrameBase.__init__(self, *args, **kwargs)
+	def __init__(self, *args, name='image', **kwargs):
+		FrameBase.__init__(self, *args, name=name, **kwargs)
 
 		# if the data re that the data are a sequence of images
 		self.data = make_sequence(self.data, **kwargs)
@@ -192,7 +192,7 @@ class imshowFrame(FrameBase):
 
 		return 't={:.5f}{:+.5f}'.format(offset.jd, (time-offset).to('day'))
 	"""
-	
+
 	def _get_image(self, time=None):
 		'''
 		Get the image at a given time (defaulting to the first time).

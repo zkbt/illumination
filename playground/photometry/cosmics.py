@@ -38,6 +38,29 @@ def ok_jitter(lc, threshold=0.15, visualize=False):
 
     return ok
 
+def save(tpfs, lcs, summary, jitter, directory):
+
+    # save the summary
+    np.save(os.path.join(directory, 'summary.npy'), summary)
+
+    # save the jitter
+    np.save(os.path.join(directory, 'jitter.npy'), jitter)
+
+    # save the TPFs
+    #if subdirectory == 'entire':
+    for k in tpfs.keys():
+        if k != 'raw':
+            tpfs[k].to_fits(output_fn=os.path.join(directory, '{}_{}.fits'.format(tpfs[k].filelabel(), k)), zip=True)
+
+    # save the light curves
+    for k in ['crm', 'nocrm']:
+        lc = lcs['{}-original'.format(k)]
+        filename = os.path.join(directory, tpfs['crm'].filelabel() + '_' + k + '.csv')
+        with open(filename, 'w') as f:
+            f.write(lc.to_csv())
+
+
+
 def evaluate_strategy(tpf2s,
                       directory='.',
                       strategy=Central(10),
@@ -147,13 +170,13 @@ def evaluate_strategy(tpf2s,
         try:
             lcs['{}-flattened'.format(k)] = lcs['{}-original'.format(k)].remove_outliers().flatten(**flattenkw)
         except:
-            raise RuntimeWarning("{}-flattened lightcurve couldn't be made".format(k))
+            print("{}-flattened lightcurve couldn't be made".format(k))
 
         # attempt to correct the light curve using SFF
         try:
             lcs['{}-corrected'.format(k)] = lcs['{}-original'.format(k)].remove_outliers().correct(**correctkw).flatten(**flattenkw)
         except:
-            raise RuntimeWarning("{}-corrected lightcurve couldn't be made".format(k))
+            print("{}-corrected lightcurve couldn't be made".format(k))
 
     # trim this timespan
     for k in lcs.keys():
@@ -180,22 +203,25 @@ def evaluate_strategy(tpf2s,
         lc = lcs[k]
 
 
+        # mark the bad jitter moments
+        badjitter = ok_jitter(lc) == False
+        lc.quality = lc.quality | (4*badjitter)
 
-        #if k == 'raw':
         #    goodjitter = np.ones_like(lc.flux).astype(np.bool)
         #    lcs[k] = lcs[k][goodjitter]
 
         # calculate the RMS of each light curve
-        summary['{}-madstd-{:.0f}m'.format(k, cadence/60)] = mad_std(lc.flux)
-        summary['{}-std-{:.0f}m'.format(k, cadence/60)] = np.std(lc.flux)
-        clipped = sigma_clip(lc.flux, sigma=3)
+        ok = lc.quality == 0
+        summary['{}-madstd-{:.0f}m'.format(k, cadence/60)] = mad_std(lc.flux[ok])
+        summary['{}-std-{:.0f}m'.format(k, cadence/60)] = np.std(lc.flux[ok])
+        clipped = sigma_clip(lc.flux[ok], sigma=3)
         fnotclipped = 1- np.sum(clipped.mask)/summary['ntotal']
         summary['{}-fractionnotclipped-{:.0f}m'.format(k, cadence/60)] = fnotclipped
         summary['{}-clippedstd-{:.0f}m'.format(k, cadence/60)] = np.std(clipped)/np.sqrt(fnotclipped)
 
         # calculate the equivalent for 30 minutes
         if cadence == 120:
-            bx, by, bz = binto(lc.time, lc.flux, binwidth=0.5/24.0, robust=False, sem=True)
+            bx, by, bz = binto(lc.time[ok], lc.flux[ok], binwidth=0.5/24.0, robust=False, sem=True)
             summary['{}-madstd-30m'.format(k)] = mad_std(by)
             summary['{}-std-30m'.format(k)] = np.std(by)
             clipped = sigma_clip(by, sigma=3)
@@ -205,7 +231,7 @@ def evaluate_strategy(tpf2s,
 
         # calculate mad-std of binned differences
         for hours in [1, 3, 6, 9, 12]:
-            bx, by, bz = binto(lc.time, lc.flux, binwidth=hours/24.0, robust=True)
+            bx, by, bz = binto(lc.time[ok], lc.flux[ok], binwidth=hours/24.0, robust=True)
             summary['{}-d{}hr-madstd'.format(k, hours)] = mad_std(np.diff(by))
             summary['{}-d{}hr-std'.format(k, hours)] = np.std(np.diff(by))
             clipped = sigma_clip(np.diff(by), sigma=3)
@@ -232,20 +258,7 @@ def evaluate_strategy(tpf2s,
     summary['directory'] = os.path.join(summary['directory'], subdirectory)
     mkdir(summary['directory'])
 
-    # save the summary
-    np.save(os.path.join(summary['directory'], 'summary.npy'), summary)
-
-    # save the TPFs
-    if subdirectory == 'entire':
-        for k in tpfs.keys():
-            if k != 'raw':
-                tpfs[k].to_fits(directory=summary['directory'], zip=True)
-
-    # save the light curves
-    for k in ['crm', 'nocrm']:
-        lc = lcs['{}-original'.format(k)]
-        filename = os.path.join(summary['directory'], tpfs['crm'].filelabel() + '_' + k + '.csv')
-        with open(filename, 'w') as f:
-            f.write(lc.to_csv())
+    # save everything
+    save(tpfs, lcs, summary, jitter, directory=summary['directory'])
 
     return tpfs, lcs, summary, jitter

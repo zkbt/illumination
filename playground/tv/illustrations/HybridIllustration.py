@@ -5,7 +5,7 @@ __all__ = ['HybridIllustration']
 class HybridIllustration(IllustrationBase):
     illustrationtype = 'Timeseries'
 
-    def __init__(self, imshows=[], timeseries=[], aspectratio=np.inf, **kwargs):
+    def __init__(self, imshows=[], timeseries=[], aspectratio=np.inf, figkw={}, **kwargs):
         '''
         Initialize an illustration from list of frames.
 
@@ -23,9 +23,9 @@ class HybridIllustration(IllustrationBase):
         bottom, top = 0.1, 0.9
         wsize = each*cols*(1 + (cols-1)*wspace)/(right-left)
         hsize = each*np.sum(height_ratios)*(1 + (rows-1)*hspace)/(top-bottom)
-
+        figkw['figsize'] = (wsize, hsize)
         IllustrationBase.__init__(self, rows, cols,
-                                    figkw=dict(figsize=(wsize, hsize)),
+                                    figkw=figkw,
                                     hspace=hspace, wspace=wspace,
                                     left=left, right=right,
                                     bottom=bottom, top=top,
@@ -44,6 +44,8 @@ class HybridIllustration(IllustrationBase):
             # register this in the frames dictionary
             try:
                 n = i.name
+                if n in self.frames:
+                    n += '-{}'.format(col)
             except AttributeError:
                 n = (row, col)
             self.frames[n] = i
@@ -64,7 +66,9 @@ class HybridIllustration(IllustrationBase):
                 plt.setp(t.ax.get_xticklabels(), visible=False)
             # register this in the frames dictionary
             try:
-                n = i.name
+                n = t.name
+                if n in self.frames:
+                    n += '-{}'.format(row)
             except AttributeError:
                 n = (row + hasimshow, col)
             self.frames[n] = t

@@ -346,7 +346,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
         # set some variables in the time dimension
 
         gpstime = stamp.temporal['TIME']
-        factory.time = Time(gpstime, format='gps').jd
+        factory.time = Time(gpstime, format='gps', scale='tdb').jd
         factory.cadenceno = np.arange(len(gpstime))#stamp.temporal['CADENCE']
         factory.quality = stamp.temporal['QUAL_BIT']
 
@@ -435,7 +435,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
             gpstime = framehdu.header['TIME']
 
             # let's convert them to jd
-            framehdu.header['TIME'] = Time(gpstime, format='gps').jd
+            framehdu.header['TIME'] = Time(gpstime, format='gps', scale='tdb').jd
 
             # add this cadence to the TOP
             factory.add_cadence(frameno=idx, raw_cnts=stamphdu.data, flux=stamphdu.data, header=framehdu.header)

@@ -23,7 +23,7 @@ class IllustrationBase:
 
 	def _gettimes(self):
 		gps = [f._gettimes().gps for f in self.frames.values()]
-		return Time(np.hstack(gps), format='gps')
+		return Time(np.hstack(gps), format='gps', scale='tdb')
 
 		#alltimes = []
 		#for k, f in self.frames.items():
