@@ -6,29 +6,34 @@ from playground.imports import *
 # let's define a range of times
 N = 5
 
-# these are the start and
-
+# these are the start and end of the ranges
 start, end = 2458278.6166949864, 2458281.660259801
 edges = np.linspace(start, end, N+1)
 starts, ends = edges[:-1], edges[1:]
 span = np.median(ends - starts)
 print('splitting {} days {} ways leaves {:.0f}/{:.0f} (30min/2min) cadences per group'.format(end-start, N, span*24/0.5, span*24*60/2))
 
+# set up the directories to look at
 stampfiles = glob.glob('/scratch2/zkbt/orbit-8196/stamps/*/*.npy')
 outputdirectory = '/scratch2/zkbt/orbit-8196/analyses'
 
+# what strategy will we test?
 strategy = Central(10)
 starts = [-np.inf] + list(starts)
 ends = [np.inf] + list(ends)
+
+# loop over time ranges
 for start, end in zip(starts, ends):
+    # loop over stamp files (these are faster to load than FITs)
     for s in stampfiles:
+        # loop over cadences
         for cadence in [120, 1800]:
             #tic = os.path.basename(s).split('tic')[1].split('_')[0]
             #search = os.path.join(outputdirectory, strategy.name.replace(' ', ''), '*tic{}*{}s'.format(tic, cadence))
             try:
                 tpf = EarlyTessTargetPixelFile.from_stamp(Stamp(s))
                 tpf.to_fits(directory=outputdirectory)
-                tpfs, lcs, summary = evaluate_strategy(tpf, directory=outputdirectory, cadence=cadence, strategy=strategy, start=start, end=end)
+                tpfs, lcs, summary, jitter = evaluate_strategy(tpf, directory=outputdirectory, cadence=cadence, strategy=strategy, start=start, end=end)
             except:
                 print("Something went wrong with {}!".format(s))
-            visualize_strategy(tpfs, lcs, summary);
+            visualize_strategy(tpfs, lcs, summary, jitter);
