@@ -36,4 +36,4 @@ for start, end in zip(starts, ends):
                 tpfs, lcs, summary, jitter = evaluate_strategy(tpf, directory=outputdirectory, cadence=cadence, strategy=strategy, start=start, end=end)
             except:
                 print("Something went wrong with {}!".format(s))
-            visualize_strategy(tpfs, lcs, summary, jitter);
+            visualize_strategy(tpfs, lcs, summary, jitter, animation=True);
