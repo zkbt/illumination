@@ -43,7 +43,7 @@ for s in stampfiles:
             tpf = EarlyTessTargetPixelFile.from_stamp(Stamp(s))
             tpf.to_fits(directory=outputdirectory)
             tpfs, lcs, summary, jitter = evaluate_strategy(tpf, directory=outputdirectory, cadence=cadence, strategy=strategy, start=start, end=end)
-            visualize_strategy(tpfs, lcs, summary, jitter, animation=True);
+            visualize_strategy(tpfs, lcs, summary, jitter, animation=False);
             #except Exception as e:
             #    print("Something went wrong with {}!".format(s))
             #    print(e)
