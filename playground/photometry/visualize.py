@@ -268,7 +268,7 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     plt.suptitle(title, fontsize=20)
 
     d = summary['directory']
-    filename = title.replace(' | ', '_').replace(' ', '')
+    filename = 'tic{}_{:.0f}m_{}'.format(tpfs['crm'].tic_id, tpfs['crm'].cadence.to('minute').value, summary['name'].replace(' ',''))
     plt.savefig(os.path.join(d, filename+'.pdf'))
     if animation:
         animate(i, cadence=tpfs['crm'].cadence, filename=os.path.join(d, filename+'.mp4'), **kw)
