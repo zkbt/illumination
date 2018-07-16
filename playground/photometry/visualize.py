@@ -256,7 +256,8 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     colors_diff = dict(gains='royalblue', losses='firebrick', net='dimgray')
     f = i.frames['fluxdiff']
     t = gains.time - f.offset
-    ylim = [np.percentile(lc_diff['losses'], 1), np.percentile(lc_diff['gains'], 99)]
+    scale = 2*nsigma*mad_std(lc_diff['gains'] + lc_diff['losses'])
+    ylim = [-scale, scale]
     for k, l in lc_diff.items():
         plot_timeseries(t, l,
                         ax=[f.ax, f.ax_hist],

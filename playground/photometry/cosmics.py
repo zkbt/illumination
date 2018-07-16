@@ -174,12 +174,14 @@ def evaluate_strategy(tpf2s,
                 lcs['{}-flattened'.format(k)] = lcs['{}-original'.format(k)].remove_outliers().flatten(**flattenkw)
             except:
                 print("{}-flattened lightcurve couldn't be made".format(k))
+                lcs['{}-flattened'.format(k)] = lcs['{}-original'.format(k)].remove_outliers()
 
             # attempt to correct the light curve using SFF
             try:
                 lcs['{}-corrected'.format(k)] = lcs['{}-original'.format(k)].remove_outliers().correct(**correctkw).flatten(**flattenkw)
             except:
                 print("{}-corrected lightcurve couldn't be made".format(k))
+                lcs['{}-corrected'.format(k)] = lcs['{}-flattened'.format(k)]
 
         # trim this timespan
         for k in lcs.keys():
