@@ -25,13 +25,19 @@ starts = list(starts) + [-np.inf]
 ends = list(ends) + [np.inf]
 
 # loop over stamp files (these are faster to load than FITs)
+np.random.shuffle(stampfiles)
 for s in stampfiles:
-    # loop over time ranges
-    for start, end in zip(starts, ends):
-        # loop over cadences
-        for cadence in [120, 1800]:
-            #tic = os.path.basename(s).split('tic')[1].split('_')[0]
-            #search = os.path.join(outputdirectory, strategy.name.replace(' ', ''), '*tic{}*{}s'.format(tic, cadence))
+    # loop over cadences
+    for cadence in [120, 1800]:
+        tic = os.path.basename(s).split('tic')[1].split('_')[0]
+        search = os.path.join(outputdirectory, strategy.name.replace(' ', ''), '*tic{}*{}s'.format(tic, cadence), '*/*.mp4')
+        if len(glob.glob(search)) > 0:
+            print('Skipping {}. It already seems finished.'.format(s))
+            continue
+
+        # loop over time ranges
+        for start, end in zip(starts, ends):
+
             try:
                 tpf = EarlyTessTargetPixelFile.from_stamp(Stamp(s))
                 tpf.to_fits(directory=outputdirectory)
