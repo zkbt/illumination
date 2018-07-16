@@ -271,7 +271,7 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     for a in [f.ax, f.ax_hist]:
         a.axhline(0, color='gray', alpha=0.3)
 
-    title = imshows[0].data.titlefordisplay.replace('\n', ' | ') + ' | ' + summary['name']
+    title = ' | '.join([imshows[0].data.titlefordisplay.replace('\n', ' | '), summary['name'], '{:.2g} DN/s'.format(summary['medflux'])])
     plt.suptitle(title, fontsize=20)
 
     for t in timeseries:

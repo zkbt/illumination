@@ -154,7 +154,7 @@ def evaluate_strategy(tpf2s,
 
         # keep track of some summary statistics
         summary = {}
-        summary['medflux'] = np.median(raw.flux)
+        summary['medflux'] = np.median(raw.flux)/raw.cadence.to('s').value
         lcs['raw'] = raw.normalize()
 
         # figure out an appropriate flatten window_length
