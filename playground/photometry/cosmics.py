@@ -241,10 +241,17 @@ def evaluate_strategy(tpf2s,
                 fnotclipped = 1 - np.sum(clipped.mask)/summary['ntotal']
                 summary['{}-d{}hr-clippedstd'.format(k, hours)] = np.std(clipped)/np.sqrt(fnotclipped)
 
+        if np.isfinite(start):
+            summary['start'] = start
+        else:
+            summary['start'] = np.min(lcs['raw'].time)
 
-        summary['start'] = start
-        summary['end'] = end
+        if np.isfinite(end):
+            summary['end'] = end
+        else:
+            summary['end'] = np.max(lcs['raw'].time)
         summary['title'] = tpfs['crm'].filelabel().replace('_', ' | ') + ' | ' + strategy.name
+
 
         if np.isfinite(start) or np.isfinite(end):
             summary['title'] += ' | {:.5f} to {:.5f}'.format(start, end)

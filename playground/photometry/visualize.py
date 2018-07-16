@@ -200,7 +200,8 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     # add the aperture onto its imshow frame
     mask = tpfs['crm'].pipeline_mask == False
     extent = [0, mask.shape[1], 0, mask.shape[0]]
-    i_aperture.ax.imshow(mask, interpolation='nearest', origin='lower', extent=extent, cmap=one2another(alphabottom=0, alphatop=0.3, top='sienna'))
+    i_aperture.ax.imshow(mask, interpolation='nearest', origin='lower', extent=extent, cmap=one2another(alphabottom=0, alphatop=0.5, top='purple'))
+    i_aperture.ax.imshow(tpfs['crm'].background_mask, interpolation='nearest', origin='lower', extent=extent, cmap=one2another(alphabottom=0, alphatop=0.5, top='hotpink'))
 
 
     # plot the individual timeseries
@@ -273,9 +274,15 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     title = imshows[0].data.titlefordisplay.replace('\n', ' | ') + ' | ' + summary['name']
     plt.suptitle(title, fontsize=20)
 
+    for t in timeseries:
+        try:
+            t.ax.set_xlim(summary['start'] - t.offset, summary['end'] - t.offset)
+        except (ValueError, TypeError):
+            pass
+
     d = summary['directory']
     filename = 'tic{}_{:.0f}m_{}'.format(tpfs['crm'].tic_id, tpfs['crm'].cadence.to('minute').value, summary['name'].replace(' ',''))
     plt.savefig(os.path.join(d, filename+'.pdf'))
     if animation:
-        animate(i, cadence=tpfs['crm'].cadence, filename=os.path.join(d, filename+'.mp4'), **kw)
+        animate(i, cadence=tpfs['crm'].cadence, filename=os.path.join(d, filename+'.mp4'), mintime=Time(summary['start'], format='jd', scale='tdb'), maxtimespan=(summary['end'] - summary['start'])*u.day, **kw)
     return i

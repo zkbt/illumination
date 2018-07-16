@@ -4,10 +4,12 @@ from playground.tv import *
 from playground.imports import *
 
 # let's define a range of times
-N = 5
+N = 1
 
 # these are the start and end of the ranges
-start, end = 2458278.6166949864, 2458281.660259801
+#start, end = 2458278.6166949864, 2458281.660259801
+start = 2458278.7
+end = start + 1.5
 edges = np.linspace(start, end, N+1)
 starts, ends = edges[:-1], edges[1:]
 span = np.median(ends - starts)

@@ -55,6 +55,10 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
     def cadence(self):
         return np.median(np.diff(self.time))*u.day
 
+    @property
+    def background_mask(self):
+        return self.hdu[-1].data == 2
+        
     def filelabel(self, label=None):
         '''
         TESS-specific file label.
