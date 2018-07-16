@@ -42,4 +42,4 @@ for s in stampfiles:
         for start, end in zip(starts, ends):
 
             tpfs, lcs, summary, jitter = evaluate_strategy(tpf, directory=outputdirectory, cadence=cadence, strategy=strategy, start=start, end=end)
-            visualize_strategy(tpfs, lcs, summary, jitter, animation=False);
+            visualize_strategy(tpfs, lcs, summary, jitter, animation=True);
