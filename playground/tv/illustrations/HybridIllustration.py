@@ -14,12 +14,12 @@ class HybridIllustration(IllustrationBase):
 
         # set up the geometry (imshows on time, timeseries below)
         hasimshow = int(len(imshows) > 0)
-        rows = hasimshow  + len(timeseries)
+        rows = hasimshow  + len(timeseries) + 1
         cols = np.maximum(1, len(imshows))
-        height_ratios = hasimshow*[1] + len(timeseries)*[0.3]
-        each = 3.2
+        height_ratios = hasimshow*[0.5] + [0.5/len(timeseries)] + len(timeseries)*[1.0/len(timeseries)]
+        each = 3.0
         hspace, wspace = 0.15, 0.08
-        left, right = 0.1, 0.95
+        left, right = 0.1, 0.9
         bottom, top = 0.1, 0.9
         wsize = each*cols*(1 + (cols-1)*wspace)/(right-left)
         hsize = each*np.sum(height_ratios)*(1 + (rows-1)*hspace)/(top-bottom)
@@ -58,7 +58,7 @@ class HybridIllustration(IllustrationBase):
             # make sure to connect the frame back to this illustration
             t.illustration = self
             # create the axes in which this should sit
-            t.ax = plt.subplot(self.grid[row + hasimshow, :], sharex=sharex)
+            t.ax = plt.subplot(self.grid[row + hasimshow + 1, :], sharex=sharex)
             sharex=t.ax
 
             # turn off the axis labels

@@ -16,7 +16,6 @@ def plot_aperture_definition(tpf):
     ax[2].set_title('target')
 
 
-
 def plot_histogram(y, bins=None, binwidth=0.1, ax=None, **kwargs):
     '''
     Plot a histogram, rotated clockwise by 90 degrees, to represent a projection of a timeseries plot.
@@ -42,14 +41,13 @@ def plot_histogram(y, bins=None, binwidth=0.1, ax=None, **kwargs):
     # create a histogram of the lightcurve values
     if bins is None:
         bins = np.arange(np.min(y)-binwidth, np.max(y)+binwidth, binwidth)
-    else:
-        binwidth = np.median(np.diff(bins))
 
     ok = np.isfinite(y)
     yhist, edges = np.histogram(y[ok], bins=bins, density=True)
 
     # define the "x"-axis at the centers of the histogram bins
     xhist = (edges[1:] + edges[0:-1])/2.0
+    binwidth = np.median(np.diff(xhist))
 
     # plot in the histogram panel
     if ax is None:
@@ -57,37 +55,18 @@ def plot_histogram(y, bins=None, binwidth=0.1, ax=None, **kwargs):
     ax.plot(yhist, xhist, **kwargs)
 
     ax.set_xscale('log')
-    ax.set_xlim(5.0/binwidth/len(y), 100*1.0/np.sqrt(2*np.pi)/binwidth)#np.max(yhist)*2)
+    ax.set_xlim(5.0/binwidth/len(y), 10*1.0/np.sqrt(2*np.pi)/binwidth)#np.max(yhist)*2)
     plt.axis('off')
 
 
-def bin_jitter(lc, binwidth=30.0/60./24, robust=False):
-    '''
-    Bin the jitter to a useful cadence.
-    '''
 
-    c, r = lc.centroid_col, lc.centroid_row
-
-    #bx, by, be = binto(lc.time, np.sqrt(c**2 + r**2), binwidth=binwidth, sem=False, robust=True)
-    #plt.bar(bx, be, width=binwidth, alpha=0.3, label='radial')
-
-    time, ry, re = binto(lc.time, r, binwidth=binwidth, sem=False, robust=False)
-    _, cy, ce = binto(lc.time, c, binwidth=binwidth, sem=False, robust=False)
-
-
-    centroid_col = cy - np.nanmedian(cy)
-    centroid_row = ry - np.nanmedian(ry)
-    intrajitter_col = ce
-    intrajitter_row = re
-    return time, centroid_col, centroid_row, intrajitter_col, intrajitter_row
-
-def plot_timeseries(x, y, ax, ylim, ylabel='', color='black', **kw):
+def plot_timeseries(x, y, ax, ylim, ylabel='', color='black', alpha=1, **kw):
     '''
     Plot a single timeseries (with both 1D series and a collapsed histogram).
     '''
     plt.sca(ax[0])
     # plot the timeseries
-    plt.plot(x, y, color=color, **kw)
+    plt.plot(x, y, color=color, alpha=alpha, **kw)
 
     # plot any outliers
     above = y > np.max(ylim)
@@ -101,14 +80,14 @@ def plot_timeseries(x, y, ax, ylim, ylabel='', color='black', **kw):
     outlierkw['marker'] = None
     plt.errorbar(x[above], np.max(ylim)*np.ones_like(x[above]), scale, color=color, **outlierkw)
     plt.errorbar(x[below], np.min(ylim)*np.ones_like(x[below]), scale, color=color, **outlierkw)
-    plt.ylabel(ylabel)
+    #plt.ylabel(ylabel)
     plt.ylim(*ylim)
 
 
     # plot the histogram
     plt.sca(ax[1])
     nbins = np.sqrt(len(y))
-    plot_histogram(y, bins=np.linspace(np.min(ylim), np.max(ylim), nbins), color=color)
+    plot_histogram(y, bins='auto', color=color, alpha=alpha) #bins=np.linspace(np.min(ylim), np.max(ylim), nbins)
     plt.ylim(*ylim)
 
 def plot_lcs(lcs, summary, xlim=[None, None], title='', nsigma=5):
@@ -180,16 +159,116 @@ def plot_lcs(lcs, summary, xlim=[None, None], title='', nsigma=5):
     ax[0,0].set_title(title)
     ax[-1,0].set_xlabel('Time - {:.5f} (days)'.format(o))
 
-def visualize_strategy(tpfs, lcs, summary, animation=True, **kw):
+
+def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **kw):
+
+    # create panels for the images we want to show
+    i_nocrm = imshowFrame(data=tpfs['nocrm'], name='nocrm')
+    i_nocrm.titlefordisplay = 'without CRM'
+
+    i_crm = imshowFrame(data=tpfs['crm'], name='crm')
+    i_crm.titlefordisplay = 'with CRM'
+
+    diff = copy.deepcopy(tpfs['crm'])
+    diff.hdu[1].data['FLUX'] = tpfs['nocrm'].flux - tpfs['crm'].flux
+    i_diff = imshowFrame(data=diff, name='difference')
+    i_diff.titlefordisplay = 'difference'
+
+    i_aperture = imshowFrame(data=tpfs['crm'], name='aperture')
+    i_aperture.titlefordisplay = '(aperture definition)'
+    imshows = [i_nocrm, i_crm, i_diff, i_aperture]
+
+    # create panels for timeseries to show
+    timeseries = [EmptyTimeseriesFrame(name='original', ylabel='original\nflux', histogram=True),
+                  EmptyTimeseriesFrame(name='flattened', ylabel='flattened\nflux', histogram=True),
+                  EmptyTimeseriesFrame(name='corrected', ylabel='corrected\nflux', histogram=True),
+                  EmptyTimeseriesFrame(name='fluxdiff', ylabel='CRM flux\ndifference', histogram=True),
+                  EmptyTimeseriesFrame(name='column', ylabel='centroid\ncolumn\n(pix)', histogram=False),
+                  EmptyTimeseriesFrame(name='row', ylabel='centroid\nrow\n(pix)', histogram=False),
+                  EmptyTimeseriesFrame(name='intraexposure', ylabel='intra-\nexposure\njitter\n(pix)', histogram=False)]
+
+    # put them all together
+    i = HybridIllustration(imshows=imshows, timeseries=timeseries, sharecolorbar=False)
+    i.plot()
+
+    # add the aperture onto its imshow frame
+    mask = tpfs['crm'].pipeline_mask == False
+    extent = [0, mask.shape[1], 0, mask.shape[0]]
+    i_aperture.ax.imshow(mask, interpolation='nearest', origin='lower', extent=extent, cmap=one2another(alphabottom=0, alphatop=0.3, top='sienna'))
+
+
+    # plot the individual timeseries
+    colors = dict(crm='mediumvioletred', nocrm='royalblue', raw='orange')
+    lckw = dict(marker='.', markersize=8, linewidth=0, markeredgecolor='none')
+
+    scale = nsigma*np.maximum(mad_std(lcs['crm-flattened'].flux),
+                              mad_std(lcs['nocrm-flattened'].flux))
+    ylim = 1-scale, 1+scale
+
+    for mode in ['original', 'flattened', 'corrected']:
+        f = i.frames[mode]
+        for c in ['nocrm', 'crm']:
+            lc = lcs['{}-{}'.format(c, mode)]
+            plot_timeseries(lc.time - f.offset, lc.flux, [f.ax, f.ax_hist], ylim, color=colors[c], **lckw)
+            f.ax_hist.text(0.995, 1 - (1.0 + 5*(c=='crm'))/7,
+                              '{}: {:.0f}ppm'.format(c.upper(), 1e6*summary['{}-{}-madstd-{:.0f}m'.format(c, mode, lc.cadence.to('min').value)]),
+                              color=colors[c], ha='right', va='center', transform=f.ax.transAxes )
+
+    # plot the centroid information
+    centroid_scale = nsigma*np.maximum(mad_std(jitter['column']),mad_std(jitter['row']))
+    centroid_ylim = [-centroid_scale, centroid_scale]
+    for cen in ['column', 'row']:
+        f = i.frames[cen]
+        f.ax.plot(jitter['time']-f.offset, jitter[cen],  color='black', **lckw)
+        f.ax.set_ylim(centroid_ylim)
+
+        for c in ['nocrm', 'crm']:
+            lc = lcs['{}-original'.format(c)]
+            if cen == 'column':
+                y = lc.centroid_col
+            elif cen == 'row':
+                y = lc.centroid_row
+            f.ax.plot(lc.time-f.offset, y-np.median(y), color=colors[c], alpha=0.5, **lckw)
+
+    f = i.frames['intraexposure']
+    f.ax.plot(jitter['time']-f.offset, jitter['intraexposure'],  color='black', **lckw)
+    f.ax.set_ylim(0, None)
+
+
+    # calculate the net gains and losses
+    lc_diff = {}
+    normalization = tpfs['crm'].to_lightcurve().flux
+    gains = copy.deepcopy(diff)
+    gains.hdu[1].data['FLUX'] = np.maximum(gains.flux, 0)
+    lc_diff['gains']  = gains.to_lightcurve().flux/normalization
+    losses = copy.deepcopy(diff)
+    losses.hdu[1].data['FLUX'] = np.minimum(losses.flux, 0)
+    lc_diff['losses'] = losses.to_lightcurve().flux/normalization
+
+    #lc_diff['net'] = lc_diff['gains'] + lc_diff['losses']
+    colors_diff = dict(gains='royalblue', losses='firebrick', net='black')
+    f = i.frames['fluxdiff']
+    t = gains.time - f.offset
+    ylim = [np.percentile(lc_diff['losses'], 1), np.percentile(lc_diff['gains'], 99)]
+    for k, l in lc_diff.items():
+        plot_timeseries(t, l,
+                        ax=[f.ax, f.ax_hist],
+                        ylim=ylim,
+                        color=colors_diff[k],
+                        linewidth=1, alpha=0.5)
+    plot_timeseries(t, lc_diff['gains'] + lc_diff['losses'],
+                    ax=[f.ax, f.ax_hist],
+                    ylim=ylim,
+                    color='black',
+                    **lckw)
+    for a in [f.ax, f.ax_hist]:
+        a.axhline(0, color='gray', alpha=0.3)
+
+    title = imshows[0].data.titlefordisplay.replace('\n', ' | ') + ' | ' + summary['name']
+    plt.suptitle(title, fontsize=20)
+
     d = summary['directory']
-    mkdir(d)
-
-    plot_lcs(lcs, summary, title=summary['title'], **kw)
-    plt.savefig(os.path.join(d, 'lightcurves.pdf'))
-
-    plot_aperture_definition(tpfs['nocrm'])
-    plt.savefig(os.path.join(d, 'apertures.pdf'))
-
+    filename = title.replace(' | ', '_').replace(' ', '')
+    plt.savefig(os.path.join(d, filename+'.pdf'))
     if animation:
-        animate_cosmics(tpfs, maxtimespan=6*u.hour, filename=os.path.join(d, 'mitigated_cosmics.mp4'), **kw)
-        #animate_both_cadences(tpfs, maxtimespan=10*u.minute, filename=os.path.join(d, 'both_cadences.mp4'), **kw)
+        animate(i, cadence=tpfs['crm'].cadence, filename=os.path.join(d, filename+'.mp4'), **kw)

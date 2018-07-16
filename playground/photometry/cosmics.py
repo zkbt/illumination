@@ -4,6 +4,7 @@ from .processing import *
 from ..imports import *
 
 
+
 def create_tpfs(s, stacker=Central(10), cadences=[2, 120,1800]):
     '''
     Starting from a Stamp, create stacked tpfs at multiple cadences.
@@ -122,143 +123,145 @@ def evaluate_strategy(tpf2s,
     jitter : dict
         a jitter timeseries
     '''
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore')
 
-    # make the TPFs
-    tpfs = {}
-    tpfs['raw'] = tpf2s
+        # make the TPFs
+        tpfs = {}
+        tpfs['raw'] = tpf2s
 
-    # create a stamp, for stacking into new TPFs
-    s = Stamp(tpf2s)
-    tpfs['crm'] = EarlyTessTargetPixelFile.from_stamp(s.stack(cadence, strategy=strategy))
-    tpfs['nocrm'] = EarlyTessTargetPixelFile.from_stamp(s.stack(cadence, strategy=Sum()))
+        # create a stamp, for stacking into new TPFs
+        s = Stamp(tpf2s)
+        tpfs['crm'] = EarlyTessTargetPixelFile.from_stamp(s.stack(cadence, strategy=strategy))
+        tpfs['nocrm'] = EarlyTessTargetPixelFile.from_stamp(s.stack(cadence, strategy=Sum()))
 
-    # define the apertures for photometry and background subtraction
-    aperture, backgroundaperture = define_apertures(tpfs['nocrm'], **aperturekw)
-    for k in tpfs.keys():
+        # define the apertures for photometry and background subtraction
+        aperture, backgroundaperture = define_apertures(tpfs['nocrm'], **aperturekw)
+        for k in tpfs.keys():
 
-        # use the same aperture for all of them
-        change_pipeline_aperture(tpfs[k], aperture, backgroundaperture)
+            # use the same aperture for all of them
+            change_pipeline_aperture(tpfs[k], aperture, backgroundaperture)
 
-        # subtract the background, redefining "flux" in each of these tpfs
-        subtract_background(tpfs[k])
-
-
-
-    lcs = {}
-
-    # create light curve from the raw 2-s cadence
-    raw = tpfs['raw'].to_lightcurve()
-
-    # keep track of some summary statistics
-    summary = {}
-    summary['medflux'] = np.median(raw.flux)
-    lcs['raw'] = raw.normalize()
-
-    # figure out an appropriate flatten window_length
-    flattenkw['window_length'] = int(np.round(flattentimescale*24.0*3600.0/cadence))
-    if (flattenkw['window_length'] % 2) == 0:
-        flattenkw['window_length'] += 1
-    correctkw['restore_trend'] = True
-
-    # create all kinds of lightcurves
-    for k in ['crm', 'nocrm']:
-
-        # make a basic light curve
-        lcs['{}-original'.format(k)] = tpfs[k].to_lightcurve().normalize()
-
-        # flatten the light curve by removing temporal trends
-        try:
-            lcs['{}-flattened'.format(k)] = lcs['{}-original'.format(k)].remove_outliers().flatten(**flattenkw)
-        except:
-            print("{}-flattened lightcurve couldn't be made".format(k))
-
-        # attempt to correct the light curve using SFF
-        try:
-            lcs['{}-corrected'.format(k)] = lcs['{}-original'.format(k)].remove_outliers().correct(**correctkw).flatten(**flattenkw)
-        except:
-            print("{}-corrected lightcurve couldn't be made".format(k))
-
-    # trim this timespan
-    for k in lcs.keys():
-        lc = lcs[k]
-
-        # trim to time
-        goodtime = (lc.time >= start)*(lc.time<=end)
-        lcs[k] = lcs[k][goodtime]
-
-    # record the jitter
-    jitter = {}
-    jt, jc, jr, jce, jre = bin_jitter(lc, binwidth=lcs['nocrm-original'].cadence.to('day').value, robust=False)
-    jitter['time'] = jt
-    jitter['column'] = jc
-    jitter['row'] = jr
-    jitter['intraexposure'] = np.sqrt(jce**2 + jre**2)
+            # subtract the background, redefining "flux" in each of these tpfs
+            subtract_background(tpfs[k])
 
 
-    summary['name'] = strategy.name
-    summary['ntotal'] = len(lcs['crm-original'].flux)
-    for k in lcs.keys():
-        if k == 'raw':
-            continue
-        lc = lcs[k]
+
+        lcs = {}
+
+        # create light curve from the raw 2-s cadence
+        raw = tpfs['raw'].to_lightcurve()
+
+        # keep track of some summary statistics
+        summary = {}
+        summary['medflux'] = np.median(raw.flux)
+        lcs['raw'] = raw.normalize()
+
+        # figure out an appropriate flatten window_length
+        flattenkw['window_length'] = int(np.round(flattentimescale*24.0*3600.0/cadence))
+        if (flattenkw['window_length'] % 2) == 0:
+            flattenkw['window_length'] += 1
+        correctkw['restore_trend'] = True
+
+        # create all kinds of lightcurves
+        for k in ['crm', 'nocrm']:
+
+            # make a basic light curve
+            lcs['{}-original'.format(k)] = tpfs[k].to_lightcurve().normalize()
+
+            # flatten the light curve by removing temporal trends
+            try:
+                lcs['{}-flattened'.format(k)] = lcs['{}-original'.format(k)].remove_outliers().flatten(**flattenkw)
+            except:
+                print("{}-flattened lightcurve couldn't be made".format(k))
+
+            # attempt to correct the light curve using SFF
+            try:
+                lcs['{}-corrected'.format(k)] = lcs['{}-original'.format(k)].remove_outliers().correct(**correctkw).flatten(**flattenkw)
+            except:
+                print("{}-corrected lightcurve couldn't be made".format(k))
+
+        # trim this timespan
+        for k in lcs.keys():
+            lc = lcs[k]
+
+            # trim to time
+            goodtime = (lc.time >= start)*(lc.time<=end)
+            lcs[k] = lcs[k][goodtime]
+
+        # record the jitter
+        jitter = {}
+        jt, jc, jr, jce, jre = bin_jitter(lcs['raw'], binwidth=(cadence*u.s/u.day).decompose(), robust=False)
+        jitter['time'] = jt
+        jitter['column'] = jc
+        jitter['row'] = jr
+        jitter['intraexposure'] = np.sqrt(jce**2 + jre**2)
 
 
-        # mark the bad jitter moments
-        badjitter = ok_jitter(lc) == False
-        lc.quality = lc.quality | (4*badjitter)
-
-        #    goodjitter = np.ones_like(lc.flux).astype(np.bool)
-        #    lcs[k] = lcs[k][goodjitter]
-
-        # calculate the RMS of each light curve
-        ok = lc.quality == 0
-        summary['{}-madstd-{:.0f}m'.format(k, cadence/60)] = mad_std(lc.flux[ok])
-        summary['{}-std-{:.0f}m'.format(k, cadence/60)] = np.std(lc.flux[ok])
-        clipped = sigma_clip(lc.flux[ok], sigma=3)
-        fnotclipped = 1- np.sum(clipped.mask)/summary['ntotal']
-        summary['{}-fractionnotclipped-{:.0f}m'.format(k, cadence/60)] = fnotclipped
-        summary['{}-clippedstd-{:.0f}m'.format(k, cadence/60)] = np.std(clipped)/np.sqrt(fnotclipped)
-
-        # calculate the equivalent for 30 minutes
-        if cadence == 120:
-            bx, by, bz = binto(lc.time[ok], lc.flux[ok], binwidth=0.5/24.0, robust=False, sem=True)
-            summary['{}-madstd-30m'.format(k)] = mad_std(by)
-            summary['{}-std-30m'.format(k)] = np.std(by)
-            clipped = sigma_clip(by, sigma=3)
-            fnotclipped = 1 - np.sum(clipped.mask)/summary['ntotal']
-            summary['{}-fractionnotclipped-30m'.format(k)] = fnotclipped
-            summary['{}-clippedstd-30m'.format(k)] = np.std(clipped)/np.sqrt(fnotclipped)
-
-        # calculate mad-std of binned differences
-        for hours in [1, 3, 6, 9, 12]:
-            bx, by, bz = binto(lc.time[ok], lc.flux[ok], binwidth=hours/24.0, robust=True)
-            summary['{}-d{}hr-madstd'.format(k, hours)] = mad_std(np.diff(by))
-            summary['{}-d{}hr-std'.format(k, hours)] = np.std(np.diff(by))
-            clipped = sigma_clip(np.diff(by), sigma=3)
-            fnotclipped = 1 - np.sum(clipped.mask)/summary['ntotal']
-            summary['{}-d{}hr-clippedstd'.format(k, hours)] = np.std(clipped)/np.sqrt(fnotclipped)
+        summary['name'] = strategy.name
+        summary['ntotal'] = len(lcs['crm-original'].flux)
+        for k in lcs.keys():
+            if k == 'raw':
+                continue
+            lc = lcs[k]
 
 
-    summary['start'] = start
-    summary['end'] = end
-    summary['title'] = tpfs['crm'].filelabel().replace('_', ' | ') + ' | ' + strategy.name
+            # mark the bad jitter moments
+            badjitter = ok_jitter(lc) == False
+            lc.quality = lc.quality | (4*badjitter)
 
-    if np.isfinite(start) or np.isfinite(end):
-        summary['title'] += ' | {:.5f} to {:.5f}'.format(start, end)
+            #    goodjitter = np.ones_like(lc.flux).astype(np.bool)
+            #    lcs[k] = lcs[k][goodjitter]
 
-    # make sure the directories exist
-    summary['directory'] = os.path.join(directory, strategy.name.replace(' ', ''))
-    mkdir(summary['directory'])
-    summary['directory'] = os.path.join(summary['directory'], tpfs['crm'].filelabel())
-    mkdir(summary['directory'])
-    if np.isfinite(start) or np.isfinite(end):
-        subdirectory = '{:.5f}to{:.5f}'.format(start, end)
-    else:
-        subdirectory = 'entire'
-    summary['directory'] = os.path.join(summary['directory'], subdirectory)
-    mkdir(summary['directory'])
+            # calculate the RMS of each light curve
+            ok = lc.quality == 0
+            summary['{}-madstd-{:.0f}m'.format(k, cadence/60)] = mad_std(lc.flux[ok])
+            summary['{}-std-{:.0f}m'.format(k, cadence/60)] = np.std(lc.flux[ok])
+            clipped = sigma_clip(lc.flux[ok], sigma=3)
+            fnotclipped = 1- np.sum(clipped.mask)/summary['ntotal']
+            summary['{}-fractionnotclipped-{:.0f}m'.format(k, cadence/60)] = fnotclipped
+            summary['{}-clippedstd-{:.0f}m'.format(k, cadence/60)] = np.std(clipped)/np.sqrt(fnotclipped)
 
-    # save everything
-    save(tpfs, lcs, summary, jitter, directory=summary['directory'])
+            # calculate the equivalent for 30 minutes
+            if cadence == 120:
+                bx, by, bz = binto(lc.time[ok], lc.flux[ok], binwidth=0.5/24.0, robust=False, sem=True)
+                summary['{}-madstd-30m'.format(k)] = mad_std(by)
+                summary['{}-std-30m'.format(k)] = np.std(by)
+                clipped = sigma_clip(by, sigma=3)
+                fnotclipped = 1 - np.sum(clipped.mask)/summary['ntotal']
+                summary['{}-fractionnotclipped-30m'.format(k)] = fnotclipped
+                summary['{}-clippedstd-30m'.format(k)] = np.std(clipped)/np.sqrt(fnotclipped)
 
-    return tpfs, lcs, summary, jitter
+            # calculate mad-std of binned differences
+            for hours in [1, 3, 6, 9, 12]:
+                bx, by, bz = binto(lc.time[ok], lc.flux[ok], binwidth=hours/24.0, robust=True)
+                summary['{}-d{}hr-madstd'.format(k, hours)] = mad_std(np.diff(by))
+                summary['{}-d{}hr-std'.format(k, hours)] = np.std(np.diff(by))
+                clipped = sigma_clip(np.diff(by), sigma=3)
+                fnotclipped = 1 - np.sum(clipped.mask)/summary['ntotal']
+                summary['{}-d{}hr-clippedstd'.format(k, hours)] = np.std(clipped)/np.sqrt(fnotclipped)
+
+
+        summary['start'] = start
+        summary['end'] = end
+        summary['title'] = tpfs['crm'].filelabel().replace('_', ' | ') + ' | ' + strategy.name
+
+        if np.isfinite(start) or np.isfinite(end):
+            summary['title'] += ' | {:.5f} to {:.5f}'.format(start, end)
+
+        # make sure the directories exist
+        summary['directory'] = os.path.join(directory, strategy.name.replace(' ', ''))
+        mkdir(summary['directory'])
+        summary['directory'] = os.path.join(summary['directory'], tpfs['crm'].filelabel())
+        mkdir(summary['directory'])
+        if np.isfinite(start) or np.isfinite(end):
+            subdirectory = '{:.5f}to{:.5f}'.format(start, end)
+        else:
+            subdirectory = 'entire'
+        summary['directory'] = os.path.join(summary['directory'], subdirectory)
+        mkdir(summary['directory'])
+
+        # save everything
+        save(tpfs, lcs, summary, jitter, directory=summary['directory'])
+
+        return tpfs, lcs, summary, jitter

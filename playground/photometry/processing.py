@@ -2,6 +2,27 @@ from ..imports import *
 from .visualize import *
 from ..postage import *
 
+def bin_jitter(lc, binwidth=30.0/60./24, robust=False):
+    '''
+    Bin the jitter to a useful cadence.
+    '''
+
+    c, r = lc.centroid_col, lc.centroid_row
+
+    #bx, by, be = binto(lc.time, np.sqrt(c**2 + r**2), binwidth=binwidth, sem=False, robust=True)
+    #plt.bar(bx, be, width=binwidth, alpha=0.3, label='radial')
+
+    time, ry, re = binto(lc.time, r, binwidth=binwidth, sem=False, robust=False)
+    _, cy, ce = binto(lc.time, c, binwidth=binwidth, sem=False, robust=False)
+
+
+    centroid_col = cy - np.nanmedian(cy)
+    centroid_row = ry - np.nanmedian(ry)
+    intrajitter_col = ce
+    intrajitter_row = re
+    return time, centroid_col, centroid_row, intrajitter_col, intrajitter_row
+
+
 def change_pipeline_aperture(tpf, aperture, backgroundaperture):
     tpf.hdu[-1].data = np.maximum(3*aperture, 2*backgroundaperture)
 

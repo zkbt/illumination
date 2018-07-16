@@ -56,7 +56,12 @@ class EmptyTimeseriesFrame(FrameBase):
 
 		if self.histogram:
 			b = self.ax.get_position()
-			#self.ax_hist = self.ax.figure.add_axes([b.x0, b.y0, b.x1, b.y1])
+			width = b.x1 - b.x0
+			scale = 0.1
+			self.ax_hist = self.ax.figure.add_axes([b.x1, b.y0, b.width*scale, b.height])
+			self.ax_hist.set_facecolor('lightgray')
+			self.ax_hist.set_axis_off()
+			self.ax.set_position([b.x0, b.y0, b.width, b.height])
 
 		# plot the time bar
 		self.plotted['vline'] = self.ax.axvline(np.nan, color='gray', alpha=0.5, zorder=-1e6)
@@ -64,7 +69,7 @@ class EmptyTimeseriesFrame(FrameBase):
 		# pull the title for this frame
 		self.ax.set_ylabel(self.titlefordisplay)
 		if self.ax.get_xticklabels()[0].get_visible():
-			plt.xlabel('Time - {:.5f} (days)'.format(self.offset))
+			self.ax.set_xlabel('Time - {:.5f} (days)'.format(self.offset))
 
 		# turn the axes lines off
 		# plt.axis('off')

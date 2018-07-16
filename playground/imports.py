@@ -4,6 +4,7 @@ import numpy as np, matplotlib.pyplot as plt
 
 import matplotlib.animation as ani
 import matplotlib.gridspec as gs
+import matplotlib.colors as co
 
 from astropy.io import fits, ascii
 from astropy.time import Time
@@ -72,14 +73,15 @@ def binto(x=None, y=None, yuncertainty=None,
 
 	if test:
 		n = 1000
-		x, y = np.arange(n), np.random.randn(n) - np.arange(n)*0.01 + 5
-		bx, by, be = binto(x, y, binwidth=20)
+		x, y = np.arange(n), np.random.randn(n)# - np.arange(n)*0.01 + 5
+		bx, by, be = binto(x, y, binwidth=20, robust=robust, sem=sem)
 		plt.figure('test of craftroom.binto')
 		plt.cla()
 		plt.plot(x, y, linewidth=0, markersize=4, alpha=0.3, marker='.', color='gray')
 		plt.errorbar(bx, by, be, linewidth=0, elinewidth=2, capthick=2, markersize=10, alpha=0.5, marker='.', color='blue')
 		return
 
+	bias = np.nanmean(y)
 	min, max = np.min(x), np.max(x)
 	bins = np.arange(min, max+binwidth, binwidth)
 	count, edges = np.histogram(x, bins=bins)
@@ -108,12 +110,16 @@ def binto(x=None, y=None, yuncertainty=None,
 			if yuncertainty is None:
 				mean = sum.astype(np.float)/count
 				sumofsquares, edges = np.histogram(x, bins=bins, weights=y**2)
-				std = np.sqrt(sumofsquares.astype(np.float)/count - mean**2)*np.sqrt(count.astype(np.float)/np.maximum(count-1.0, 1.0))
+
+				std = np.sqrt((sumofsquares.astype(np.float) - count*mean**2)/(count-1))#*np.sqrt(count.astype(np.float)/np.maximum(count-1.0, 1.0))
+				#plt.plot(count*mean**2)
+				#plt.plot(sumofsquares)
+				#plt.show()
+
 		if sem:
 			error = std/np.sqrt(count)
 		else:
 			error = std
-
 
 	x = 0.5*(edges[1:] + edges[:-1])
 	return x, mean, error
@@ -123,6 +129,12 @@ def binto(x=None, y=None, yuncertainty=None,
 
 	if robust:
 		print("Hmmm...the robust binning feature isn't finished yet.")
+
+def name2color(name):
+	'''
+	Return the 3-element RGB array of a given color name.
+	'''
+	return co.hex2color(co.cnames[name])
 
 def one2another(bottom='white', top='red', alphabottom=1.0, alphatop=1.0, N=256):
         '''

@@ -7,8 +7,8 @@ class imshowFrame(FrameBase):
 	frametype = 'imshow'
 	xmin, xmax = None, None
 	ymin, ymax = None, None
-	def __init__(self, *args, name='image', **kwargs):
-		FrameBase.__init__(self, *args, name=name, **kwargs)
+	def __init__(self, *args, name='image', title=None,**kwargs):
+		FrameBase.__init__(self, *args, name=name,  **kwargs)
 
 		# if the data re that the data are a sequence of images
 		self.data = make_sequence(self.data, **kwargs)
@@ -24,7 +24,8 @@ class imshowFrame(FrameBase):
 			self.titlefordisplay =  self.data.titlefordisplay
 		except AttributeError:
 			self.titlefordisplay =  ''
-
+		if title is not None:
+			self.titlefordisplay = title
 	def _cmap_norm_ticks(self, *args, **kwargs):
 		'''
 		Return the cmap and normalization.
@@ -109,7 +110,7 @@ class imshowFrame(FrameBase):
 		# rotate into the display coordinates
 		unrotatedx, unrotatedy = origin
 		x, y = self._transformxy(*origin)
-		arrow_kw = dict(zorder=10, facecolor='black', edgecolor='none', width=length*0.03, head_width=length*0.3, head_length=length*0.2, clip_on=False, length_includes_head=True)
+		arrow_kw = dict(zorder=10, color='black', width=length*0.03, head_width=length*0.3, head_length=length*0.2, clip_on=False, length_includes_head=True)
 		text_kw = dict(va='center', color='black', ha='center', fontsize=7, fontweight='bold', clip_on=False)
 		buffer = 1.4
 
