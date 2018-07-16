@@ -84,7 +84,8 @@ def plot_timeseries(x, y, ax, ylim, ylabel='', color='black', alpha=1, **kw):
     plt.errorbar(x[above], np.max(ylim)*np.ones_like(x[above]), scale, color=color, **outlierkw)
     plt.errorbar(x[below], np.min(ylim)*np.ones_like(x[below]), scale, color=color, **outlierkw)
     #plt.ylabel(ylabel)
-    plt.ylim(*ylim)
+    if np.isfinite(ylim).all():
+        plt.ylim(*ylim)
 
 
     # plot the histogram
