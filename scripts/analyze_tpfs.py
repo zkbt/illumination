@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from playground.photometry import *
 from playground.postage import *
 from playground.tv import *
