@@ -34,7 +34,7 @@ class ZoomFrame(imshowFrame):
 		self.ax.set_aspect('equal')
 		plt.setp(self.ax.get_xticklabels(), visible=False)
 		plt.setp(self.ax.get_yticklabels(), visible=False)
-		self.ax.set_facecolor('black')
+		#self.ax.set_facecolor('black')
 
 		self.titlefordisplay =  '{} | {}'.format(self.frametype, self.position)
 

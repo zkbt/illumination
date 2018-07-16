@@ -9,7 +9,7 @@ timescale = 'tdb'
 # this is ahead of TAI by about 31.184s
 # and it differs from UTC by additional leap seconds
 
-def guess_time_format(t):
+def guess_time_format(t, default='jd'):
 	'''
 	For a given array of times,
 	make a guessa about its time format.
@@ -18,11 +18,14 @@ def guess_time_format(t):
 					jd=[2.4e6, 3e6], # valid between 1858-11-16 12:00:00.000 and 3501-08-15 12:00:00.000
 					mjd=[4e4, 8e4]) # valid between 1968-05-24 00:00:00.000 and 2077-11-28 00:00:00.000
 
+	if t == []:
+		return default
+
 	for k in ranges.keys():
 		if np.min(t) >= ranges[k][0] and np.max(t) <= ranges[k][1]:
 			return k
 
-	return None
+	return default
 
 class Sequence(Talker):
 	'''
@@ -45,10 +48,11 @@ class Sequence(Talker):
 		Given a time, identify its index.
 		'''
 
-		diff = time - self._gettimes()
-		if len(diff) == 0:
+		times = self._gettimes()
+		if len(times) == 0:
 			return None
 		else:
+			diff = time - times
 			step = np.argmin(abs(diff))
 			return step
 		#try:
@@ -129,7 +133,7 @@ class FITS_Sequence(Sequence):
 		self.spatial = {}
 
 		# make up an imaginary GPS time
-		self.time = Time(np.arange(self.N), format='gps', scale=timescale)
+		self.time = Time(np.arange(self.N), format='gps', scale='tai')
 		try:
 			self._populate_from_headers()
 		except:
@@ -197,7 +201,10 @@ class FITS_Sequence(Sequence):
 		for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB']:
 			try:
 				t = self.temporal[k]
-				self.time = Time(np.asarray(t), format=timeformat or guess_time_format(t), scale=timescale)
+				if isinstance(t, Time):
+					self.time = t
+				else:
+					self.time = Time(np.asarray(t), format=timeformat or guess_time_format(t), scale=timescale)
 				self.speak('using {} as the time axis'.format(k))
 			except KeyError:
 				break
@@ -244,7 +251,10 @@ class Stamp_Sequence(Sequence):
 
 		# set up the basic sequence
 		self.stamp = stamp
-		self.time = Time(self.stamp.time, format=guess_time_format(self.stamp.time), scale=timescale)
+		if isinstance(self.stamp.time, Time):
+			self.time=self.stamp.time
+		else:
+			self.time = Time(self.stamp.time, format=guess_time_format(self.stamp.time), scale=timescale)
 
 	def __getitem__(self, timestep):
 		'''
@@ -313,6 +323,9 @@ class TPF_Sequence(Sequence):
 		return len(self.time)
 
 class Timeseries_Sequence(Sequence):
+	'''
+	NOT CURRENTLY BEING USED.
+	'''
 	def __init__(self, initial, y=None, yuncertainty=None, name='timeseries', **kwargs):
 		'''
 		Initialize a Sequence from some 1D timeseries.
@@ -348,7 +361,6 @@ class Timeseries_Sequence(Sequence):
 
 		# create a sequence out of that stamp
 		Sequence.__init__(self, name=name)
-		cadence = np.round(np.median(np.diff(self.time.gps)))
 
 		# set a rough title for this plot
 		self.titlefordisplay = '{}'.format(self.name)
@@ -389,13 +401,13 @@ def make_sequence(initial, *args, **kwargs):
 	elif type(initial) == Stamp:
 		return Stamp_Sequence(initial, *args, **kwargs)
 	else:
+		#try:
+		#	# is initial a 1D thing?
+		#	assert(len(np.shape(initial))==1 or isinstance(initial, LightCurve))
+		#	return Timeseries_Sequence(initial, *args, **kwargs)
+		#except AssertionError:
 		try:
-			# is initial a 1D thing?
-			assert(len(np.shape(initial))==1 or isinstance(initial, LightCurve))
-			return Timeseries_Sequence(initial, *args, **kwargs)
-		except AssertionError:
-			try:
-				assert(isinstance, TargetPixelFile)
-				return TPF_Sequence(initial, *args, **kwargs)
-			except AssertionError:
-				return FITS_Sequence(initial, *args, **kwargs)
+			assert(isinstance, TargetPixelFile)
+			return TPF_Sequence(initial, *args, **kwargs)
+		except (AttributeError,AssertionError):
+			return FITS_Sequence(initial, *args, **kwargs)

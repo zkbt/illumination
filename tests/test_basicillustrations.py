@@ -28,7 +28,7 @@ def test_FourCameraIllustration():
 
 def test_StampsIllustration():
     print("\nTesting the Stamps illustration.")
-    data = [create_test_stamp(cadence=120, n=25, xsize=10, ysize=10) for _ in range(4)]
+    data = [create_test_stamp(cadence=2, N=5, xsize=10, ysize=10) for _ in range(4)]
     illustration = StampsIllustration(data, sharecolorbar=False)
     illustration.plot()
     filename = os.path.join(directory, 'stamps-animation.mp4')
@@ -36,7 +36,7 @@ def test_StampsIllustration():
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
-def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50,50)):
+def test_SingleCameraIllustrationWithStamps():
     print("\nTesting a Single Camera with a Zoom.")
     illustration = SingleCameraWithZoomIllustration(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1,
                     zoomposition=position, zoomsize=size)
@@ -49,7 +49,7 @@ def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50,50)):
 
 def test_SingleCameraIllustrationWithStamps():
     print("\nTesting a Single Camera with some stamps.")
-    illustration = SingleCameraIllustration(data=[])
+    illustration = SingleCameraIllustration(data=[create_test_fits(rows=300, cols=300) for _ in range(10)])
     camera = illustration.frames['camera']
     xmax, ymax = camera.xmax, camera.ymax
 
@@ -65,3 +65,10 @@ def test_SingleCameraIllustrationWithStamps():
     #animate(illustration, filename)
     #print("Take a look at {} and see what you think!".format(filename))
     return illustration
+
+if __name__ == '__main__':
+    test_SingleCameraIllustrationWithStamps()
+    test_StampsIllustration()
+    test_FourCameraIllustration()
+    test_SingleCameraIllustration()
+    test_SingleCameraIllustrationWithStamps()

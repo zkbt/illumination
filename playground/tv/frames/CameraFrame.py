@@ -11,7 +11,7 @@ class CameraFrame(imshowFrame):
 		self.ax.set_aspect('equal')
 		plt.setp(self.ax.get_xticklabels(), visible=False)
 		plt.setp(self.ax.get_yticklabels(), visible=False)
-		self.ax.set_facecolor('silver')
+		#self.ax.set_facecolor('silver')
 
 
 		self.xmin, self.ymin = 0, 0

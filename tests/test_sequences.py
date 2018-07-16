@@ -45,6 +45,7 @@ def test_TPF():
 
 
 
+"""
 def test_timeseries():
 	'''
 	Run a test of the Timeseries_Sequence.
@@ -54,7 +55,13 @@ def test_timeseries():
 	a = make_sequence(x, y)
 	assert(isinstance(a, Timeseries_Sequence))
 	return a
+"""
 
+if __name__ == '__main__':
+	test_timeseries()
+	test_TPF()
+	test_FITS()
+	test_Stamps()
 """
 def test_many_FITS(N=30):
 	'''

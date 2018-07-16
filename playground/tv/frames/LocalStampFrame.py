@@ -102,7 +102,7 @@ class LocalStampFrame(imshowFrame):
 
 		# Create a Rectangle patch
 		rect = Rectangle((left, bottom), xsize*self.zoom,ysize*self.zoom,
-				linewidth=1,edgecolor='black',facecolor='none',
+				linewidth=1, edgecolor='black', facecolor='none',
 				zorder=zorder+0.5, clip_on=True)
 
 		# Add the patch to the Axes

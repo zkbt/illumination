@@ -109,7 +109,7 @@ class imshowFrame(FrameBase):
 		# rotate into the display coordinates
 		unrotatedx, unrotatedy = origin
 		x, y = self._transformxy(*origin)
-		arrow_kw = dict(zorder=10, color='black', width=length*0.03, head_width=length*0.3, head_length=length*0.2, clip_on=False, edgecolor='none', length_includes_head=True)
+		arrow_kw = dict(zorder=10, facecolor='black', edgecolor='none', width=length*0.03, head_width=length*0.3, head_length=length*0.2, clip_on=False, length_includes_head=True)
 		text_kw = dict(va='center', color='black', ha='center', fontsize=7, fontweight='bold', clip_on=False)
 		buffer = 1.4
 
@@ -177,7 +177,7 @@ class imshowFrame(FrameBase):
 		plt.ylim(self.ymin, self.ymax)
 
 		self.plotted['arrow'] = self.draw_arrows()
-		self.ax.set_facecolor('black')
+		#self.ax.set_facecolor('black')
 
 	"""
 	def _timestring(self, time):

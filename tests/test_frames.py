@@ -5,9 +5,8 @@ from playground.cartoons import *
 def test_timeseries():
     x = (np.linspace(0, 1)*u.day + Time.now()).jd
     y = np.random.normal(0, 1, len(x))
-    seq = make_sequence(x, y)
-    f = TimeseriesFrame(ax=plt.gca(), data=seq)
-    f.plot()
+    f = EmptyTimeseriesFrame(ax=plt.gca())
+    f.ax.plot(x, y)
     return f
 
 

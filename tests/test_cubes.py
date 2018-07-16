@@ -8,7 +8,7 @@ def test_cube(normalization='none', **kw):
 	'''
 	Make a plot of the cube.
 	'''
-	a = create_test_array(n=600, **kw)
+	a = create_test_array(N=600, **kw)
 	unbinned = Cube(a, cadence=2)
 	central = unbinned.stack(cadence=120, strategy=Central(10))
 	summed = unbinned.stack(cadence=120, strategy=Sum())
