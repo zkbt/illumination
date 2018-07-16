@@ -19,13 +19,13 @@ outputdirectory = '/scratch2/zkbt/orbit-8196/analyses'
 
 # what strategy will we test?
 strategy = Central(10)
-starts = [-np.inf] + list(starts)
-ends = [np.inf] + list(ends)
+starts = list(starts) + [-np.inf]
+ends = list(ends) + [np.inf]
 
-# loop over time ranges
-for start, end in zip(starts, ends):
-    # loop over stamp files (these are faster to load than FITs)
-    for s in stampfiles:
+# loop over stamp files (these are faster to load than FITs)
+for s in stampfiles:
+    # loop over time ranges
+    for start, end in zip(starts, ends):
         # loop over cadences
         for cadence in [120, 1800]:
             #tic = os.path.basename(s).split('tic')[1].split('_')[0]
