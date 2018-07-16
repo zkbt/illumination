@@ -7,8 +7,8 @@ class imshowFrame(FrameBase):
 	frametype = 'imshow'
 	xmin, xmax = None, None
 	ymin, ymax = None, None
-	def __init__(self, *args, name='image', title=None,**kwargs):
-		FrameBase.__init__(self, *args, name=name,  **kwargs)
+	def __init__(self, ax=None, data=None, name='image', title=None,**kwargs):
+		FrameBase.__init__(self, ax=ax, data=data, name=name,  **kwargs)
 
 		# if the data re that the data are a sequence of images
 		self.data = make_sequence(self.data, **kwargs)
