@@ -31,7 +31,7 @@ for s in stampfiles:
     # loop over cadences
     for cadence in [120, 1800]:
         tic = os.path.basename(s).split('tic')[1].split('_')[0]
-        search = os.path.join(outputdirectory, strategy.name.replace(' ', ''), '*tic{}*{}s'.format(tic, cadence), '*/*.mp4')
+        search = os.path.join(outputdirectory, strategy.name.replace(' ', ''), '*tic{}*{}s'.format(tic, cadence), '*/*.pdf')
         if len(glob.glob(search)) > 0:
             print('Skipping {}. It already seems finished.'.format(s))
             continue
