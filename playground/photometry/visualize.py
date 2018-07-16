@@ -176,7 +176,7 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     i_crm.titlefordisplay = 'with CRM'
 
     diff = copy.deepcopy(tpfs['crm'])
-    diff.hdu[1].data['FLUX'] = tpfs['nocrm'].flux - tpfs['crm'].flux
+    diff.hdu[1].data['FLUX'] = tpfs['nocrm'].raw_counts - tpfs['crm'].raw_counts
     i_diff = imshowFrame(data=diff, name='difference')
     i_diff.titlefordisplay = 'difference'
 
