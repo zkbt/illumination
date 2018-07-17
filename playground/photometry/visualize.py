@@ -218,3 +218,62 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     if animation:
         animate(i, cadence=tpfs['crm'].cadence, filename=os.path.join(d, filename+'.mp4'), mintime=Time(summary['start'], format='jd', scale='tdb'), maxtimespan=(summary['end'] - summary['start'])*u.day, **kw)
     return i
+
+
+
+def plot_jitter_correlate(path):
+    '''
+    Make and save a jitter correlation plot for a given directory path
+    (that must contain some light curves, a jitter, and a summary).
+    '''
+    label = path.split('/')[-3].replace('_', ' | ')
+    lcfiles = glob.glob(os.path.join(path, '*.csv'))
+    lcs = {}
+    for f in lcfiles:
+        k = f.split('_')[-1].split('.csv')[0]
+        lcs[k] = ascii.read(f, delimiter=',', data_start=1, names='time,time1,flux,flux_err,quality,centroid_col,centroid_row'.split(','))
+    diff = lcs['nocrm']['flux'] - lcs['crm']['flux']
+
+    jitterfile = os.path.join(path, 'jitter.npy')
+    jitter = np.load(jitterfile, encoding='latin1')[()]
+
+
+    summaryfile = os.path.join(path, 'summary.npy')
+    summary = np.load(summaryfile, encoding='latin1')[()]
+
+    rows = dict(crm=lcs['crm']['flux'], nocrm=lcs['nocrm']['flux'])
+    rows['nocrm-crm'] = diff
+    # make a plot
+    fi, ax = plt.subplots(3, 4, sharey='row', sharex='col', figsize=(10, 7), dpi=200,
+                         gridspec_kw=dict(hspace=0.04, wspace=0.04))
+    for row, ylabel in enumerate(['nocrm', 'crm', 'nocrm-crm']):
+        for col, k in enumerate(['row', 'column', 'intraexposure', 'time']):
+            plt.sca(ax[row, col])
+            x = jitter[k][:len(diff)]
+            if k == 'time':
+                x-= np.min(x)
+            y = rows[ylabel]
+            plt.plot(x, y, '.', alpha=0.5, markeredgecolor='none', color='mediumseagreen')
+            xlim = np.percentile(x, [1, 99])
+            nbins=20
+            bx, by, be = binto(x, y, binwidth=(xlim[1] - xlim[0])/nbins)
+            plt.errorbar(bx, by, be, color='black', linewidth=0, elinewidth=4, zorder=10)
+            plt.ylim(*np.percentile(y, [1, 99]))
+            plt.xlim(*xlim)
+
+            plt.axhline(0, color='black', zorder=100, alpha=0.5)
+            if col == 0:
+                plt.ylabel(ylabel)#('Fractional flux\nlost to CRM')
+            if row == 2:
+                plt.xlabel(k)
+
+            rho = scipy.stats.spearmanr(x,y)[0]
+            R = scipy.stats.pearsonr(x,y)[0]
+            plt.text(0.05, 0.95, 'R={:.3f}\n{}={:.3f}'.format(R, r'$\rho$', rho), transform=plt.gca().transAxes, ha='left', va='top')
+            if k != 'intraexposure' or ylabel != 'nocrm-crm':
+                plt.gca().set_facecolor('gainsboro')
+    plt.suptitle(summary['title'] + ' | {:.2g} DN/s'.format(summary['medflux']))
+    #plt.tight_layout()
+    filename = 'jitter_' + summary['title'].replace(' | ', '_').replace(' ', '') + '.pdf'
+    plt.savefig(os.path.join(path, filename))
+    print(os.path.join(path, filename))
