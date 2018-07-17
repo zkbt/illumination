@@ -5,7 +5,7 @@ from playground.tv import *
 from playground.imports import *
 
 outputdirectory = '/scratch2/zkbt/orbit-8196/analyses'
-directories = glob.glob(outputdirectory, 'Central*/cam*/*/')
+directories = glob.glob(os.path.join(outputdirectory, 'Central*/cam*/*/'))
 
 for d in directories:
     if len(glob.glob(os.path.join(d, 'jitter*.pdf'))) > 0:

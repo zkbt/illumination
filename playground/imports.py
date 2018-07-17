@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os, copy, subprocess, glob, shutil, warnings
 import numpy as np, matplotlib.pyplot as plt
+import scipy.stats
 
 import matplotlib.animation as ani
 import matplotlib.gridspec as gs
