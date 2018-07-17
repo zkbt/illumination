@@ -8,6 +8,7 @@ outputdirectory = '/scratch2/zkbt/orbit-8196/analyses'
 directories = glob.glob(os.path.join(outputdirectory, 'Central*/cam*/*/'))
 
 for d in directories:
+    print('making jitter plot for {}'.format(d))
     if len(glob.glob(os.path.join(d, 'jitter*.pdf'))) > 0:
         print('skipping {}'.format(d))
         continue

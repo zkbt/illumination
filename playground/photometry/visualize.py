@@ -256,7 +256,7 @@ def plot_jitter_correlate(path):
             plt.plot(x, y, '.', alpha=0.5, markeredgecolor='none', color='mediumseagreen')
             xlim = np.percentile(x, [1, 99])
             nbins=20
-            bx, by, be = binto(x, y, binwidth=(xlim[1] - xlim[0])/nbins)
+            bx, by, be = binto(x, y, binwidth=(xlim[1] - xlim[0])/nbins, robust=True)
             plt.errorbar(bx, by, be, color='black', linewidth=0, elinewidth=4, zorder=10)
             plt.ylim(*np.percentile(y, [1, 99]))
             plt.xlim(*xlim)
@@ -272,7 +272,7 @@ def plot_jitter_correlate(path):
             plt.text(0.05, 0.95, 'R={:.3f}\n{}={:.3f}'.format(R, r'$\rho$', rho), transform=plt.gca().transAxes, ha='left', va='top')
             if k != 'intraexposure' or ylabel != 'nocrm-crm':
                 plt.gca().set_facecolor('gainsboro')
-    plt.suptitle(summary['title'] + ' | {:.2g} DN/s'.format(summary['medflux']))
+    plt.suptitle(summary['title'].replace('s |', 's\n') + ' | {:.2g} DN/s'.format(summary['medflux']))
     #plt.tight_layout()
     filename = 'jitter_' + summary['title'].replace(' | ', '_').replace(' ', '') + '.pdf'
     plt.savefig(os.path.join(path, filename))
