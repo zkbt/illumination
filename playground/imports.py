@@ -83,7 +83,7 @@ def binto(x=None, y=None, yuncertainty=None,
 		return
 
 	bias = np.nanmean(y)
-	min, max = np.min(x), np.max(x)
+	min, max = np.min(x[np.isfinite(x)]), np.max(x[np.isfinite(x)])
 	bins = np.arange(min, max+binwidth, binwidth)
 	count, edges = np.histogram(x, bins=bins)
 	sum, edges = np.histogram(x, bins=bins, weights=y)

@@ -97,7 +97,7 @@ def plot_timeseries(x, y, ax, ylim, ylabel='', color='black', alpha=1, **kw):
     except IndexError:
         pass
 
-def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **kw):
+def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, ylims={}, **kw):
 
     # create panels for the images we want to show
     i_nocrm = imshowFrame(data=tpfs['nocrm'], name='nocrm')
@@ -139,17 +139,29 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, **
     colors = dict(crm='mediumvioletred', nocrm='royalblue', raw='orange')
     lckw = dict(marker='.', markersize=8, linewidth=0, markeredgecolor='none')
 
-    scale = nsigma*np.maximum(mad_std(lcs['crm-original'].flux),
-                              mad_std(lcs['nocrm-original'].flux))
-    ylim = 1-scale, 1+scale
+    scale = nsigma*np.maximum(mad_std(lcs['crm-flattened'].flux),
+                              mad_std(lcs['nocrm-flattened'].flux))
 
     for mode in ['original', 'flattened', 'corrected']:
         f = i.frames[mode]
         for c in ['nocrm', 'crm']:
             lc = lcs['{}-{}'.format(c, mode)]
+            if mode in 'original':
+                if mode in ylims:
+                    ylim = ylims[mode]
+                else:
+                    bottom, top = np.nanpercentile(lc.flux, [1,99])
+                    ylim = [np.minimum(bottom, 1-scale), np.maximum(top, 1+scale)]
+            else:
+                ylim = 1-scale, 1+scale
             plot_timeseries(lc.time - f.offset, lc.flux, [f.ax, f.ax_hist], ylim, color=colors[c], alpha=1, **lckw)
-            f.ax_hist.text(0.995, 1 - (1.0 + 5*(c=='crm'))/7,
-                              '{}: {:.0f}ppm'.format(c.upper(), 1e6*summary['{}-{}-madstd-{:.0f}m'.format(c, mode, lc.cadence.to('min').value)]),
+
+            f.ax_hist.text(0.995, 0.97 - (1.0 + 5*(c=='crm'))/7,
+                              '{}: {}={:.0f}ppm, {}={:.0f}ppm, {}={:.0f}ppm'.format(
+                                    c.upper(),
+                                    r'$\sigma$', 1e6*summary['{}-{}-std-{:.0f}m'.format(c, mode, lc.cadence.to('min').value)],
+                                    r'$\sigma_{clipped}$', 1e6*summary['{}-{}-clippedstd-{:.0f}m'.format(c, mode, lc.cadence.to('min').value)],
+                                    r'$\sigma_{MAD}$', 1e6*summary['{}-{}-madstd-{:.0f}m'.format(c, mode, lc.cadence.to('min').value)]),
                               color=colors[c], ha='right', va='center', transform=f.ax.transAxes )
 
     # plot the centroid information
@@ -253,13 +265,16 @@ def plot_jitter_correlate(path):
             if k == 'time':
                 x-= np.min(x)
             y = rows[ylabel]
+
+            xlim = np.nanpercentile(x[np.isfinite(x)], [2, 98])
+            ylim = np.nanpercentile(y[np.isfinite(y)], [2, 98])
             plt.plot(x, y, '.', alpha=0.5, markeredgecolor='none', color='mediumseagreen')
-            xlim = np.percentile(x, [1, 99])
+
+            ok = (x >= xlim[0])*(x <= xlim[1])*(y >= ylim[0])*(y <= ylim[1])
             nbins=20
-            bx, by, be = binto(x, y, binwidth=(xlim[1] - xlim[0])/nbins, robust=True)
+            bx, by, be = binto(x[ok], y[ok], binwidth=(xlim[1] - xlim[0])/nbins, robust=True)
             plt.errorbar(bx, by, be, color='black', linewidth=0, elinewidth=4, zorder=10)
-            plt.ylim(*np.percentile(y, [1, 99]))
-            plt.xlim(*xlim)
+
 
             plt.axhline(0, color='black', zorder=100, alpha=0.5)
             if col == 0:
@@ -267,11 +282,14 @@ def plot_jitter_correlate(path):
             if row == 2:
                 plt.xlabel(k)
 
-            rho = scipy.stats.spearmanr(x,y)[0]
-            R = scipy.stats.pearsonr(x,y)[0]
+            rho = scipy.stats.spearmanr(x[ok],y[ok])[0]
+            R = scipy.stats.pearsonr(x[ok],y[ok])[0]
             plt.text(0.05, 0.95, 'R={:.3f}\n{}={:.3f}'.format(R, r'$\rho$', rho), transform=plt.gca().transAxes, ha='left', va='top')
             if k != 'intraexposure' or ylabel != 'nocrm-crm':
                 plt.gca().set_facecolor('gainsboro')
+
+            plt.xlim(*xlim)
+            plt.ylim(*ylim)
     plt.suptitle(summary['title'].replace('s |', 's\n') + ' | {:.2g} DN/s'.format(summary['medflux']))
     #plt.tight_layout()
     filename = 'jitter_' + summary['title'].replace(' | ', '_').replace(' ', '') + '.pdf'

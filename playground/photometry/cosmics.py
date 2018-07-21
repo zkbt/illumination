@@ -147,7 +147,6 @@ def evaluate_strategy(tpf2s,
 
 
 
-
         # create light curve from the raw 2-s cadence
         raw = tpfs['raw'].to_lightcurve()
 
@@ -157,7 +156,7 @@ def evaluate_strategy(tpf2s,
 
         ########################
         # KLUDGE (for bright stars)
-        if summary['medflux'] > 5e4:
+        if (summary['medflux'] > 5e4) and 'apertureradius' not in aperturekw:
             # define the apertures for photometry and background subtraction
             aperturekw['apertureradius'] = 5 + np.sqrt(summary['medflux']/5e4)
             aperture, backgroundaperture = define_apertures(tpfs['nocrm'], **aperturekw)
