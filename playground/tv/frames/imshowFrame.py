@@ -156,7 +156,7 @@ class imshowFrame(FrameBase):
 			# make a stacked image
 			s = np.zeros_like(image)
 			for i in range(self.data.N):
-				s += self.data[i]
+				s += self._transformimage(self.data[i])
 
 			self.plotted['imshow'] = self.ax.imshow(s/self.data.N, extent=extent, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 
