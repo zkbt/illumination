@@ -112,9 +112,9 @@ class FITS_Sequence(Sequence):
 				#self.hdulists = [fits.open(initial)]
 		elif type(initial) == list:
 			# a list of filenames
-			if np.all([type(s) == str for s in initial]):
-				if np.all(['fit' in f.lower() for f in initial]):
-					self.filenames = initial
+			if np.all([os.path.exists(s) for s in initial]):
+				#if np.all(['fit' in f.lower() for f in initial]):
+				self.filenames = initial
 					#self.hdulists = [fits.open(f) for f in initial]
 			elif np.all([type(hdu) == fits.HDUList for hdu in initial]):
 				self._hdulists = initial
