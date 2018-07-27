@@ -1,8 +1,12 @@
 from ..imports import *
 from ..postage.stamps import Stamp
 from ..postage.tpf import EarlyTessTargetPixelFile
-from lightkurve.lightcurve import LightCurve
-from lightkurve.targetpixelfile import TargetPixelFile
+
+try:
+	from lightkurve.lightcurve import LightCurve
+	from lightkurve.targetpixelfile import TargetPixelFile
+except:
+	raise RuntimeWarning("no lightkurve found; some TPF tools may not be available")
 
 timescale = 'tdb'
 # by default, assume all times are TDB
@@ -12,7 +16,20 @@ timescale = 'tdb'
 def guess_time_format(t, default='jd'):
 	'''
 	For a given array of times,
-	make a guessa about its time format.
+	make a guess about its time format.
+
+	Parameters
+	----------
+	t : array, float
+		A time, in any format. This will try to guess the format, assuming we're in the 2000s
+
+	default : str
+		The default format, if no actual choice can be made.
+
+	Returns
+	-------
+	format : str
+		A time format string appropriate for astropy times.
 	'''
 	ranges = dict(	gps=[0.1e9, 2e9], # valid between 1983-03-08 09:46:59.000 and 2043-05-23 03:33:39.000
 					jd=[2.4e6, 3e6], # valid between 1858-11-16 12:00:00.000 and 3501-08-15 12:00:00.000
@@ -144,10 +161,10 @@ class FITS_Sequence(Sequence):
 				#self.hdulists = [fits.open(initial)]
 		elif type(initial) == list:
 			# a list of filenames
-			if np.all([os.path.exists(s) for s in initial]):
-				self.filenames = initial
-			elif np.all([type(hdu) == fits.HDUList for hdu in initial]):
+			if np.all([type(hdu) == fits.HDUList for hdu in initial]):
 				self._hdulists = initial
+			elif np.all([os.path.exists(s) for s in initial]):
+				self.filenames = initial
 
 		# if we're starting frmo hdulists, then get their filenames
 		if self._hdulists is not None:
