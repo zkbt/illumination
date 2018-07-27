@@ -41,41 +41,71 @@ class Sequence(Talker):
 		self.name = name
 
 	def cadence(self):
+		'''
+
+		Returns
+		-------
+
+		'''
+
 		return np.median(np.diff(self.time))
 
 	def _find_timestep(self, time):
 		'''
 		Given a time, identify its index.
+
+		Parameters
+		----------
+
+		time : float
+			A single time (in JD?).
+
+		Returns
+		-------
+		index : int
+			The index of the *closest* time point.
 		'''
 
+		# pull out actual times associated with this sequence
 		times = self._gettimes()
+
+		# if there are no times, return nothing
 		if len(times) == 0:
 			return None
 		else:
+			# find the index of the timepoint that is closest to this one
 			diff = time - times
 			step = np.argmin(abs(diff))
 			return step
-		#try:
-			#step = np.argmin(abs(diff))#
-			#step = np.flatnonzero(abs(diff)<=(self.cadence()/2.0))
-			#print(self.cadence())
-			#assert(len(step) == 1)
-			#return step[0]
-		#except (IndexError, AssertionError):
-		#	return 0
 
 	def _gettimes(self):
 		'''
 		Get the available times associated with this frame.
+
+		Returns
+		-------
+		times : array
+			All of the times associated with this sequence.
 		'''
 		return self.time
 
 	def __repr__(self):
+		'''
+		How should this sequence be represented, by default, as a string.
+		'''
 		return '<{} of {} images>'.format(self.nametag, self.N)
 
+	@property
+	def N(self):
+		'''
+		How many elements are in this sequence?
+		'''
+		return len(self.time)
 
 class FITS_Sequence(Sequence):
-
+	'''
+	A sequence of FITS images, with a time associated with each.
+	'''
 	def __init__(self, initial, ext_image=1, ext_primary=0, name='FITS', **kwargs):
 		'''
 		Initialize a Sequence of FITS images. The goal is
@@ -87,19 +117,21 @@ class FITS_Sequence(Sequence):
 		initial : (many possible types)
 			-single FITS filename, and an extension to use.
 			-list of FITS filenames, and an extension to use.
-			-a glob-like search string containing '*'
+			-a glob-like search string containing '*'.
 			-single FITS HDUList, and an extension to use.
 			-list of loaded FITS HDULists, and an extension to use.
-
 		'''
+
+		# initialize the basic sequence
 		Sequence.__init__(self, name=name)
 
 		# we keep the HDUs out of memory, until we need them
-		# (this should probably be rewritten as an iterator?)
+		# (this should probably someday be rewritten as an iterator?)
 		self._hdulists = None
 
-		# we want to make a list of HDULists
+		# ultimately, we want to make a list of filenames or HDULists
 		if type(initial) == fits.HDUList:
+			# if this is one HDUList, make it a list of them
 			self._hdulists = [initial]
 		elif type(initial) == str:
 			# a search string
@@ -113,15 +145,16 @@ class FITS_Sequence(Sequence):
 		elif type(initial) == list:
 			# a list of filenames
 			if np.all([os.path.exists(s) for s in initial]):
-				#if np.all(['fit' in f.lower() for f in initial]):
 				self.filenames = initial
-					#self.hdulists = [fits.open(f) for f in initial]
 			elif np.all([type(hdu) == fits.HDUList for hdu in initial]):
 				self._hdulists = initial
 
 		# if we're starting frmo hdulists, then get their filenames
 		if self._hdulists is not None:
 			self.filenames = [h.filename() for h in self._hdulists]
+
+		# make sure this FITS_Sequence isn't empty
+		assert(len(self.filenames) > 0)
 
 		self.ext_primary = ext_primary
 		self.ext_image = ext_image
@@ -132,8 +165,9 @@ class FITS_Sequence(Sequence):
 		self.static = {}
 		self.spatial = {}
 
-		# make up an imaginary GPS time
+		# make up an imaginary GPS time (and keep track of whether it is fake)
 		self.time = Time(np.arange(self.N), format='gps', scale='tai')
+		self._timeisfake = True
 		try:
 			self._populate_from_headers()
 		except:
@@ -149,6 +183,8 @@ class FITS_Sequence(Sequence):
 	def _get_hdulist(self, i):
 		'''
 		Return an HDUlist for the ith element in the sequence.
+
+		(We might want to open them only one at a time, for memory's sake.)
 		'''
 		if self._hdulists is not None:
 			return self._hdulists[i]
@@ -160,24 +196,31 @@ class FITS_Sequence(Sequence):
 		Attempt to populate the sequence from the headers.
 		'''
 
+		# pull out the first HDUList in the sequence
 		first = self._get_hdulist(0)
+
+		# check to see if the requested image extension exists
 		try:
 			first[self.ext_image]
 		except IndexError:
 			print('image extension {} not found, switching to 0'.format(self.ext_image))
-			self.ext_image[0]
+			self.ext_image = 0
 
+		# load the headers for the primary and the image
 		pri, img = first[self.ext_primary].header, first[self.ext_image].header
 
 		# if only a single image, everything is static (but can be viewed as temporal)
-
 		if self.N == 1:
 			for h in [pri, img]:
 				for k in h.keys():
 					self.static[k] = h[k]
 					self.temporal[k] = [self.static[k]]
 		else:
+
+			# look through the unique extensions
 			extensions = np.unique([self.ext_primary, self.ext_image])
+
+			# create lists for each key in the headers
 			for e in extensions:
 				h = first[e].header
 				for k in h.keys():
@@ -200,18 +243,28 @@ class FITS_Sequence(Sequence):
 		# try to pull a time axis from these
 		for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB']:
 			try:
+				# treat some value as a time
 				t = self.temporal[k]
+
+				# if it's already an astropy time, keep it as such
 				if isinstance(t, Time):
 					self.time = t
+				# make an astropy time out of the values
 				else:
 					self.time = Time(np.asarray(t), format=timeformat or guess_time_format(t), scale=timescale)
 				self.speak('using {} as the time axis'.format(k))
+				self._timeisfake = False
 			except KeyError:
 				break
 
 	def __getitem__(self, timestep):
 		'''
 		Return the image data for a given timestep.
+
+		Parameters
+		----------
+		timestep : int
+			An index for a timestep.
 		'''
 		if timestep is None:
 			return None
@@ -219,11 +272,12 @@ class FITS_Sequence(Sequence):
 			return self._get_hdulist(timestep)[self.ext_image].data
 
 
+
 class Stamp_Sequence(Sequence):
 	def __init__(self, initial, name='Stamp', **kwargs):
 		'''
 		Initialize a Sequence from a Stamp.
-
+		(a Stamp is a custom, simplified version of a TPF)
 
 		Parameters
 		----------
@@ -246,13 +300,15 @@ class Stamp_Sequence(Sequence):
 
 		# create a sequence out of that stamp
 		Sequence.__init__(self, name=name)
+
+		# (not coincidentally), a Stamp has similar variables to a Sequence
 		for k in stamp._savable:
 			vars(self)[k] = vars(stamp)[k]
 
-		# set up the basic sequence
+		# set up the basic sequence, including the time array
 		self.stamp = stamp
 		if isinstance(self.stamp.time, Time):
-			self.time=self.stamp.time
+			self.time = self.stamp.time
 		else:
 			self.time = Time(self.stamp.time, format=guess_time_format(self.stamp.time), scale=timescale)
 
@@ -264,10 +320,6 @@ class Stamp_Sequence(Sequence):
 			return None
 		else:
 			return self.stamp.todisplay[timestep, :, :]
-
-	@property
-	def N(self):
-		return len(self.time)
 
 	@property
 	def titlefordisplay(self):
@@ -318,9 +370,7 @@ class TPF_Sequence(Sequence):
 		else:
 			return self.tpf.flux[timestep, :, :]
 
-	@property
-	def N(self):
-		return len(self.time)
+
 
 class Timeseries_Sequence(Sequence):
 	'''
