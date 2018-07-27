@@ -95,6 +95,10 @@ def photometer(tpf, **kw):
     return lc
 
 def calculate_differences(tpf, **kw):
+    '''
+    Make a copy of a TPF that is populated with time-differences.
+    '''
+
     differenced = copy.deepcopy(tpf)
 
     differenced.hdu[1].data['FLUX'][:-1,:,:] = np.diff(tpf.flux, axis=0)
@@ -103,6 +107,53 @@ def calculate_differences(tpf, **kw):
     #differenced.hdu[1].data['FLUX'][0,:,:] = 0#np.nan
 
     return differenced
+
+def calculate_gradients(image, visualize=False):
+    '''
+    Make the 2D image gradients of the image.
+
+    Parameters
+    ----------
+
+    image : 2D array
+        For example, a median-stacked image.
+
+    Returns
+    -------
+
+    dMdx_forward, dMdy_forward, dMdx_forward, dMdy_backward : 2D arrays
+        Each the same size as the original image,
+        containing the image gradient components.
+    '''
+    dMdx_forward, dMdx_backward, dMdy_forward, dMdy_backward = [np.zeros_like(image) for _ in range(4)]
+    dMdx_forward[:,:-1] = np.diff(image, axis=1)
+    dMdx_backward[:,1:] = np.diff(image, axis=1)
+    dMdy_forward[:-1,:] = np.diff(image, axis=0)
+    dMdy_backward[1::] = np.diff(image, axis=0)
+
+    if visualize:
+        fi, ax = plt.subplots(4, 2, sharex=True, sharey=True, figsize=(3,7))
+        grady, gradx = np.gradient(image)# np.diff(image[::-1], axis=1)[::-1]
+        kw = dict(origin='lower')
+        ax[0,0].imshow(image, **kw)
+        ax[0,1].set_visible(False)
+        ax[1,0].imshow(dMdx_forward, **kw)
+        ax[2,0].imshow(dMdx_backward, **kw)
+        ax[3,0].imshow(gradx, **kw)
+
+        ax[1,1].imshow(dMdy_forward, **kw)
+        ax[2,1].imshow(dMdy_backward, **kw)
+        ax[3,1].imshow(grady, **kw)
+
+        ax[1,0].set_ylabel('forward')
+        ax[2,0].set_ylabel('backward')
+        ax[3,0].set_ylabel('threepix')
+
+        ax[3,0].set_xlabel('x'); ax[3,1].set_xlabel('y')
+    return dMdx_forward, dMdy_forward, dMdx_forward, dMdy_backward
+
+
+
 
 # NEXT STEPS
 # -compare light curves with/without CRM

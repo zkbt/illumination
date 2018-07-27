@@ -3,6 +3,9 @@ from ..colors import cmap_norm_ticks
 from ..sequence import make_sequence
 
 class imshowFrame(FrameBase):
+	'''
+	An imshow frame can show a sequence of images, as an imshow.
+	'''
 
 	frametype = 'imshow'
 	xmin, xmax = None, None
@@ -10,7 +13,7 @@ class imshowFrame(FrameBase):
 	def __init__(self, ax=None, data=None, name='image', title=None,**kwargs):
 		FrameBase.__init__(self, ax=ax, data=data, name=name,  **kwargs)
 
-		# if the data re that the data are a sequence of images
+		# ensure that the data are a sequence of images
 		self.data = make_sequence(self.data, **kwargs)
 
 		# if there's an image, use it to set the size

@@ -36,7 +36,10 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
     '''
 
     # pull out the files
-    files = glob.glob(pattern)
+    if type(pattern) == list:
+        files = pattern
+    else:
+        files = list(np.sort(glob.glob(pattern)))
     data = {'cam{}'.format(c):[] for c in [1,2,3,4,'?']}
 
     # sort them into cameras
