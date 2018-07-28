@@ -99,8 +99,8 @@ class EmptyTimeseriesFrame(FrameBase):
         # add a time label
         #s = self._timestring(time)
         # try:
-        #	self.plotted['text'].set_text(s)
+        #	self.plotted['time'].set_text(s)
         # except KeyError:
-        #	self.plotted['text'] = self.ax.text(0.01, +0.02, s, va='bottom', zorder=1e6, transform=self.ax.transAxes)
+        #	self.plotted['time'] = self.ax.text(0.01, +0.02, s, va='bottom', zorder=1e6, transform=self.ax.transAxes)
 
         self.currenttimestep = time

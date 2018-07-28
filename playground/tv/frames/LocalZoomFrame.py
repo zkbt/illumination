@@ -130,9 +130,7 @@ class LocalZoomFrame(imshowFrame):
             return
 
         if timestep != self.currenttimestep:
-            self.plotted['imshow'].set_data(image)
+            self.plotted['image'].set_data(image)
 
             timestring = self.source._timestring(actual_time)
-            if self.source._currenttimestring != timestring:
-                self.source.plotted['text'].set_text(timestring)
-                self.source._currenttimestring = timestring
+            self.source.plotted['time'].set_text(timestring)

@@ -8,12 +8,63 @@ class imshowFrame(FrameBase):
     An imshow frame can show a sequence of images, as an imshow.
     '''
 
+    # what is the type of this frame?
     frametype = 'imshow'
+
+    # what are the coordinate limits?
     xmin, xmax = None, None
     ymin, ymax = None, None
 
-    def __init__(self, ax=None, data=None, name='image', title=None, cmapkw={}, **kwargs):
-        FrameBase.__init__(self, ax=ax, data=data, name=name,  **kwargs)
+    def __init__(self,
+                 name='image',
+                 ax=None,
+                 data=None,
+                 title=None,
+                 plotingredients=[  'image',
+                                    'time',
+                                    'colorbar',
+                                    'arrows',
+                                    'title'], # other options might be 'filename', 'axes', what else?
+                 cmapkw={},
+                 **kwargs):
+        '''
+        Initialize this imshowFrame, will can show a sequence of 2D images.
+
+        Parameters
+        ----------
+
+        name : str
+            A name to give this Frame.
+
+        ax : matplotlib.axes.Axes instance
+            All plotting will happen inside this ax.
+            If set to None, the `self.ax attribute` will
+            need to be set manually before plotting.
+
+        data : Image_Sequence
+            Any Sequence that contains 2D images.
+
+        title : str
+            A string to display as the title of this frame.
+            If nothing, this will try to pull a title out
+            of the data, or leave it blank.
+
+        plotingredients : list
+            A list of keywords indicating features that will be
+            plotted in this frame. It can be modified either now
+            when initializing the frame, or any time before
+            calling `i.plot()` from the illustration.
+
+        cmapkw : dict
+            Dictionary of keywords to feed into the cmap generation.
+        '''
+
+        # initialize the frame base
+        FrameBase.__init__(self, name=name,
+                                 ax=ax,
+                                 data=data,
+                                 plotingredients=plotingredients,
+                                 **kwargs)
 
         # ensure that the data are a sequence of images
         self.data = make_sequence(self.data, **kwargs)
@@ -25,6 +76,7 @@ class imshowFrame(FrameBase):
         except (IndexError, AttributeError, TypeError):
             pass
 
+        # try to figure out a title for the imshowFrame
         try:
             self.titlefordisplay = self.data.titlefordisplay
         except AttributeError:
@@ -32,6 +84,7 @@ class imshowFrame(FrameBase):
         if title is not None:
             self.titlefordisplay = title
 
+        # keep track of an extra keywords for generating the cmaps
         self.cmapkw = cmapkw
 
     def _cmap_norm_ticks(self, *args, **kwargs):
@@ -51,6 +104,7 @@ class imshowFrame(FrameBase):
             self.cmap, self.norm, self.ticks = self.illustration._cmap_norm_ticks(**kwargs)
             return self.cmap, self.norm, self.ticks
         else:
+            # use already-defined properties, or make new ones
             try:
                 return self.cmap, self.norm, self.ticks
             except AttributeError:
@@ -67,30 +121,44 @@ class imshowFrame(FrameBase):
         Parameters
         ----------
 
-        image : the output from imshow
+        image : the output returned from imshow
 
         '''
+        # do we use a shared colorbar for the whole illustration?
         if self.illustration.sharecolorbar:
-            # try to use a shared colorbar for the whole illustration
+
             try:
-                self.illustration.colorbar
-            except AttributeError:
-                self.illustration.colorbar = self.illustration._add_colorbar(
-                    image, ticks=self.ticks)
+                self.illustration.plotted['colorbar']
+            except KeyError:
+                c = self.illustration._add_colorbar(image,
+                                                    ticks=self.ticks)
+                self.illustration.plotted['colorbar'] = c
+
+        # or do we just give this one frame its own colorbar?
         else:
             try:
-                self.colorbar
+                self.plotted['colorbar']
             except:
                 # create a colorbar for this illustration
-                self.colorbar = self.illustration._add_colorbar(
-                    image, self.ax, ticks=self.ticks)
+                c = self.illustration._add_colorbar(image,
+                                                    self.ax,
+                                                    ticks=self.ticks)
+                self.plotted['colorbar'] = c
 
     def draw_arrows(self, origin=(0, 0), ratio=0.05):
         '''
         Draw arrows on this Frame, to indicate
         the +x and +y directions.
+
+        Parameters
+        ----------
+        origin : tuple
+            The (x,y) coordinates of the corner of the arrows.
+        ratio : float
+            What fraction of the (longest) axis should the arrows span?
         '''
 
+        # figure out the length of the arrows (in data units)
         try:
             xspan = np.abs(self.xmax - self.xmin)
             yspan = np.abs(self.ymax - self.ymin)
@@ -98,7 +166,9 @@ class imshowFrame(FrameBase):
         except:
             length = 50
 
+        # store the arrows in a dictionary
         arrows = {}
+
         # rotate into the display coordinates
         unrotatedx, unrotatedy = origin
         x, y = self._transformxy(*origin)
@@ -126,7 +196,7 @@ class imshowFrame(FrameBase):
 
         return arrows
 
-    def plot(self, timestep=0, clean=False, **kwargs):
+    def plot(self, time=None, clean=False, **kwargs):
         '''
         Make an imshow of a single frame of the cube.
         '''
@@ -141,10 +211,11 @@ class imshowFrame(FrameBase):
             plt.cla()
 
         # pull out the array to work on
-        image, actual_time = self._get_image()
-        if actual_time is None:
-            timelabel = ''
-        else:
+        image, actual_time = self._get_image(time)
+
+        # plot the image, as an imshow
+        if ('image' in self.plotingredients) and (image is not None):
+
             # pull out the cmap, normalization, and suggested ticks
             cmap, norm, ticks = self._cmap_norm_ticks(image, **self.cmapkw)
 
@@ -157,47 +228,64 @@ class imshowFrame(FrameBase):
                 firstimage = self.data.median()
             except (AttributeError, AssertionError):
                 firstimage = image
-            self.plotted['imshow'] = self.ax.imshow(
+            self.plotted['image'] = self.ax.imshow(
                 firstimage, extent=extent, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 
-            # define the timelabel
-            timelabel = self._timestring(self._gettimes()[timestep])
-
+        # plot the colorbar
+        if ('colorbar' in self.plotingredients) and 'imshow' in self.plotted:
             # add the colorbar
-            self._ensure_colorbar_exists(self.plotted['imshow'])
+            self.plotted['colorbar'] = self._ensure_colorbar_exists(self.plotted['image'])
 
-        # add a time label
-        self.plotted['text'] = self.ax.text(
-            0.0, -0.02, timelabel, va='top', zorder=1e6, color='gray', transform=self.ax.transAxes)
+        # plot some text labeling the time
+        if 'time' in self.plotingredients:
+            if actual_time is None:
+                timelabel = ''
+            else:
+                timelabel = self._timestring(actual_time)
 
-        # pull the title for this frame
-        plt.title(self.titlefordisplay)
+            # add a time label
+            self.plotted['time'] = self.ax.text(
+                0.0, -0.02, timelabel, va='top', zorder=1e6, color='gray', transform=self.ax.transAxes)
 
-        # turn the axes lines off
-        plt.axis('off')
+        # plot the arrows
+        if 'arrows' in self.plotingredients:
+            self.plotted['arrows'] = self.draw_arrows()
+
+        # plot a title on this frame
+        if 'title' in self.plotingredients:
+            plt.title(self.titlefordisplay)
+
+        # plot lines and ticks for axes only if requested
+        if 'axes' not in self.plotingredients:
+            # turn the axes lines off
+            plt.axis('off')
+
+        # change the x and y limits, if need be
+        self.ax.set_xlim(self.xmin, self.xmax)
+        self.ax.set_ylim(self.ymin, self.ymax)
+        self.ax.set_aspect('equal')
 
         # keep track of the current plotted timestep
+        try:
+            timestep = self._find_timestep(time)
+        except:
+            timestep = None
         self.currenttimestep = timestep
 
-        plt.xlim(self.xmin, self.xmax)
-        plt.ylim(self.ymin, self.ymax)
-
-        self.plotted['arrow'] = self.draw_arrows()
-        # self.ax.set_facecolor('black')
 
     """
-	def _timestring(self, time):
-		'''
-		Return a string, given an input time (still in spacecraft time).
-		'''
-		try:
-			offset = np.min(self.illustration._gettimes())
-		except AttributeError:
-			print('no illustration times found!')
-			offset=0
+    def _timestring(self, time):
+    '''
+    Return a string, given an input time (still in spacecraft time).
+    '''
+    try:
+    offset = np.min(self.illustration._gettimes())
+    except AttributeError:
+    print('no illustration times found!')
+    offset=0
 
-		return 't={:.5f}{:+.5f}'.format(offset.jd, (time-offset).to('day'))
-	"""
+    return 't={:.5f}{:+.5f}'.format(offset.jd, (time-offset).to('day'))
+    """
 
     def _get_image(self, time=None):
         '''
@@ -212,8 +300,8 @@ class imshowFrame(FrameBase):
             assert(rawimage is not None)
             image = self._transformimage(rawimage)
             actual_time = self._gettimes()[timestep]
-            #print(" ")
-            #print(time, timestep)
+            # print(" ")
+            # print(time, timestep)
         except (IndexError, AssertionError, ValueError):
             return None, None
         return image, actual_time
@@ -243,6 +331,6 @@ class imshowFrame(FrameBase):
             return
 
         if timestep != self.currenttimestep:
-            self.plotted['imshow'].set_data(image)
+            self.plotted['image'].set_data(image)
 
-            self.plotted['text'].set_text(self._timestring(actual_time))
+            self.plotted['time'].set_text(self._timestring(actual_time))

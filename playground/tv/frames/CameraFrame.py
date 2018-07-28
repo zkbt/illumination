@@ -9,12 +9,6 @@ class CameraFrame(imshowFrame):
 
         imshowFrame.__init__(self, *args, **kwargs)
 
-        # tidy up the axes for this camera
-        self.ax.set_aspect('equal')
-        plt.setp(self.ax.get_xticklabels(), visible=False)
-        plt.setp(self.ax.get_yticklabels(), visible=False)
-        # self.ax.set_facecolor('silver')
-
         self.xmin, self.ymin = 0, 0
         try:
             # if there's an image, use it to set the size

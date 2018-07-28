@@ -7,38 +7,55 @@ class FrameBase:
     plotted = None
     frametype = 'base'
     timeunit = 'day'
+    aspectratio = 1
+    plotted = {}
 
-    def __init__(self, ax=None,
-                 data=None,
-                 name='',
-                 illustration=None,
-                 aspectratio=1,
-                 **kwargs):
+    def __init__(self,
+                    name='',
+                    ax=None,
+                    data=None,
+                    illustration=None,
+                    plotingredients=[],
+                    **kwargs):
         '''
-        Initialize this Frame.
-
-
-        choosing the Axes in which it will display,
-        and the setting data to be associated with it.
+        Initialize this Frame, which can be one (of multiple)
+        frames in an Illustration. Before plotting, each frame
+        needs to have an `ax` defined saying where it should be
+        plotted and (generally) some `data` associated with it.
 
         Parameters
         ----------
 
+        name : str
+            A name to give this Frame.
+
         ax : matplotlib.axes.Axes instance
-                All plotting will happen inside this ax.
-                If set to None, the `self.ax attribute` will
-                need to be set manually before plotting.
+            All plotting will happen inside this ax.
+            If set to None, the `self.ax attribute` will
+            need to be set manually before plotting.
 
         data : flexible
-                It can be custom object (e.g. a Stamp),
-                or simple arrays, or a list of HDULists,
-                or something else, depending on
-                what this actual Frame does with it
-                in `plot` and `update`.
+            It can be custom object (e.g. a Stamp),
+            or simple arrays, or a list of HDULists,
+            or something else, depending on
+            what this actual Frame does with it
+            in `plot` and `update`.
 
-        name : str
-                A name to give this Frame.
+        illustration : an Illustration
+            The illustration in which this frame will be embedded.
+            We keep track of this (sometimes) because we might want
+            information that's shared across the whole illustration
+            to be accessible to this individual frame when plotting.
+
+        plotingredients : list
+            A list of keywords indicating features that will be
+            plotted in this frame. It can be modified either now
+            when initializing the frame, or any time before
+            calling `i.plot()` from the illustration.
         '''
+
+        # store a name for this frame
+        self.name = name
 
         # assign this frame an axes to sit in
         self.ax = ax
@@ -49,15 +66,12 @@ class FrameBase:
         # is there another overarching frame this one should be aware of?
         self.illustration = illustration
 
-        # what is the intrinsic aspect ratio of this frame?
-        self.aspectratio = aspectratio
+        # what ingredients should be included when plotting?
+        self.plotingredients = plotingredients
 
-        # keep track of a list of frames included in this one
+        # keep track of a list of frames included in this one (e.g. zooms)
         self.includes = []
 
-        # store a name for this frame, if there is one
-        self.name = name
-        self._currenttimestring = None
 
     @property
     def offset(self):

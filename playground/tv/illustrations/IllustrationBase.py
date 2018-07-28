@@ -10,6 +10,7 @@ class IllustrationBase:
     for a linked visualization of images.
     '''
     illustrationtype = 'Base'
+    plotted = {}
 
     def __init__(self, nrows=1, ncols=1, figkw=dict(figsize=None, dpi=None), sharecolorbar=True, **kwargs):
         '''
@@ -150,7 +151,7 @@ class IllustrationBase:
             pad=0.07,
             ticks=ticks)
 
-        #colorbarred = plt.colorbar(self.plotted['imshow'], ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.07, ticks=ticks)
+        #colorbarred = plt.colorbar(self.plotted['image'], ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.07, ticks=ticks)
         colorbar.ax.set_xticklabels(
             ['{:.0f}'.format(v) for v in ticks], fontsize=8, color='gray')
         colorbar.outline.set_visible(False)

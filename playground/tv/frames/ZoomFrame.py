@@ -5,7 +5,7 @@ from astropy.nddata.utils import Cutout2D
 class ZoomFrame(imshowFrame):
     frametype = 'Zoom'
 
-    def __init__(self, source, position=(0, 0), size=(10, 10), **kwargs):
+    def __init__(self, source, position=(0, 0), size=(10, 10), cmapkw={}, **kwargs):
         '''
         Initialize a ZoomFrame that can display
         images taken from a zoomed subset of
@@ -40,6 +40,7 @@ class ZoomFrame(imshowFrame):
 
         self.titlefordisplay = '{} | {}'.format(self.frametype, self.position)
 
+        self.cmapkw = cmapkw
     def _gettimes(self):
         '''
         Get the available times associated with this frame.
@@ -87,5 +88,5 @@ class ZoomFrame(imshowFrame):
             return
 
         if timestep != self.currenttimestep:
-            self.plotted['imshow'].set_data(image)
-            self.plotted['text'].set_text(self._timestring(actual_time))
+            self.plotted['image'].set_data(image)
+            self.plotted['time'].set_text(self._timestring(actual_time))

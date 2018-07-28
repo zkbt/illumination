@@ -96,7 +96,7 @@ class LocalStampFrame(imshowFrame):
         zorder = zooms.index(self)
 
         # draw the imshow
-        self.plotted['imshow'] = self.source.ax.imshow(image,
+        self.plotted['image'] = self.source.ax.imshow(image,
                                                        extent=extent,
                                                        interpolation='nearest',
                                                        origin='lower',
@@ -118,7 +118,7 @@ class LocalStampFrame(imshowFrame):
         #boxonoriginal = self.cutout.plot_on_original(ax=self.source.ax, clip_on=True)
 
         # make sure there's a colorbar
-        self.source._ensure_colorbar_exists(self.plotted['imshow'])
+        self.source._ensure_colorbar_exists(self.plotted['image'])
 
         # keep track of the current timestep
         self.currenttimestep = timestep
@@ -134,8 +134,6 @@ class LocalStampFrame(imshowFrame):
             return
 
         if timestep != self.currenttimestep:
-            self.plotted['imshow'].set_data(image)
+            self.plotted['image'].set_data(image)
             timestring = self.source._timestring(actual_time)
-            if self.source._currenttimestring != timestring:
-                self.source.plotted['text'].set_text(timestring)
-                self.source._currenttimestring = timestring
+            self.source.plotted['time'].set_text(timestring)
