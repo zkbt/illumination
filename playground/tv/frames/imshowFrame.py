@@ -12,7 +12,7 @@ class imshowFrame(FrameBase):
     xmin, xmax = None, None
     ymin, ymax = None, None
 
-    def __init__(self, ax=None, data=None, name='image', title=None, **kwargs):
+    def __init__(self, ax=None, data=None, name='image', title=None, cmapkw={}, **kwargs):
         FrameBase.__init__(self, ax=ax, data=data, name=name,  **kwargs)
 
         # ensure that the data are a sequence of images
@@ -32,6 +32,8 @@ class imshowFrame(FrameBase):
         if title is not None:
             self.titlefordisplay = title
 
+        self.cmapkw = cmapkw
+
     def _cmap_norm_ticks(self, *args, **kwargs):
         '''
         Return the cmap and normalization.
@@ -46,7 +48,7 @@ class imshowFrame(FrameBase):
 
         if self.illustration.sharecolorbar:
             # pull the cmap and normalization from the illustration
-            self.cmap, self.norm, self.ticks = self.illustration._cmap_norm_ticks()
+            self.cmap, self.norm, self.ticks = self.illustration._cmap_norm_ticks(**kwargs)
             return self.cmap, self.norm, self.ticks
         else:
             try:
@@ -56,24 +58,6 @@ class imshowFrame(FrameBase):
                 self.cmap, self.norm, self.ticks = cmap_norm_ticks(
                     *args, **kwargs)
 
-                # make a colorbar attached to the frame
-                #	axes = [f.ax for f in self.illustration.frames.values() if f.ax is not None]
-                '''
-				self.colorbar = plt.matplotlib.colorbar.ColorbarBase(
-									ax=self.ax,
-									cmap=self.cmap,
-									norm=self.norm,
-									orientation='horizontal',
-									#label=self.data.colorbarlabelfordisplay,
-									#fraction=0.04,
-									#pad=0.07,
-									ticks=self.ticks)
-
-				#colorbarred = plt.colorbar(self.plotted['imshow'], ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.07, ticks=ticks)
-				self.colorbar.ax.set_xticklabels(['{:.0f}'.format(v) for v in self.ticks])
-				self.colorbar.outline.set_visible(False)
-				self.plotted['colorbar'] = self.colorbar
-				'''
                 return self.cmap, self.norm, self.ticks
 
     def _ensure_colorbar_exists(self, image):
@@ -162,7 +146,7 @@ class imshowFrame(FrameBase):
             timelabel = ''
         else:
             # pull out the cmap, normalization, and suggested ticks
-            cmap, norm, ticks = self._cmap_norm_ticks(image)
+            cmap, norm, ticks = self._cmap_norm_ticks(image, **self.cmapkw)
 
             # display the image for this frame
             extent = [0, image.shape[1], 0, image.shape[0]]

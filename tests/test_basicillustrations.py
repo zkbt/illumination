@@ -8,10 +8,10 @@ directory = 'examples/'
 mkdir(directory)
 
 
-def test_SingleCameraIllustration(N=10):
+def test_SingleCameraIllustration(N=10, **kw):
     print("\nTesting a Single Camera illustration.")
     illustration = SingleCameraIllustration(
-        data=[create_test_fits(rows=300, cols=300) for _ in range(N)], ext_image=1)
+        data=[create_test_fits(rows=300, cols=300) for _ in range(N)], ext_image=1, **kw)
     illustration.plot()
     filename = os.path.join(directory, 'single-camera-animation.mp4')
     animate(illustration, filename)
