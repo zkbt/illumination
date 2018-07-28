@@ -1,6 +1,6 @@
-from .Sequence import *
+from .Image_Sequence import *
 
-class Stamp_Sequence(Sequence):
+class Stamp_Sequence(Image_Sequence):
 	def __init__(self, initial, name='Stamp', **kwargs):
 		'''
 		Initialize a Sequence from a Stamp.
@@ -54,6 +54,12 @@ class Stamp_Sequence(Sequence):
 			return None
 		else:
 			return self.stamp.todisplay[timestep, :, :]
+
+	def _gather_3d(self):
+		'''
+		Gather a 3D cube of images.
+		'''
+		return self.stamp.todisplay[:, :, :]
 
 	@property
 	def titlefordisplay(self):

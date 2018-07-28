@@ -1,6 +1,6 @@
-from .Sequence import *
+from .Image_Sequence import *
 
-class FITS_Sequence(Sequence):
+class FITS_Sequence(Image_Sequence):
 	'''
 	A sequence of FITS images, with a time associated with each.
 	'''

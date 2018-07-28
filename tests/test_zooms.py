@@ -8,7 +8,7 @@ directory = 'examples/'
 mkdir(directory)
 
 
-def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50,50)):
+def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50, 50)):
     print("\nTesting a Single Camera with a Zoom.")
 
     # create the illustration
@@ -25,7 +25,10 @@ def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50,50)):
     return illustration
 
 
-def test_SingleCameraIllustrationLocalZoom(N=3, testgeometry=False, zoom=10, size=(10,10)):
+def test_SingleCameraIllustrationLocalZoom(N=3,
+                                           testgeometry=False,
+                                           zoom=10,
+                                           size=(10, 10)):
     '''
     Test the local zoom windows on a Single Camera.
     '''
@@ -40,17 +43,24 @@ def test_SingleCameraIllustrationLocalZoom(N=3, testgeometry=False, zoom=10, siz
 
     # some options for where to add the stamps (corners, or random?)
     if testgeometry:
-        for row in [0,nrows]:
+        for row in [0, nrows]:
             for col in [0, ncols]:
-                f = add_zoom(illustration, position=(col,row), zoom=zoom, size=size)
-        f = add_zoom(illustration, position=(ncols/2,nrows/2), zoom=zoom, size=size)
+                f = add_zoom(illustration,
+                             position=(col, row),
+                             zoom=zoom,
+                             size=size)
+        f = add_zoom(illustration, position=(
+            ncols / 2, nrows / 2), zoom=zoom, size=size)
         filename = 'single-camera-local-zoom-geometry-animation.mp4'
     else:
         for i in range(N):
-            row, col = np.random.randint(0,nrows), np.random.randint(0,ncols)
-            f = add_zoom(illustration, position=(col,row), zoom=zoom, size=size)
+            row, col = np.random.randint(0, nrows), np.random.randint(0, ncols)
+            f = add_zoom(illustration,
+                         position=(col, row),
+                         zoom=zoom, size=size)
             f.titlefordisplay = ''
-        filename = os.path.join(directory, 'single-camera-local-zoom-animation.mp4')
+        filename = os.path.join(
+            directory, 'single-camera-local-zoom-animation.mp4')
 
     # plot and animate
     illustration.plot()
@@ -59,7 +69,7 @@ def test_SingleCameraIllustrationLocalZoom(N=3, testgeometry=False, zoom=10, siz
     return illustration
 
 
-def test_FourCameraLocalZoom(N=3, zoom=3, size=(50,50)):
+def test_FourCameraLocalZoom(N=3, zoom=3, size=(50, 50)):
     '''
     Test the local zooms on four cameras.
     '''
@@ -67,14 +77,15 @@ def test_FourCameraLocalZoom(N=3, zoom=3, size=(50,50)):
     # create the illustration
     print("\nTesting a FourCamera illustration with local zooms.")
     nrows, ncols = 300, 300
-    data ={'cam{}'.format(i+1):[create_test_fits(rows=300, cols=300) for _ in range(10)] for i in range(4)}
+    data = {'cam{}'.format(i + 1): [create_test_fits(rows=300, cols=300)
+                                    for _ in range(10)] for i in range(4)}
     illustration = FourCameraIllustration(**data, ext_image=1)
 
     # add some random zoom to it
     for i in range(N):
-        row, col = np.random.randint(0,nrows), np.random.randint(0,ncols)
-        f = add_zoom(illustration, camera='cam{}'.format(np.random.randint(1,5)),
-                                  position=(col,row), zoom=zoom, size=size)
+        row, col = np.random.randint(0, nrows), np.random.randint(0, ncols)
+        f = add_zoom(illustration, camera='cam{}'.format(np.random.randint(1, 5)),
+                     position=(col, row), zoom=zoom, size=size)
         f.titlefordisplay = ''
 
     # plot and animate
@@ -83,6 +94,7 @@ def test_FourCameraLocalZoom(N=3, zoom=3, size=(50,50)):
     animate(illustration, filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
+
 
 """
 def test_SingleCameraIllustrationWithStamps():

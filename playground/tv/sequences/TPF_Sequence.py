@@ -1,6 +1,6 @@
-from .Sequence import *
+from .Image_Sequence import *
 
-class TPF_Sequence(Sequence):
+class TPF_Sequence(Image_Sequence):
 	def __init__(self, initial, name='TPF', **kwargs):
 		'''
 		Initialize a Sequence from a Target Pixel File
@@ -48,3 +48,9 @@ class TPF_Sequence(Sequence):
 			return None
 		else:
 			return self.tpf.flux[timestep, :, :]
+
+	def _gather_3d(self):
+		'''
+		Gather a 3D cube of images.
+		'''
+		return self.tpf.flux[:, :, :]
