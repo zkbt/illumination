@@ -18,7 +18,7 @@ class CameraFrame(imshowFrame):
 		try:
 			# if there's an image, use it to set the size
 			self.ymax, self.xmax = self.data[0].shape
-		except IndexError:
+		except (IndexError, AttributeError, TypeError):
 			# allow us to create an empty image
 			self.ymax = 4156
 			self.xmax = 4272

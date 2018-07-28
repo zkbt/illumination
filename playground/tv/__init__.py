@@ -9,4 +9,4 @@ from .tools import illustratefits
 from .animation import animate
 from .zoom import *
 from .illustrations import *
-from .sequence import *
+from .sequences import *

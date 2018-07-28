@@ -1,4 +1,4 @@
-from playground.tv.sequence import *
+from playground.tv.sequences import *
 from playground.cartoons import *
 from playground.imports import *
 

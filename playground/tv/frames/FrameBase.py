@@ -5,10 +5,18 @@ class FrameBase:
 	data = None
 	plotted = None
 	frametype = 'base'
+	timeunit = 'day'
 
-	def __init__(self, ax=None, data=None, name='', illustration=None, aspectratio=1, **kwargs):
+	def __init__(self, ax=None,
+					   data=None,
+					   name='',
+					   illustration=None,
+					   aspectratio=1,
+					   **kwargs):
 		'''
-		Initialize this frame,
+		Initialize this Frame.
+
+
 		choosing the Axes in which it will display,
 		and the setting data to be associated with it.
 
@@ -17,12 +25,16 @@ class FrameBase:
 
 		ax : matplotlib.axes.Axes instance
 			All plotting will happen inside this ax.
+			If set to None, the `self.ax attribute` will
+			need to be set manually before plotting.
+
 		data : flexible
 			It can be custom object (e.g. a Stamp),
 			or simple arrays, or a list of HDULists,
 			or something else, depending on
 			what this actual Frame does with it
 			in `plot` and `update`.
+
 		name : str
 			A name to give this Frame.
 		'''
@@ -48,12 +60,24 @@ class FrameBase:
 
 	@property
 	def offset(self):
+		'''
+		Get a time offset, to use as a zero-point.
+
+		Returns
+		-------
+		offset : float
+			An appropriate time zero-point (in JD).
+		'''
+
+		# is an offset already defined?
 		try:
 			return self._offset
 		except AttributeError:
+			# is there a minimum of the illustration's times?
 			try:
 				self._offset = np.min(self.illustration._gettimes().jd)
 			except (AttributeError, ValueError):
+				# otherwise, use only this frame to estimate the offset
 				try:
 					self._offset = np.min(self._gettimes().jd)
 				except ValueError:
@@ -63,12 +87,30 @@ class FrameBase:
 
 	def _timestring(self, time):
 		'''
-		Return a string, given an input time (still in spacecraft time).
+		Return a string, given an input time.
+
+		Parameters
+		----------
+		time : astropy Time
+			A particular time.
+
+		Returns
+		-------
+		timestring : str
+			A string describing the times.
 		'''
-		return 't={:.5f}{:+.5f}'.format(self.offset, time.jd-self.offset)
+
+		days = time.jd-self.offset
+		inunits = (days*u.day).to(self.timeunit)
+		return 't={:.5f}{:+.5f}'.format(self.offset, inunits)
 
 	def __repr__(self):
-		return '<{} Frame | data={}>'.format(self.frametype, self.data)
+		'''
+		Default string representation for this frame.
+		'''
+		return '<{} Frame | data={} | name={}>'.format(self.frametype,
+													   self.data,
+													   self.name)
 
 	def plot(self):
 		'''
@@ -85,6 +127,17 @@ class FrameBase:
 	def _find_timestep(self, time):
 		'''
 		Given a time, identify its index.
+
+		Parameters
+		----------
+
+		time : float
+			A single time (in JD?).
+
+		Returns
+		-------
+		index : int
+			The index of the *closest* time point.
 		'''
 		return self.data._find_timestep(time)
 
@@ -92,8 +145,11 @@ class FrameBase:
 		'''
 		Get the available times associated with this frame.
 		'''
+
+		# does the data have a time axis defined?
 		try:
 			return self.data.time
+		# if not, return an empty time
 		except AttributeError:
 			return Time([], format='gps')
 
@@ -119,16 +175,19 @@ class FrameBase:
 		try:
 			times, cadence = self._precaculatedtimesandcadence[round]
 		except KeyError:
-			alltimes = self._gettimes()
+			gps = self._gettimes().gps
 
 			if round is None:
-				diffs = np.diff(np.sort(alltimes))
+				diffs = np.diff(np.sort(gps))
 				round = np.min(diffs[diffs > 0])
-			baseline = np.min(alltimes)
-			rounded = round*np.round(np.array(alltimes-baseline)/round) + baseline
-			times = np.unique(rounded)
-			cadence = np.min(np.diff(times))
+
+			baseline = np.min(gps)
+			rounded = round*np.round((gps-baseline)/round) + baseline
+			uniquegpstimes = np.unique(rounded)
+			cadence = np.min(np.diff(uniquegpstimes))*u.s
+			times = Time(uniquegpstimes, format='gps')
 			self._precaculatedtimesandcadence[round] = times, cadence
+
 		return times, cadence
 
 	def _transformimage(self, image):

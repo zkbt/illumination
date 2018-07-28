@@ -1,6 +1,6 @@
 from .FrameBase import *
 from ..colors import cmap_norm_ticks
-from ..sequence import make_sequence
+from ..sequences import make_sequence
 
 class imshowFrame(FrameBase):
 	'''
@@ -20,7 +20,7 @@ class imshowFrame(FrameBase):
 		try:
 			self.xmin, self.ymin = 0,0
 			self.ymax, self.xmax = self.data[0].shape
-		except IndexError:
+		except (IndexError, AttributeError, TypeError):
 			pass
 
 		try:

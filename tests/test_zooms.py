@@ -12,8 +12,10 @@ def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50,50)):
     print("\nTesting a Single Camera with a Zoom.")
 
     # create the illustration
-    illustration = SingleCameraWithZoomIllustration(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1,
-                    zoomposition=position, zoomsize=size)
+    illustration = SingleCameraWithZoomIllustration(
+        data=[create_test_fits(rows=300, cols=300) for _ in range(10)],
+        ext_image=1,
+        zoomposition=position, zoomsize=size)
 
     # plot and animate
     illustration.plot()
@@ -32,7 +34,9 @@ def test_SingleCameraIllustrationLocalZoom(N=3, testgeometry=False, zoom=10, siz
 
     # create the illustration
     nrows, ncols = 300, 300
-    illustration = SingleCameraIllustration(data=[create_test_fits(rows=nrows, cols=ncols) for _ in range(10)], ext_image=1)
+    illustration = SingleCameraIllustration(
+        data=[create_test_fits(rows=nrows, cols=ncols) for _ in range(10)],
+        ext_image=1)
 
     # some options for where to add the stamps (corners, or random?)
     if testgeometry:
@@ -80,6 +84,7 @@ def test_FourCameraLocalZoom(N=3, zoom=3, size=(50,50)):
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
+"""
 def test_SingleCameraIllustrationWithStamps():
     print("\nTesting a Single Camera with some stamps.")
 
@@ -127,7 +132,8 @@ def test_FourCameraWithStamps(N=3):
     animate(illustration, filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
+"""
 
 if __name__ == '__main__':
-    test_SingleCameraIllustrationWithStamps()
-    test_FourCameraWithStamps()
+    test_SingleCameraWithZoomIllustration()
+    test_FourCameraLocalZoom()
