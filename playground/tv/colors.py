@@ -20,6 +20,7 @@ def cmap_norm_ticks(a, whatpercentiles=[1, 99], howmanysigmaarelinear=1.5, whatf
         if vmax is not None:
             vmin = -vmax
         else:
+            vmin, vmax = np.percentile(a, whatpercentiles)            
             scale = np.maximum(np.abs(vmin), np.abs(vmax))
             vmin, vmax = -scale, scale
         span = np.log10(vmax)
