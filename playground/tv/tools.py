@@ -5,11 +5,13 @@ from playground.postage.stamps import *
 
 __all__ = ['illustratefits', 'illustratestamps']
 
+
 def camera_from_filename(f):
     try:
         return os.path.basename(f).split('cam')[1].split('_')[0]
     except IndexError:
         return '?'
+
 
 def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
     '''
@@ -40,7 +42,7 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
         files = pattern
     else:
         files = list(np.sort(glob.glob(pattern)))
-    data = {'cam{}'.format(c):[] for c in [1,2,3,4,'?']}
+    data = {'cam{}'.format(c): [] for c in [1, 2, 3, 4, '?']}
 
     # sort them into cameras
     for f in files:
@@ -64,6 +66,7 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
         illustration = FourCameraIllustration(**inputs)
 
     return illustration
+
 
 def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filename, zoom=50, **kw):
     '''
@@ -91,7 +94,7 @@ def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filenam
 
     # pull out the files
     files = glob.glob(pattern)
-    data = {'cam{}'.format(c):[] for c in [1,2,3,4,'?']}
+    data = {'cam{}'.format(c): [] for c in [1, 2, 3, 4, '?']}
 
     # sort them into cameras
     for f in files:
@@ -103,7 +106,6 @@ def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filenam
     for k in keys:
         if len(data[k]) == 0:
             data.pop(k)
-
 
     singlecamera = len(data) == 1
     # figure out how to display them

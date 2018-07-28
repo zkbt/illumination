@@ -5,6 +5,7 @@ from playground.postage.tpf import EarlyTessTargetPixelFile
 directory = 'examples/'
 mkdir(directory)
 
+
 def test_tpfbasics():
     tpf = create_test_tpf()
     tpf.plot()
@@ -15,6 +16,7 @@ def test_tpfbasics():
     lc.flatten().correct().plot(ax, color='blue', label='corrected')
     plt.savefig('examples/stamp-to-tpf-to-lightcurve.pdf')
     return tpf
+
 
 if __name__ == '__main__':
     test_tpfbasics()

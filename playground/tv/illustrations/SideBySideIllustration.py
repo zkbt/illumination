@@ -2,6 +2,7 @@ from .IllustrationBase import *
 
 __all__ = ['HybridIllustration']
 
+
 class SideBySideIllustration(IllustrationBase):
     illustrationtype = 'Timeseries'
 
@@ -20,16 +21,17 @@ class SideBySideIllustration(IllustrationBase):
         hspace, wspace = 0.15, 0.08
         left, right = 0.1, 0.95
         bottom, top = 0.1, 0.9
-        wsize = each*np.sum(width_ratios)*(1 + (cols-1)*wspace)/(right-left)
-        hsize = each*rows*(1 + (rows-1)*hspace)/(top-bottom)
+        wsize = each * np.sum(width_ratios) * \
+            (1 + (cols - 1) * wspace) / (right - left)
+        hsize = each * rows * (1 + (rows - 1) * hspace) / (top - bottom)
 
         IllustrationBase.__init__(self, rows, cols,
-                                    figkw=dict(figsize=(wsize, hsize)),
-                                    hspace=hspace, wspace=wspace,
-                                    left=left, right=right,
-                                    bottom=bottom, top=top,
-                                    width_ratios=width_ratios,
-                                    **kwargs)
+                                  figkw=dict(figsize=(wsize, hsize)),
+                                  hspace=hspace, wspace=wspace,
+                                  left=left, right=right,
+                                  bottom=bottom, top=top,
+                                  width_ratios=width_ratios,
+                                  **kwargs)
 
         # add the imshows
         for row, i in enumerate(imshows):
@@ -47,7 +49,7 @@ class SideBySideIllustration(IllustrationBase):
             self.frames[n] = i
 
         # add the timeseries
-        sharex = None # you may want to change the shared axes for different visualizations
+        sharex = None  # you may want to change the shared axes for different visualizations
         for row, t in enumerate(timeseries):
             col = 0
 
@@ -55,7 +57,7 @@ class SideBySideIllustration(IllustrationBase):
             t.illustration = self
             # create the axes in which this should sit
             t.ax = plt.subplot(self.grid[row, col], sharex=sharex)
-            sharex=t.ax
+            sharex = t.ax
 
             # turn off the axis labels
             if row != len(timeseries) - 1:

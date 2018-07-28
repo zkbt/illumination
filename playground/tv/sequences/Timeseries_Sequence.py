@@ -1,53 +1,56 @@
 from .Sequence import *
 
+
 class Timeseries_Sequence(Sequence):
-	'''
-	NOT CURRENTLY BEING USED.
-	'''
-	def __init__(self, initial, y=None, yuncertainty=None, name='timeseries', **kwargs):
-		'''
-		Initialize a Sequence from some 1D timeseries.
+    '''
+    NOT CURRENTLY BEING USED.
+    '''
 
-		Parameters
-		----------
-		initial : LightCruve object, or array of times (either astropy times, or in JD)
-			The time values, to be plotted on the x-axis
-		y : array
-			The values to be plotted on the y-axis
-		yuncertainty : array
-			The errorbars on y (optional).
-		**kwargs are passed to plt.plot()
-		'''
+    def __init__(self, initial, y=None, yuncertainty=None, name='timeseries', **kwargs):
+        '''
+        Initialize a Sequence from some 1D timeseries.
 
-		try:
-			# is it a lightkurve?
-			time = initial.time
-			y = initial.flux
-		except:
-			time = initial
+        Parameters
+        ----------
+        initial : LightCruve object, or array of times (either astropy times, or in JD)
+                The time values, to be plotted on the x-axis
+        y : array
+                The values to be plotted on the y-axis
+        yuncertainty : array
+                The errorbars on y (optional).
+        **kwargs are passed to plt.plot()
+        '''
 
-		# make sure we have a TPF as imput
-		# set up the basic sequence
-		if isinstance(time, Time):
-			self.time = time
-		else:
-			self.time = Time(time, format=guess_time_format(time), scale=timescale)
+        try:
+            # is it a lightkurve?
+            time = initial.time
+            y = initial.flux
+        except:
+            time = initial
 
-		# store the dependent values
-		self.y = y
-		self.yuncertainty = yuncertainty
+        # make sure we have a TPF as imput
+        # set up the basic sequence
+        if isinstance(time, Time):
+            self.time = time
+        else:
+            self.time = Time(
+                time, format=guess_time_format(time), scale=timescale)
 
-		# create a sequence out of that stamp
-		Sequence.__init__(self, name=name)
+        # store the dependent values
+        self.y = y
+        self.yuncertainty = yuncertainty
 
-		# set a rough title for this plot
-		self.titlefordisplay = '{}'.format(self.name)
+        # create a sequence out of that stamp
+        Sequence.__init__(self, name=name)
 
-	def __getitem__(self, timestep):
-		'''
-		Return the image data for a given timestep.
-		'''
-		if timestep is None:
-			return None
-		else:
-			return self.y[timestep, :, :]
+        # set a rough title for this plot
+        self.titlefordisplay = '{}'.format(self.name)
+
+    def __getitem__(self, timestep):
+        '''
+        Return the image data for a given timestep.
+        '''
+        if timestep is None:
+            return None
+        else:
+            return self.y[timestep, :, :]
