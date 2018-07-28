@@ -1,5 +1,5 @@
 '''
-This scripts makes some movies of the Mars encounter
+This script makes some movies of the Mars encounter
 at the end of commissioning.
 '''
 from playground.tv import *

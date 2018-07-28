@@ -17,12 +17,12 @@ def cmap_norm_ticks(a, whatpercentiles=[1, 99], howmanysigmaarelinear=1.5, whatf
     # figure out a decent color scale
     if (a <= 0).any():
         # go diverging, if this is a difference that crosses zero
-        scale = np.maximum(np.abs(vmin), np.abs(vmax))
         if vmax is not None:
             vmin = -vmax
         else:
+            scale = np.maximum(np.abs(vmin), np.abs(vmax))
             vmin, vmax = -scale, scale
-        span = np.log10(scale)
+        span = np.log10(vmax)
         sigma = mad(a)
 
         norm = SymLogNorm(howmanysigmaarelinear * sigma,
