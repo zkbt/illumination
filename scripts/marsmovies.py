@@ -37,3 +37,19 @@ i = illustratefits(files, ext_image=0)
 i.plot()
 i.frames['camera'].plotted['time'].set_visible(False)
 animate(i, fps=fps, cadence=1*u.s, filename='mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
+
+
+
+
+
+
+
+from playground.tv import *
+fps = 30
+code = '_diff'
+path = '/pdo/ramp/orbit-14348/cam*_dehoc{}.fits'.format(code)
+files = list(np.sort(glob.glob(path)))
+files = [f for f in files if '121650' not in f]
+i = illustratefits(files, ext_image=0, zoomposition=(3000, 2500), zoomsize=(300, 600))
+i.plot()
+animate(i, fps=fps, cadence=1*u.s, filename='zooms-mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
