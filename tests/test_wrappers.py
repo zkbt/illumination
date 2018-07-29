@@ -1,7 +1,7 @@
 from playground.imports import *
 from playground.cartoons import *
 from playground.tv.tools import *
-from playground.tv.animation import *
+from playground.tv.tools import *
 
 directory = 'examples/'
 mkdir(directory)

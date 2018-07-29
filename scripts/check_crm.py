@@ -1,7 +1,7 @@
 #tic = 248093171
 from playground.postage.stamps import *
 from playground.tv.illustrations import StampsIllustration
-from playground.tv.animation import animate
+from playground.tv.tools import animate
 
 path = '/pdo/ramp/zkbt/orbit-8196/stamps'
 possible = glob.glob(os.path.join(path, '/cam*/*.npy'))
