@@ -116,7 +116,7 @@ class IllustrationBase:
                 try:
                     firstimages.extend(frame.data[0].flatten())
                     print('including {} in shared colorbar'.format(frame))
-                except (TypeError, IndexError):
+                except (TypeError, IndexError, AttributeError):
                     print('found no data for {}'.format(frame))
             # create the cmap from the given data
             self.cmap, self.norm, self.ticks = cmap_norm_ticks(
