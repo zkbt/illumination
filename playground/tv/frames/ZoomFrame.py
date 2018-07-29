@@ -55,6 +55,8 @@ class ZoomFrame(imshowFrame):
         self.source = source
         self.position = position
         self.size = size
+
+        # set the aspect ratio (width/height) for this zoom frame
         self.aspectratio = float(size[1])/size[0] #width/height
 
         self.titlefordisplay = '{} | {}'.format(self.frametype, self.position)
