@@ -20,7 +20,7 @@ def test_hybrid(howmany=3):
             tpfs[x].tic_id, names[x])
 
     i = HybridIllustration(imshows=imshows, timeseries=timeseries,
-                           sharecolorbar=False, figkw=dict(dpi=50))
+                           sharecolorbar=False, dpi=50)
     i.plot()
     for l, t in zip(lcs, timeseries):
         t.ax.plot(l.time - t.offset, l.flux)

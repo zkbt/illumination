@@ -1,6 +1,6 @@
 from ..imports import *
 from .zoom import *
-from .illustrations import SingleCameraIllustration, FourCameraIllustration
+from .illustrations import SingleCameraIllustration, FourCameraIllustration, SingleCameraWithZoomIllustration
 from playground.postage.stamps import *
 
 __all__ = ['illustratefits', 'illustratestamps']
@@ -13,7 +13,7 @@ def camera_from_filename(f):
         return '?'
 
 
-def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
+def illustratefits(pattern='*.fits', get_camera=camera_from_filename, zoomposition=None, zoomsize=(10,10), **kw):
     '''
     Make an Illustration from a group of FITS files.
 
@@ -31,6 +31,12 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
 
     get_camera : function
         Returns 1,2,3,4 or "?" based on strings in the filename.
+
+    zoomposition : tuple
+        (x,y) position of where a zoom should be placed
+
+    zoomsize : tuple
+        (x,y) size of the zoom window to create
 
     **kw : dict
         Keyword arguments will be passed to the Illustration
@@ -58,7 +64,12 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, **kw):
     # figure out how to display them
     if len(data) == 1:
         cam = list(data.keys())[0]
-        illustration = SingleCameraIllustration(data[cam], **kw)
+        if zoomposition is not None:
+            illustration = SingleCameraWithZoomIllustration(data[cam], zoomposition=zoomposition, zoomsize=zoomsize, **kw)
+
+        else:
+            illustration = SingleCameraIllustration(data[cam], **kw)
+
     elif len(data) > 1:
         inputs = dict(**data)
         for k in kw.keys():

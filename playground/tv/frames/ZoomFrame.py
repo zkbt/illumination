@@ -109,3 +109,9 @@ class ZoomFrame(imshowFrame):
             if 'time' in self.plotted:
                 self.plotted['time'].set_text(self._timestring(actual_time))
         self.currenttimestep = timestep
+
+    def __repr__(self):
+        '''
+        Default string representation for this frame.
+        '''
+        return '<{} Frame | position={} | size={}>'.format(self.frametype, self.position, self.size)
