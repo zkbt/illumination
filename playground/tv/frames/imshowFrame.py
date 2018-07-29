@@ -236,7 +236,7 @@ class imshowFrame(FrameBase):
                 firstimage, extent=extent, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 
         # plot the colorbar
-        if ('colorbar' in self.plotingredients) and 'imshow' in self.plotted:
+        if ('colorbar' in self.plotingredients) and 'image' in self.plotted:
             # add the colorbar
             self.plotted['colorbar'] = self._ensure_colorbar_exists(self.plotted['image'])
 
