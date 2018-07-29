@@ -196,19 +196,23 @@ class imshowFrame(FrameBase):
 
         return arrows
 
-    def plot(self, time=None, clean=False, **kwargs):
+    def plot(self, time=None):
         '''
-        Make an imshow of a single frame of the cube.
-        '''
+        Generate the (initial) plot for this frame.
 
-        self.plotted = {}
+        Individual features can be modified afterwards,
+        through the .ax (the plotted axes) or the .plotted
+        (dictionary of plotted elements) attributes.
+
+        Parameters
+        ----------
+
+        time : astropy Time
+            The time to plot, defaults to the first with None.
+        '''
 
         # make sure we point back at this frame
         plt.sca(self.ax)
-
-        # clean up by erasing this frame's axes
-        if clean:
-            plt.cla()
 
         # pull out the array to work on
         image, actual_time = self._get_image(time)
@@ -273,20 +277,6 @@ class imshowFrame(FrameBase):
         self.currenttimestep = timestep
 
 
-    """
-    def _timestring(self, time):
-    '''
-    Return a string, given an input time (still in spacecraft time).
-    '''
-    try:
-    offset = np.min(self.illustration._gettimes())
-    except AttributeError:
-    print('no illustration times found!')
-    offset=0
-
-    return 't={:.5f}{:+.5f}'.format(offset.jd, (time-offset).to('day'))
-    """
-
     def _get_image(self, time=None):
         '''
         Get the image at a given time (defaulting to the first time).
@@ -294,12 +284,12 @@ class imshowFrame(FrameBase):
 
         try:
             if time is None:
-                time = self._gettimes()[0]
+                time = self._get_times()[0]
             timestep = self._find_timestep(time)
             rawimage = self.data[timestep]
             assert(rawimage is not None)
             image = self._transformimage(rawimage)
-            actual_time = self._gettimes()[timestep]
+            actual_time = self._get_times()[timestep]
             # print(" ")
             # print(time, timestep)
         except (IndexError, AssertionError, ValueError):
@@ -314,7 +304,7 @@ class imshowFrame(FrameBase):
         for f in self.includes:
             try:
                 timestep = f._find_timestep(time)
-                actual_time = self._gettimes()[timestep]
+                actual_time = self._get_times()[timestep]
                 break
             except IndexError:
                 pass
@@ -332,5 +322,5 @@ class imshowFrame(FrameBase):
 
         if timestep != self.currenttimestep:
             self.plotted['image'].set_data(image)
-
             self.plotted['time'].set_text(self._timestring(actual_time))
+        self.currenttimestep = timestep

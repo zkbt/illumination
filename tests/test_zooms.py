@@ -148,4 +148,5 @@ def test_FourCameraWithStamps(N=3):
 
 if __name__ == '__main__':
     test_SingleCameraWithZoomIllustration()
+    test_SingleCameraIllustrationLocalZoom()
     test_FourCameraLocalZoom()

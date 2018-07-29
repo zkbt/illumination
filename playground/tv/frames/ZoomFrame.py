@@ -5,7 +5,14 @@ from astropy.nddata.utils import Cutout2D
 class ZoomFrame(imshowFrame):
     frametype = 'Zoom'
 
-    def __init__(self, source, position=(0, 0), size=(10, 10), cmapkw={}, **kwargs):
+    def __init__(self,  source=None,
+                        position=(0, 0),
+                        size=(10, 10),
+                        name='zoom',
+                        cmapkw={},
+                        plotingredients=[   'image',
+                                            'colorbar'], #'arrows','title'],
+                        **kwargs):
         '''
         Initialize a ZoomFrame that can display
         images taken from a zoomed subset of
@@ -24,34 +31,40 @@ class ZoomFrame(imshowFrame):
 
         shape : (tuple)
                 The (x, y) = (ncols, nrows) shape of the zoom.
+
+        name : str
+            A name to give this Frame.
+
+        ax : matplotlib.axes.Axes instance
+            All plotting will happen inside this ax.
+            If set to None, the `self.ax attribute` will
+            need to be set manually before plotting.
+
+        plotingredients : list
+            A list of keywords indicating features that will be
+            plotted in this frame. It can be modified either now
+            when initializing the frame, or any time before
+            calling `i.plot()` from the illustration.
+
+        cmapkw : dict
+            Dictionary of keywords to feed into the cmap generation.
         '''
 
-        FrameBase.__init__(self,  **kwargs)
+        imshowFrame.__init__(self,  name=name, plotingredients=plotingredients, **kwargs)
 
         self.source = source
         self.position = position
         self.size = size
-
-        # tidy up the axes for this camera
-        self.ax.set_aspect('equal')
-        plt.setp(self.ax.get_xticklabels(), visible=False)
-        plt.setp(self.ax.get_yticklabels(), visible=False)
-        # self.ax.set_facecolor('black')
+        self.aspectratio = float(size[1])/size[0] #width/height
 
         self.titlefordisplay = '{} | {}'.format(self.frametype, self.position)
 
         self.cmapkw = cmapkw
-    def _gettimes(self):
+    def _get_times(self):
         '''
         Get the available times associated with this frame.
         '''
-        return self.source._gettimes()
-
-    # def _timestring(self, time):
-    #	'''
-    #	Return a string, given an input time (still in spacecraft time).
-    #	'''
-    #	return  't={}'.format(time)
+        return self.source._get_times()
 
     def _find_timestep(self, time):
         '''
@@ -72,6 +85,8 @@ class ZoomFrame(imshowFrame):
         return cutoutimage, actual_time
 
     def plot(self, *args, **kwargs):
+
+        # do all the normal stuff for an imshow plot
         imshowFrame.plot(self, *args, **kwargs)
 
         # add a box to the source image (cutout must have ben created, if plot has happened)
@@ -89,4 +104,6 @@ class ZoomFrame(imshowFrame):
 
         if timestep != self.currenttimestep:
             self.plotted['image'].set_data(image)
-            self.plotted['time'].set_text(self._timestring(actual_time))
+            if 'time' in self.plotted:
+                self.plotted['time'].set_text(self._timestring(actual_time))
+        self.currenttimestep = timestep

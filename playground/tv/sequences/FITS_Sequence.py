@@ -66,7 +66,7 @@ class FITS_Sequence(Image_Sequence):
         self.spatial = {}
 
         # make up an imaginary GPS time (and keep track of whether it is fake)
-        self.time = Time(np.arange(self.N), format='gps', scale='tai')
+        self.time = Time(np.arange(self.N), format='gps', scale='tdb')
         self._timeisfake = True
         try:
             self._populate_from_headers()
@@ -152,6 +152,7 @@ class FITS_Sequence(Image_Sequence):
                 else:
                     self.time = Time(np.asarray(
                         t), format=timeformat or guess_time_format(t), scale=timescale)
+                    self._timeisfake = False
                 self.speak('using {} as the time axis'.format(k))
                 self._timeisfake = False
             except KeyError:

@@ -25,13 +25,13 @@ class IllustrationBase:
     def __repr__(self):
         return '<{} Illustration | ({} Frames) >'.format(self.illustrationtype, len(self.frames))
 
-    def _gettimes(self):
-        gps = [f._gettimes().gps for f in self.frames.values()]
+    def _get_times(self):
+        gps = [f._get_times().gps for f in self.frames.values()]
         return Time(np.hstack(gps), format='gps', scale='tdb')
 
         #alltimes = []
         # for k, f in self.frames.items():
-        #	alltimes.extend(f._gettimes())
+        #	alltimes.extend(f._get_times())
         # return alltimes
 
     def _timesandcadence(self, round=1):
@@ -58,11 +58,11 @@ class IllustrationBase:
             times, cadence = self._precaculatedtimesandcadence[round]
         except KeyError:
 
-            gps = np.hstack([f._gettimes().gps for f in self.frames.values()])
+            gps = np.hstack([f._get_times().gps for f in self.frames.values()])
             #alltimes =  Time(np.hstack(gps), format='gps')
             #alltimes = []
             # for k, f in self.frames.items():
-            #	alltimes.extend(f._gettimes())
+            #	alltimes.extend(f._get_times())
 
             if round is None:
                 diffs = np.diff(np.sort(gps))

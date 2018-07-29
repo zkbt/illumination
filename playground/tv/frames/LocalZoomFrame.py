@@ -1,9 +1,9 @@
-from .imshowFrame import *
+from .ZoomFrame import *
 from astropy.nddata.utils import Cutout2D
 from matplotlib.patches import Rectangle
 
 
-class LocalZoomFrame(imshowFrame):
+class LocalZoomFrame(ZoomFrame):
     frametype = 'Zoom'
 
     def __init__(self, source, position=(0, 0), size=(10, 10), zoom=10, **kwargs):
@@ -31,7 +31,7 @@ class LocalZoomFrame(imshowFrame):
                 The (x, y) = (ncols, nrows) shape of the zoom.
         '''
 
-        FrameBase.__init__(self,  **kwargs)
+        ZoomFrame.__init__(self,  **kwargs)
 
         #
         self.source = source
@@ -43,17 +43,11 @@ class LocalZoomFrame(imshowFrame):
 
         self.titlefordisplay = '{} | {}'.format(self.frametype, self.position)
 
-    def _gettimes(self):
+    def _get_times(self):
         '''
         Get the available times associated with this frame.
         '''
-        return self.source._gettimes()
-
-    # def _timestring(self, time):
-    #	'''
-    #	Return a string, given an input time (still in spacecraft time).
-    #	'''
-    #	return  't={}'.format(time)
+        return self.source._get_times()
 
     def _find_timestep(self, time):
         '''
@@ -79,10 +73,27 @@ class LocalZoomFrame(imshowFrame):
         cutoutimage = self.cutout.data
         return cutoutimage, actual_time
 
-    def plot(self, timestep=0, **kwargs):
+    def plot(self, time=None):
+        '''
+        Generate the (initial) plot for this local zoom frame.
 
-        image, actual_time = self._get_image()
+        Individual features can be modified afterwards,
+        through the .ax (the plotted axes) or the .plotted
+        (dictionary of plotted elements) attributes.
+
+        Parameters
+        ----------
+
+        time : astropy Time
+            The time to plot, defaults to the first with None.
+        '''
+
+        # pull out the array to work on
+        image, actual_time = self._get_image(time)
+
+        # extract the cmap from the source image
         cmap, norm, ticks = self.source._cmap_norm_ticks(image)
+
 
         # these are in the rotated camera frame
         x, y = self.cutout.center_original
@@ -97,26 +108,29 @@ class LocalZoomFrame(imshowFrame):
                  for k in self.illustration.frames.keys() if 'zoom' in k]
         zorder = zooms.index(self)
 
-        imshowed = self.source.ax.imshow(image,
-                                         extent=extent,
-                                         interpolation='nearest',
-                                         origin='lower',
-                                         norm=norm, cmap=cmap,
-                                         zorder=zorder)
+        self.plotted['image'] = self.source.ax.imshow(image,
+                                                     extent=extent,
+                                                     interpolation='nearest',
+                                                     origin='lower',
+                                                     norm=norm, cmap=cmap,
+                                                     zorder=zorder)
 
-        # Create a Rectangle patch
+        # reate a Rectangle patch
         rect = Rectangle((left, bottom), xsize * self.zoom, ysize * self.zoom,
                          linewidth=1, edgecolor='black', facecolor='none',
                          zorder=zorder + 0.5, clip_on=True)
 
         # Add the patch to the Axes
-        boxonzoom = self.source.ax.add_patch(rect)
+        self.plotted['boxonzoom'] = self.source.ax.add_patch(rect)
 
         self.source.ax.set_clip_on(True)
         # add a box to the source image (cutout must have ben created, if plot has happened)
         #boxonoriginal = self.cutout.plot_on_original(ax=self.source.ax, clip_on=True)
 
-        self.plotted = dict(imshow=imshowed, boxonzoom=boxonzoom)
+        try:
+            timestep = self._find_timestep(time)
+        except:
+            timestep = None
         self.currenttimestep = timestep
 
     def update(self, time):
@@ -132,5 +146,7 @@ class LocalZoomFrame(imshowFrame):
         if timestep != self.currenttimestep:
             self.plotted['image'].set_data(image)
 
-            timestring = self.source._timestring(actual_time)
-            self.source.plotted['time'].set_text(timestring)
+            if 'time' in self.plotted:
+                timestring = self.source._timestring(actual_time)
+                self.source.plotted['time'].set_text(timestring)
+        self.currenttimestep = timestep

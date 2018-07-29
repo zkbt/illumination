@@ -8,7 +8,6 @@ class FrameBase:
     frametype = 'base'
     timeunit = 'day'
     aspectratio = 1
-    plotted = {}
 
     def __init__(self,
                     name='',
@@ -72,6 +71,9 @@ class FrameBase:
         # keep track of a list of frames included in this one (e.g. zooms)
         self.includes = []
 
+        # keep track of what's been plotted
+        self.plotted = {}
+
 
     @property
     def offset(self):
@@ -90,11 +92,11 @@ class FrameBase:
         except AttributeError:
             # is there a minimum of the illustration's times?
             try:
-                self._offset = np.min(self.illustration._gettimes().jd)
+                self._offset = np.min(self.illustration._get_times().jd)
             except (AttributeError, ValueError):
                 # otherwise, use only this frame to estimate the offset
                 try:
-                    self._offset = np.min(self._gettimes().jd)
+                    self._offset = np.min(self._get_times().jd)
                 except ValueError:
                     self._offset = 0.0
 
@@ -115,9 +117,13 @@ class FrameBase:
                 A string describing the times.
         '''
 
-        days = time.jd - self.offset
-        inunits = (days * u.day).to(self.timeunit)
-        return 't={:.5f}{:+.5f}'.format(self.offset, inunits)
+        if self.data._timeisfake:
+            timestep = self._find_timestep(time)
+            return '#{}'.format(timestep)
+        else:
+            days = time.jd - self.offset
+            inunits = (days * u.day).to(self.timeunit)
+            return 't={:.5f}{:+.5f}'.format(self.offset, inunits)
 
     def __repr__(self):
         '''
@@ -158,7 +164,7 @@ class FrameBase:
         '''
         return self.data._find_timestep(time)
 
-    def _gettimes(self):
+    def _get_times(self):
         '''
         Get the available times associated with this frame.
         '''
@@ -192,7 +198,7 @@ class FrameBase:
         try:
             times, cadence = self._precaculatedtimesandcadence[round]
         except KeyError:
-            gps = self._gettimes().gps
+            gps = self._get_times().gps
 
             if round is None:
                 diffs = np.diff(np.sort(gps))

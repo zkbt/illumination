@@ -56,6 +56,7 @@ class Sequence(Talker):
 
     titlefordisplay = ''
     colorbarlabelfordisplay = ''
+    _timeisfake = False
 
     def __init__(self, name='generic', *args, **kwargs):
         Talker.__init__(self)
@@ -89,7 +90,7 @@ class Sequence(Talker):
         '''
 
         # pull out actual times associated with this sequence
-        times = self._gettimes()
+        times = self._get_times()
 
         # if there are no times, return nothing
         if len(times) == 0:
@@ -100,7 +101,7 @@ class Sequence(Talker):
             step = np.argmin(abs(diff))
             return step
 
-    def _gettimes(self):
+    def _get_times(self):
         '''
         Get the available times associated with this frame.
 

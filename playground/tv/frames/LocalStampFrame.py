@@ -50,17 +50,11 @@ class LocalStampFrame(imshowFrame):
 
         self.titlefordisplay = '{} | {}'.format(self.frametype, self.position)
 
-    def _gettimes(self):
+    def _get_times(self):
         '''
         Get the available times associated with this frame.
         '''
-        return self.data._gettimes()
-
-    # def _timestring(self, time):
-    #	'''
-    #	Return a string, given an input time (still in spacecraft time).
-    #	'''
-    #	return  't={}'.format(time)
+        return self.data._get_times()
 
     def _find_timestep(self, time):
         '''
