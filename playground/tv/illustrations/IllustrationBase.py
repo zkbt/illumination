@@ -114,7 +114,7 @@ class IllustrationBase:
             firstimages = []
             for name, frame in self.frames.items():
                 try:
-                    firstimages.extend(frame.data[0].flatten())
+                    firstimages.extend(frame._get_image()[0].flatten())
                     print('including {} in shared colorbar'.format(frame))
                 except (TypeError, IndexError, AttributeError):
                     print('found no data for {}'.format(frame))
@@ -126,7 +126,8 @@ class IllustrationBase:
     def _add_colorbar(self, imshowed, ax=None, ticks=None):
         '''
         Make a colorbar,
-        attached to a particular axes.
+        attached to a particular axes
+        (or multiple axes at once).
 
         Parameters
         ----------

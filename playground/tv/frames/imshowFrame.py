@@ -25,6 +25,8 @@ class imshowFrame(FrameBase):
                                     'colorbar',
                                     'arrows',
                                     'title'], # other options might be 'filename', 'axes', what else?
+                 processingsteps=[],
+                 firstframe=None,
                  cmapkw={},
                  **kwargs):
         '''
@@ -86,6 +88,12 @@ class imshowFrame(FrameBase):
 
         # keep track of an extra keywords for generating the cmaps
         self.cmapkw = cmapkw
+
+        # are there steps to apply to the image before displaying?
+        self.processingsteps = processingsteps
+
+        # should we plot something special for the first frame?
+        self.firstframe = firstframe
 
     def _cmap_norm_ticks(self, *args, **kwargs):
         '''
@@ -222,17 +230,19 @@ class imshowFrame(FrameBase):
         if ('image' in self.plotingredients) and (image is not None):
 
             # pull out the cmap, normalization, and suggested ticks
+
             cmap, norm, ticks = self._cmap_norm_ticks(image, **self.cmapkw)
 
             # display the image for this frame
             extent = [0, image.shape[1], 0, image.shape[0]]
 
             # make a stacked image
-            try:
-                assert(np.size(image) < 10000 or self.data.N < 50)
-                firstimage = self.data.median()
-            except (AttributeError, AssertionError):
+            if self.firstframe is None:
                 firstimage = image
+            elif self.firstframe == 'median':
+                #assert(np.size(image) < 10000 or self.data.N < 50)
+                firstimage = self.data.median()
+
             self.plotted['image'] = self.ax.imshow(
                 firstimage, extent=extent, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 
@@ -277,6 +287,18 @@ class imshowFrame(FrameBase):
             timestep = None
         self.currenttimestep = timestep
 
+    def process_image(self, image):
+        '''
+        Apply any extra processing steps to the image
+        (subract a median image, normalize, mask, ???)
+        '''
+
+        if 'subtractmedian' in self.processingsteps:
+            processedimage = image - self.data.median()
+            #print('subtracted median image')
+        else:
+            processedimage = image
+        return processedimage
 
     def _get_image(self, time=None):
         '''
@@ -289,7 +311,9 @@ class imshowFrame(FrameBase):
             timestep = self._find_timestep(time)
             rawimage = self.data[timestep]
             assert(rawimage is not None)
-            image = self._transformimage(rawimage)
+
+            processedimage = self.process_image(rawimage)
+            image = self._transformimage(processedimage)
             actual_time = self._get_times()[timestep]
             # print(" ")
             # print(time, timestep)

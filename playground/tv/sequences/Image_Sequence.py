@@ -5,6 +5,7 @@ class Image_Sequence(Sequence):
     '''
     This isn't a standalone. Other image sequences inherit from it.
     '''
+    spatial = {}
 
     @property
     def shape(self):
@@ -33,8 +34,10 @@ class Image_Sequence(Sequence):
         '''
 
         s = np.zeros(self.shape)
-        for i in range(self.data.N):
-            s[i, :, :] = self.data[i]
+        self.speak('gathering the sequence cube of shape {}'.format(self.shape))
+        for i in range(self.N):
+            self.speak(' loaded frame {}/{}'.format(i+1, self.N))
+            s[i, :, :] = self[i]
         return s
 
     def median(self):
@@ -47,8 +50,13 @@ class Image_Sequence(Sequence):
             The median of the image sequence.
         '''
 
-        s = self._gather_3d()
-        return np.median(s, axis=0)
+        try:
+            self.spatial['median']
+        except KeyError:
+            self.speak('creating a median image for {}'.format(self))
+            s = self._gather_3d()
+            self.spatial['median'] = np.median(s, axis=0)
+        return self.spatial['median']
 
     def sum(self):
         '''
