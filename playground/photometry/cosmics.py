@@ -60,6 +60,14 @@ def save(tpfs, lcs, summary, jitter, directory):
         with open(filename, 'w') as f:
             f.write(lc.to_csv())
 
+def make_tpfs(tpf2s, strategy=Central(10), cadence=1800):
+
+    # create a stamp, for stacking into new TPFs
+    s = Stamp(tpf2s)
+    crm = EarlyTessTargetPixelFile.from_stamp(s.stack(cadence, strategy=strategy))
+    nocrm = EarlyTessTargetPixelFile.from_stamp(s.stack(cadence, strategy=Sum()))
+
+    return crm, nocrm
 
 
 def evaluate_strategy(tpf2s,
@@ -132,8 +140,7 @@ def evaluate_strategy(tpf2s,
 
         # create a stamp, for stacking into new TPFs
         s = Stamp(tpf2s)
-        tpfs['crm'] = EarlyTessTargetPixelFile.from_stamp(s.stack(cadence, strategy=strategy))
-        tpfs['nocrm'] = EarlyTessTargetPixelFile.from_stamp(s.stack(cadence, strategy=Sum()))
+        tpfs['crm'], tpfs['nocrm'] = make_tpfs(tpf2s, strategy=strategy)
 
         # define the apertures for photometry and background subtraction
         aperture, backgroundaperture = define_apertures(tpfs['nocrm'], **aperturekw)

@@ -6,9 +6,16 @@ class HybridIllustration(IllustrationBase):
     def __init__(self,  imshows=[],
                         timeseries=[],
                         imshowheight=1.0,
+                        imshowrows=1,
                         sizescale=3,
                         figsize=None,
                         dpi=None,
+                        hspace=0.03,
+                        wspace = 0.08,
+                        left=0.1,
+                        right=0.9,
+                        bottom=0.1,
+                        top=0.9,
                         **illkw):
         '''
         Initialize an illustration from list of frames.
@@ -34,28 +41,22 @@ class HybridIllustration(IllustrationBase):
         **illkw keywords are passed to IllustrationBase
         '''
 
-
         # one row for imshows + one for each timeseries
         hasimshow = int(len(imshows) > 0)
         hastimeseries = int(len(timeseries) > 0)
-        rows = hasimshow + len(timeseries) + hastimeseries
 
         # one column for each imshow
-        cols = np.maximum(1, len(imshows))
+        imshowcols = int(np.ceil(float(len(imshows))/imshowrows))
+        rows = hasimshow * imshowrows + len(timeseries) + hastimeseries
+        cols = np.maximum(1, imshowcols)
 
         # use the frame aspect ratios to set the width ratios
         width_ratios = [f.aspectratio for f in imshows]
 
         # set the height ratios, including a gap between imshows and timeseries
-        height_ratios = (   hasimshow * [imshowheight] +
-                            hastimeseries * [0.5 / (0.001 + len(timeseries))] +
-                            len(timeseries) * [1.0 / (0.001 + len(timeseries))])
-
-
-        # set the basic layout
-        hspace, wspace = 0.03, 0.08
-        left, right = 0.1, 0.9
-        bottom, top = 0.1, 0.9
+        height_ratios = (   hasimshow * imshowrows * [imshowheight] +
+                            hastimeseries * [0.5] +
+                            len(timeseries) * [1.0 / (1 + len(timeseries))])
 
         # set the sizes, trying to keep square imshows square
         wsize = sizescale * np.sum(width_ratios) * (1 + (cols - 1) * wspace) / (right - left)
@@ -76,9 +77,10 @@ class HybridIllustration(IllustrationBase):
                                   width_ratios=width_ratios,
                                   **illkw)
 
-        # add the imshows
-        for col, i in enumerate(imshows):
-            row = 0
+        # add the imshows to the illustration
+        for count, i in enumerate(imshows):
+            row = count // imshowcols
+            col = count % imshowcols
 
             # make sure to connect the frame back to this illustration
             i.illustration = self
@@ -94,7 +96,7 @@ class HybridIllustration(IllustrationBase):
                 n = (row, col)
             self.frames[n] = i
 
-        # add the timeseries
+        # add the timeseries to the illustration
         sharex = None  # you may want to change the shared axes for different visualizations
         for row, t in enumerate(timeseries):
             col = 0

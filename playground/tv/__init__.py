@@ -5,8 +5,7 @@ it'll be useful for automated visualizations
 and for animations.
 '''
 
-from .tools import illustratefits
-from .animation import animate
-from .zoom import *
 from .illustrations import *
+from .zoom import *
 from .sequences import *
+from .tools import *

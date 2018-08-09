@@ -131,6 +131,7 @@ class imshowFrame(FrameBase):
                 self.illustration.plotted['colorbar']
             except KeyError:
                 c = self.illustration._add_colorbar(image,
+                                                    ax=None,
                                                     ticks=self.ticks)
                 self.illustration.plotted['colorbar'] = c
 
@@ -141,7 +142,7 @@ class imshowFrame(FrameBase):
             except:
                 # create a colorbar for this illustration
                 c = self.illustration._add_colorbar(image,
-                                                    self.ax,
+                                                    ax=self.ax,
                                                     ticks=self.ticks)
                 self.plotted['colorbar'] = c
 

@@ -129,6 +129,7 @@ class FITS_Sequence(Image_Sequence):
             # compile all values from the headers
             for i in range(self.N):
                 hdulist = self._get_hdulist(i)
+                print("populating header {} of {}".format(i+1, self.N))
                 for e in extensions:
                     h = hdulist[e].header
                     for k in h.keys():
