@@ -74,12 +74,27 @@ class Image_Sequence(Sequence):
     def mean(self):
         '''
         Calculate the sum of all the images.
+        It works in an inline fashion, so you
+        don't need to load the entire image
+        cube into memory (that might get big!)
 
         Returns
         -------
-        sum : 2D image
+        mean : 2D image
             The median of the image sequence.
         '''
 
-        s = self._gather_3d()
-        return np.mean(s, axis=0)
+        try:
+            self.spatial['mean']
+        except KeyError:
+            self.speak('creating a mean image for {}'.format(self))
+
+            # calculate the mean in a running fashion (less memory)
+            total = np.zeros_like(self[0])
+            for i in range(self.N):
+                self.speak(' included frame {}/{} in mean'.format(i+1, self.N))
+                total += self[i]
+
+            self.spatial['mean'] = total/self.N
+
+        return self.spatial['mean']

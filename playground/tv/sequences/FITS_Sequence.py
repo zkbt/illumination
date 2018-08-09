@@ -1,4 +1,5 @@
 from .Image_Sequence import *
+from __future__ import print_function
 
 
 class FITS_Sequence(Image_Sequence):
@@ -129,7 +130,7 @@ class FITS_Sequence(Image_Sequence):
             # compile all values from the headers
             for i in range(self.N):
                 hdulist = self._get_hdulist(i)
-                print("populating header {} of {}".format(i+1, self.N))
+                print("populating header {} of {}".format(i+1, self.N), end='\r'))
                 for e in extensions:
                     h = hdulist[e].header
                     for k in h.keys():

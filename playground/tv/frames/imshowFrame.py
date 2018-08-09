@@ -296,6 +296,8 @@ class imshowFrame(FrameBase):
         if 'subtractmedian' in self.processingsteps:
             processedimage = image - self.data.median()
             #print('subtracted median image')
+        elif 'subtractmean' in self.processingsteps:
+            processedimage = image - self.data.mean()
         else:
             processedimage = image
         return processedimage

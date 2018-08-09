@@ -14,12 +14,12 @@ def camera_from_filename(f):
 
 
 # make a movie of the four cameras
-i = illustratefits(pattern='/pdo/ramp/orbit-9/ffi_fits/tess*-*-*-crm-ffi_dehoc.fits',
+i = illustratefits(pattern='/pdo/ramp/orbit-9/ffi_fits/tess*-0000500*-*-crm-ffi_dehoc.fits',
                    ext_image=0, get_camera=camera_from_filename)
-for f in i.frames.items():
-    f.processingsteps = ['subtractmedian']
+for f in i.frames.values():
+    f.processingsteps = ['subtractmean']
 i.plot()
-filename = 'orbit-{}-four-camera-illustrated.pdf'.format(orbit)
+filename = 'difference-orbit-{}-four-camera-illustrated.pdf'.format(orbit)
 plt.savefig(filename, dpi=1000)
 print("saved to {}".format(filename))
 animate(i, filename=filename.replace('.pdf', '.mp4'), dpi=300,
