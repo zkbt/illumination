@@ -1,5 +1,5 @@
-from .Image_Sequence import *
 from __future__ import print_function
+from .Image_Sequence import *
 
 
 class FITS_Sequence(Image_Sequence):
