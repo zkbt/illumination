@@ -9,7 +9,7 @@ for camera in [1, 2, 3, 4]:
             camera=camera, ccd=ccd), ext_image=0, get_camera=camera_from_filename)
         filename = 'orbit-{}-camera-{}-ccd-{}-illustrated.pdf'.format(
             orbit, camera, ccd)
-        plt.savefig(filename, dpi=300)
+        plt.savefig(filename, dpi=1000)
         print("saved to {}".format(filename))
         animate(i, filename=filename.replace('.pdf', '.mp4'), dpi=600,
                 cadence=1 * u.s)  # dehocs have no time, so use 1s

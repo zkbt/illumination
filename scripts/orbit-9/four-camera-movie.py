@@ -18,7 +18,7 @@ i = illustratefits(pattern='/pdo/ramp/orbit-9/ffi_fits/tess*-*-*-crm-ffi_dehoc.f
                    ext_image=0, get_camera=camera_from_filename)
 i.plot()
 filename = 'orbit-{}-four-camera-illustrated.pdf'.format(orbit)
-plt.savefig(filename, dpi=300)
+plt.savefig(filename, dpi=1000)
 print("saved to {}".format(filename))
 animate(i, filename=filename.replace('.pdf', '.mp4'), dpi=300,
         cadence=1 * u.s)  # dehocs have no time, so use 1s
