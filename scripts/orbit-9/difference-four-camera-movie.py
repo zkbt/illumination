@@ -14,7 +14,7 @@ def camera_from_filename(f):
 
 
 # make a movie of the four cameras
-i = illustratefits(pattern='/pdo/ramp/orbit-9/ffi_fits/tess*-0000500*-*-crm-ffi_dehoc.fits',
+i = illustratefits(pattern='/pdo/ramp/orbit-9/ffi_fits/tess*-000*-*-crm-ffi_dehoc.fits',
                    ext_image=0, get_camera=camera_from_filename)
 for f in i.frames.values():
     f.processingsteps = ['subtractmean']
