@@ -7,6 +7,8 @@ for camera in [1, 2, 3, 4]:
     for ccd in [1, 2, 3, 4]:
         i = illustratefits(pattern='/pdo/ramp/orbit-9/cal_ffi/tess*-*-{camera}-crm-ffi_ccd{ccd}.cal.fits'.format(
             camera=camera, ccd=ccd), ext_image=0, get_camera=camera_from_filename)
+        i.plot()
+
         filename = 'orbit-{}-camera-{}-ccd-{}-illustrated.pdf'.format(
             orbit, camera, ccd)
         plt.savefig(filename, dpi=1000)
