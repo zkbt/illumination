@@ -83,6 +83,7 @@ class imshowFrame(FrameBase):
             self.titlefordisplay = self.data.titlefordisplay
         except AttributeError:
             self.titlefordisplay = ''
+            
         if title is not None:
             self.titlefordisplay = title
 

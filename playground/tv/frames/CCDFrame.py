@@ -19,6 +19,7 @@ class CCDFrame(imshowFrame):
                        camera=CameraFrame(),
                        **kwargs):
 
+        # if this CCD is associated with a named camera, label in this frame
         if camera.name != 'camera':
             name = '{}-{}'.format(camera.name, name)
 
@@ -34,7 +35,6 @@ class CCDFrame(imshowFrame):
             # if there's an image, use it to set the size
             self.ymax, self.xmax = self.data[0].shape
         except (IndexError, AttributeError, TypeError):
-
             # allow us to create an empty image
             self.ymax = 2078
             self.xmax = 2136
@@ -134,7 +134,9 @@ class CCD4Frame(CCD3Frame):
     def __init__(self, name='ccd4', **kwargs):
         CCDFrame.__init__(self, name=name, **kwargs)
 
-ccds = {'ccd1': CCD1Frame,
+# define a dictionary, so these ccds are easier to access
+ccds = {'ccd' : CCDFrame,
+        'ccd1': CCD1Frame,
         'ccd2': CCD2Frame,
         'ccd3': CCD3Frame,
         'ccd4': CCD4Frame}

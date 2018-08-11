@@ -1,3 +1,7 @@
+'''
+Make some cartoon datasets to play with.
+'''
+
 from .imports import *
 from .postage.stamps import Stamp
 from .postage.tpf import EarlyTessTargetPixelFile, EarlyTessLightCurve

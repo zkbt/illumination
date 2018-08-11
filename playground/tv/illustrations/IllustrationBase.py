@@ -232,6 +232,24 @@ class IllustrationBase(Talker):
 
         return colorbar
 
+    def savefig(self, filename, **savefigkw):
+        '''
+        Call plt.savefig, but make an announcement about it.
+        This should be called after illustration.plot()
+
+        Parameters
+        ----------
+
+        filename : str
+            Where should the figure be saved?
+
+        **savefigkw are passed to savefig
+        '''
+
+        plt.savefig(filename, **savefigkw)
+        self.speak('saved figure to {}'.format(filename))
+
+
     def animate(self, filename='test.mp4',
                       mintime=None, maxtimespan=None, cadence=2 * u.s,
                       fps=30, dpi=None, **kw):
@@ -239,7 +257,12 @@ class IllustrationBase(Talker):
         Create an animation from an Illustration,
         using the time axes associated with each frame.
 
-        The Illustration needs to have been plotted once already.
+        This should be called after illustration.plot()
+
+        Parameters
+        ----------
+
+        filename : str
         '''
 
         # figure out the times to display
@@ -262,13 +285,13 @@ class IllustrationBase(Talker):
             upper = lower + np.minimum(upper - lower, maxtimespan.to('s').value)
 
         times = np.arange(lower, upper, cadence)
-        self.speak('animating {} times at {}s cadence for {}'.format(
+        self.speak('about to animate {} times at {}s cadence for {}'.format(
             len(times), cadence, self))
 
         # get the writer
         writer = get_writer(filename, fps=fps)
 
-        self.speak('animation will be saved to {}'.format(filename))
+        self.speak('the animation will be saved to {}'.format(filename))
         # set up the animation writer
         with writer.saving(self.figure,
                            filename,
@@ -280,8 +303,8 @@ class IllustrationBase(Talker):
 
                 # update the illustration to a new time
                 self.update(Time(t, format='gps', scale='tdb'))
-
                 writer.grab_frame()
+        self.speak('the animation is finished!')
 
 """
 class Row(IllustrationBase):

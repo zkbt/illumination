@@ -51,6 +51,8 @@ class FrameBase(Talker):
             plotted in this frame. It can be modified either now
             when initializing the frame, or any time before
             calling `i.plot()` from the illustration.
+
+        **kwargs go nowhere (?)
         '''
 
         # initialize the Talker

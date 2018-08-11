@@ -1,18 +1,19 @@
 from .imshowFrame import *
 from matplotlib.colors import SymLogNorm, LogNorm
 
-
-
-
-
 class CameraFrame(imshowFrame):
     frametype = 'camera'
 
     def __init__(self, name='camera',
                        ax=None,
-                       data=None, **kwargs):
+                       data=None,
+                       **framekw):
 
         '''
+        Initialize a CameraFrame. For plotting, this
+        expects to see a full-frame image from a full
+        camera (not split into CCDs.)
+
         Parameters
         ----------
 
@@ -27,13 +28,15 @@ class CameraFrame(imshowFrame):
         data : Image_Sequence
             Any Sequence that contains 2D images.
 
-        **kwargs : dict
+        **framekw : dict
             Passed to imshowFrame;
             check it out for more options.
         '''
 
-        imshowFrame.__init__(self, name=name, ax=ax, data=data, **kwargs)
+        # initialize the imshow frame
+        imshowFrame.__init__(self, name=name, ax=ax, data=data, **framekw)
 
+        # set up the basic geometry
         self.xmin, self.ymin = 0, 0
         try:
             # if there's an image, use it to set the size
@@ -101,8 +104,9 @@ class Camera4Frame(Camera3Frame):
     def __init__(self, name='cam4', **kwargs):
         CameraFrame.__init__(self, name=name, **kwargs)
 
+# define a dictionary, so these cameras are easier to access
 cameras = { 'camera': CameraFrame,
-            'cam1': Camera1Frame,
-            'cam2': Camera2Frame,
-            'cam3': Camera3Frame,
-            'cam4': Camera4Frame}
+            'cam1'  : Camera1Frame,
+            'cam2'  : Camera2Frame,
+            'cam3'  : Camera3Frame,
+            'cam4'  : Camera4Frame}

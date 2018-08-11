@@ -1,3 +1,9 @@
+'''
+Frames each have a .plot and .update method associated with them,
+meaning that they can be included and animated inside a structured
+Illustration.
+'''
+
 from .FrameBase import FrameBase
 from .imshowFrame import imshowFrame
 from .CameraFrame import CameraFrame, cameras
