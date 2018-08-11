@@ -22,4 +22,5 @@ for camera in [1, 2, 3, 4]:
         i = HybridIllustration(imshows=[raw, normal, subtracted], sharecolorbar=False, left=0.02, right=0.98, hspace=0.01)
         i.plot()
         filename = 'test-qlptrio-orbit{}-cam{}-ccd{}.pdf'.format(orbit, camera, ccd)
-        i.animate(filename=filename.replace('pdf', 'mp4'), dpi=1000)
+        i.savefig(pdf, dpi=1200)
+        i.animate(filename=filename.replace('pdf', 'mp4'), dpi=500)

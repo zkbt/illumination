@@ -27,7 +27,5 @@ for difference in [True, False]:
 
     i.plot()
     filename = '{}qlp-orbit-{}-cam{}-ccd{}.pdf'.format({True:'difference-', False:''}[difference], orbit, camera, ccd)
-    i.savefig(filename, dpi=1200)
-    i.animate(filename=filename.replace('.pdf', '.mp4'),
-              dpi=1000,
-              cadence=1 * u.s)  # chelsea's FFIs have no time, so use 1s
+    i.savefig(pdf, dpi=1200)
+    i.animate(filename=filename.replace('pdf', 'mp4'), dpi=500)
