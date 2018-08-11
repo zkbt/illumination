@@ -15,7 +15,7 @@ class CameraIllustration(IllustrationBase):
                  orientation='horizontal',
                  sizeofcamera=4,
                  subplot_spec=None,
-                 **kwargs):
+                 **framekw):
         '''
         Parameters
         ----------
@@ -35,6 +35,7 @@ class CameraIllustration(IllustrationBase):
         sizeofcamera : float
             What's the size, in inches, to display a single camera?
 
+        **framekw passed to CameraFrame
         '''
 
 
@@ -62,7 +63,7 @@ class CameraIllustration(IllustrationBase):
         self.frames['camera'] = CameraFrame(illustration=self,
                                             ax=ax,
                                             data=make_sequence(data),
-                                            **kwargs)
+                                            **framekw)
 
 
 class CameraOfCCDsIllustration(CameraIllustration):
@@ -78,7 +79,7 @@ class CameraOfCCDsIllustration(CameraIllustration):
                  sizeofcamera=4,
                  subplot_spec=None,
                  camera='camera',
-                 **kwargs):
+                 **framekw):
         '''
         Parameters
         ----------
@@ -109,7 +110,7 @@ class CameraOfCCDsIllustration(CameraIllustration):
             Specify it here via 'camera' (default, no transformation)
             or 'cam1', 'cam2', 'cam3', 'cam4'.
 
-        **kwargs are passed to make_sequence
+        **framekw passed to frame
         '''
 
 
@@ -144,5 +145,5 @@ class CameraOfCCDsIllustration(CameraIllustration):
                                      ax=ax[k],
                                      data=make_sequence(locals()[k]),
                                      camera=self._cameraframe,
-                                     **kwargs)
+                                     **framekw)
             assert(self.frames[k].camera == self._cameraframe)

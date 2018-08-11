@@ -1,4 +1,5 @@
 from __future__ import print_function
+from .filenameparsers import *
 from .Image_Sequence import *
 
 
@@ -7,7 +8,12 @@ class FITS_Sequence(Image_Sequence):
     A sequence of FITS images, with a time associated with each.
     '''
 
-    def __init__(self, initial, ext_image=1, ext_primary=0, name='FITS', use_headers=True, **kwargs):
+    def __init__(self, initial, ext_image=1, ext_primary=0, name='FITS',
+                       use_headers=True,
+                       use_filenames=False,
+                       filenameparser=qlp_filenameparser,
+                       timekey=None, timeformat=None,
+                       **kwargs):
         '''
         Initialize a Sequence of FITS images. The goal is
         to create a list of FITS HDUs, one for each time.
@@ -66,15 +72,49 @@ class FITS_Sequence(Image_Sequence):
         self.static = {}
         self.spatial = {}
 
-        # make up an imaginary GPS time (and keep track of whether it is fake)
-        self.time = Time(np.arange(self.N), format='gps', scale='tdb')
-        self._timeisfake = True
-
+        # populate the temporal axes, somehow
+        assert(use_headers or use_filenames)
         if use_headers:
             try:
                 self._populate_from_headers()
             except:
-                self.speak('unable to populate headers for {}'.format(self))
+                self.speak('unable to extract temporal things from headers for {}'.format(self))
+        if use_filenames:
+            try:
+                self._populate_from_filenames(filenameparser=filenameparser)
+            except:
+                self.speak('unable to extract temporal things from filenames for {}'.format(self))
+        # make sure a time axis gets defined
+        self._define_time_axis(timekey=timekey, timeformat=timeformat)
+
+
+    def _clean_temporal(self):
+        '''
+        Move anything that's non-changing from temporal to static.
+        '''
+        # move non-changing things to static
+        for k in list(self.temporal.keys()):
+            if len(np.unique(self.temporal[k])) == 1:
+                self.static[k] = self.temporal.pop(k)[0]
+
+    def _populate_from_filenames(self, filenameparser=qlp_filenameparser):
+        '''
+        Pull the basic information and temporal axis from the filenames.
+        '''
+        for i, f in enumerate(self.filenames):
+            this = filenameparser(f)
+
+            # create empty lists, if necessary
+            if i == 0:
+                for k in this.keys():
+                    self.temporal[k] = []
+
+            # tack this file onto the list
+            for k in this.keys():
+                self.temporal[k].append(this[k])
+
+            # move static things away from temporal
+            self._clean_temporal()
 
     @property
     def N(self):
@@ -94,7 +134,7 @@ class FITS_Sequence(Image_Sequence):
         else:
             return fits.open(self.filenames[i], memmap=False)
 
-    def _populate_from_headers(self, timeformat=None):
+    def _populate_from_headers(self):
         '''
         Attempt to populate the sequence from the headers.
         '''
@@ -138,29 +178,41 @@ class FITS_Sequence(Image_Sequence):
                     for k in h.keys():
                         self.temporal[k].append(h[k])
 
-            # move non-changing things to static
-            for k in list(self.temporal.keys()):
-                if len(np.unique(self.temporal[k])) == 1:
-                    self.static[k] = self.temporal.pop(k)[0]
+            # move static things away from temporal
+            self._clean_temporal()
 
-        # try to pull a time axis from these
-        for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB']:
-            try:
-                # treat some value as a time
-                t = self.temporal[k]
+    def _define_time_axis(self, timekey=None, timeformat=None):
 
-                # if it's already an astropy time, keep it as such
-                if isinstance(t, Time):
-                    self.time = t
-                # make an astropy time out of the values
-                else:
-                    self.time = Time(np.asarray(
-                        t), format=timeformat or guess_time_format(t), scale=timescale)
+        # make up an imaginary GPS time (and keep track of whether it is fake)
+        self.time = Time(np.arange(self.N), format='gps', scale='tdb')
+        self._timeisfake = True
+
+        # try to pull out a specific key
+        if timekey is not None:
+            self.time = Time(np.asarray(self.temporal[timekey]),
+                        format=timeformat or guess_time_format(self.temporal[timekey]),
+                        scale=timescale)
+            self.speak('using "{}" as the time axis'.format(timekey))
+        else:
+            # try to pull a time axis from these
+            for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB']:
+                try:
+                    # treat some value as a time
+                    t = self.temporal[k]
+
+                    # if it's already an astropy time, keep it as such
+                    if isinstance(t, Time):
+                        self.time = t
+                    # make an astropy time out of the values
+                    else:
+                        self.time = Time(np.asarray(t),
+                                    format=timeformat or guess_time_format(t),
+                                    scale=timescale)
+                        self._timeisfake = False
+                    self.speak('guessing "{}" is good as the time axis'.format(k))
                     self._timeisfake = False
-                self.speak('using {} as the time axis'.format(k))
-                self._timeisfake = False
-            except KeyError:
-                break
+                except KeyError:
+                    continue
 
     def __getitem__(self, timestep):
         '''
