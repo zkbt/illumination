@@ -136,6 +136,9 @@ class FITS_Sequence(Image_Sequence):
         for k in list(self.temporal.keys()):
             if len(np.unique(self.temporal[k])) == 1:
                 self.static[k] = self.temporal.pop(k)[0]
+            else:
+                self.temporal[k] = np.asarray(self.temporal[k])
+
         self.speak('the temporal keys for {} are {}'.format(self, self.temporal.keys()))
         self.speak('the static keys for {} are {}'.format(self, self.static.keys()))
 
