@@ -8,9 +8,9 @@ directory = 'examples/'
 mkdir(directory)
 
 
-def test_SingleCameraIllustration(N=10, **kw):
+def test_CameraIllustration(N=10, **kw):
     print("\nTesting a Single Camera illustration.")
-    illustration = SingleCameraIllustration(
+    illustration = CameraIllustration(
         data=[create_test_fits(rows=300, cols=300) for _ in range(N)], ext_image=1, **kw)
     illustration.plot()
     filename = os.path.join(directory, 'single-camera-animation.mp4')
@@ -43,7 +43,7 @@ def test_StampsIllustration():
     return illustration
 
 
-def test_SingleCameraIllustrationWithStamps():
+def test_CameraIllustrationWithStamps():
     print("\nTesting a Single Camera with a Zoom.")
     illustration = SingleCameraWithZoomIllustration(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1,
                                                     zoomposition=position, zoomsize=size)
@@ -55,9 +55,9 @@ def test_SingleCameraIllustrationWithStamps():
     return illustration
 
 
-def test_SingleCameraIllustrationWithStamps():
+def test_CameraIllustrationWithStamps():
     print("\nTesting a Single Camera with some stamps.")
-    illustration = SingleCameraIllustration(
+    illustration = CameraIllustration(
         data=[create_test_fits(rows=300, cols=300) for _ in range(10)])
     camera = illustration.frames['camera']
     xmax, ymax = camera.xmax, camera.ymax
@@ -78,8 +78,8 @@ def test_SingleCameraIllustrationWithStamps():
 
 
 if __name__ == '__main__':
-    test_SingleCameraIllustrationWithStamps()
+    test_CameraIllustrationWithStamps()
     test_StampsIllustration()
     test_FourCameraIllustration()
-    test_SingleCameraIllustration()
-    test_SingleCameraIllustrationWithStamps()
+    test_CameraIllustration()
+    test_CameraIllustrationWithStamps()

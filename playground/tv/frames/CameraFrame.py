@@ -2,12 +2,37 @@ from .imshowFrame import *
 from matplotlib.colors import SymLogNorm, LogNorm
 
 
+
+
+
 class CameraFrame(imshowFrame):
-    frametype = 'Camera'
+    frametype = 'camera'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, name='camera',
+                       ax=None,
+                       data=None, **kwargs):
 
-        imshowFrame.__init__(self, *args, **kwargs)
+        '''
+        Parameters
+        ----------
+
+        name : str
+            A name to give this Frame.
+
+        ax : matplotlib.axes.Axes instance
+            All plotting will happen inside this ax.
+            If set to None, the `self.ax attribute` will
+            need to be set manually before plotting.
+
+        data : Image_Sequence
+            Any Sequence that contains 2D images.
+
+        **kwargs : dict
+            Passed to imshowFrame;
+            check it out for more options.
+        '''
+
+        imshowFrame.__init__(self, name=name, ax=ax, data=data, **kwargs)
 
         self.xmin, self.ymin = 0, 0
         try:
@@ -19,9 +44,11 @@ class CameraFrame(imshowFrame):
             self.xmax = 4272
 
 
-# FIXME -- make sure I understand the geometry here (I don't think I do now)
+### FIXME -- make sure I understand the geometry here (I don't think I do now)
 class Camera1Frame(CameraFrame):
-    frametype = 'Camera 1'
+
+    def __init__(self, name='cam1', **kwargs):
+        CameraFrame.__init__(self, name=name, **kwargs)
 
     def _transformimage(self, image):
         '''
@@ -44,11 +71,12 @@ class Camera1Frame(CameraFrame):
 
 
 class Camera2Frame(Camera1Frame):
-    frametype = 'Camera 2'
-
+    def __init__(self, name='cam2', **kwargs):
+        CameraFrame.__init__(self, name=name, **kwargs)
 
 class Camera3Frame(CameraFrame):
-    frametype = 'Camera 3'
+    def __init__(self, name='cam3', **kwargs):
+        CameraFrame.__init__(self, name=name, **kwargs)
 
     def _transformimage(self, image):
         '''
@@ -69,10 +97,11 @@ class Camera3Frame(CameraFrame):
             displayx = self.ymax - y
         return displayx, displayy
 
-
 class Camera4Frame(Camera3Frame):
-    frametype = 'Camera 4'
+    def __init__(self, name='cam4', **kwargs):
+        CameraFrame.__init__(self, name=name, **kwargs)
 
-
-cameras = {'cam1': Camera1Frame, 'cam2': Camera2Frame,
-           'cam3': Camera3Frame, 'cam4': Camera4Frame}
+cameras = { 'cam1': Camera1Frame,
+            'cam2': Camera2Frame,
+            'cam3': Camera3Frame,
+            'cam4': Camera4Frame}

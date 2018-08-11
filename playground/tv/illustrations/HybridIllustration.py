@@ -51,7 +51,7 @@ class HybridIllustration(IllustrationBase):
         cols = np.maximum(1, imshowcols)
 
         # use the frame aspect ratios to set the width ratios
-        width_ratios = [f.aspectratio for f in imshows]
+        width_ratios = [f.aspectratio for f in imshows][0:imshowcols]
 
         # set the height ratios, including a gap between imshows and timeseries
         height_ratios = (   hasimshow * imshowrows * [imshowheight] +
@@ -84,6 +84,7 @@ class HybridIllustration(IllustrationBase):
 
             # make sure to connect the frame back to this illustration
             i.illustration = self
+
             # create the axes in which this should sit
             i.ax = plt.subplot(self.grid[row, col])
 

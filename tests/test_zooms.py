@@ -25,7 +25,7 @@ def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50, 50)):
     return illustration
 
 
-def test_SingleCameraIllustrationLocalZoom(N=3,
+def test_CameraIllustrationLocalZoom(N=3,
                                            testgeometry=False,
                                            zoom=10,
                                            size=(10, 10)):
@@ -37,7 +37,7 @@ def test_SingleCameraIllustrationLocalZoom(N=3,
 
     # create the illustration
     nrows, ncols = 300, 300
-    illustration = SingleCameraIllustration(
+    illustration = CameraIllustration(
         data=[create_test_fits(rows=nrows, cols=ncols) for _ in range(10)],
         ext_image=1)
 
@@ -97,11 +97,11 @@ def test_FourCameraLocalZoom(N=3, zoom=3, size=(50, 50)):
 
 
 """
-def test_SingleCameraIllustrationWithStamps():
+def test_CameraIllustrationWithStamps():
     print("\nTesting a Single Camera with some stamps.")
 
     # create illustration (of an empty camera)
-    illustration = SingleCameraIllustration()
+    illustration = CameraIllustration()
 
     # make up some imaginary stamps
     camera = illustration.frames['camera']
@@ -148,5 +148,5 @@ def test_FourCameraWithStamps(N=3):
 
 if __name__ == '__main__':
     test_SingleCameraWithZoomIllustration()
-    test_SingleCameraIllustrationLocalZoom()
+    test_CameraIllustrationLocalZoom()
     test_FourCameraLocalZoom()

@@ -17,6 +17,8 @@ class IllustrationBase:
         Initialize an Illustration,
         setting up its figure and basic layout.
         '''
+
+        #
         self.figure = plt.figure(**figkw)
         self.grid = gs.GridSpec(nrows, ncols, **kwargs)
         self.sharecolorbar = sharecolorbar

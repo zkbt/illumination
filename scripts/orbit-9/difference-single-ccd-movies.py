@@ -11,7 +11,7 @@ for camera in [1, 2, 3, 4]:
             f.processingsteps = ['subtractmean']
         i.plot()
 
-        filename = 'orbit-{}-camera-{}-ccd-{}-illustrated.pdf'.format(
+        filename = 'difference-orbit-{}-camera-{}-ccd-{}-illustrated.pdf'.format(
             orbit, camera, ccd)
         plt.savefig(filename, dpi=1000)
         print("saved to {}".format(filename))

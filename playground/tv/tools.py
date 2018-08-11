@@ -2,7 +2,7 @@ from __future__ import print_function
 
 from ..imports import *
 from .zoom import *
-from .illustrations import SingleCameraIllustration, FourCameraIllustration, SingleCameraWithZoomIllustration
+from .illustrations import CameraIllustration, FourCameraIllustration, SingleCameraWithZoomIllustration
 from playground.postage.stamps import *
 
 
@@ -18,7 +18,7 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, zoompositi
     Make an Illustration from a group of FITS files.
 
     If one (or fewer) cameras are found through
-    the 'cam{}' substring, a SingleCameraIllustration illustration is returned.
+    the 'cam{}' substring, a CameraIllustration illustration is returned.
 
     If more than on cameras are found through
     the 'cam{}' substring, a FourCameraIllustration illustration is returned.
@@ -68,7 +68,7 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, zoompositi
             illustration = SingleCameraWithZoomIllustration(data[cam], zoomposition=zoomposition, zoomsize=zoomsize, **kw)
 
         else:
-            illustration = SingleCameraIllustration(data[cam], **kw)
+            illustration = CameraIllustration(data[cam], **kw)
 
     elif len(data) > 1:
         inputs = dict(**data)
@@ -84,7 +84,7 @@ def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filenam
     Make an Illustration from a group of Stamps.
 
     If one (or fewer) cameras are found through
-    the 'cam{}' substring, a SingleCameraIllustration illustration is returned.
+    the 'cam{}' substring, a CameraIllustration illustration is returned.
 
     If more than on cameras are found through
     the 'cam{}' substring, a FourCameraIllustration illustration is returned.
@@ -122,7 +122,7 @@ def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filenam
     # figure out how to display them
     if singlecamera:
         cam = 'camera'
-        illustration = SingleCameraIllustration(**kw)
+        illustration = CameraIllustration(**kw)
     elif len(data) > 1:
         cam = None
         illustration = FourCameraIllustration(**kw)
