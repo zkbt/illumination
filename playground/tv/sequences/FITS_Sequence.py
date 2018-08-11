@@ -111,7 +111,7 @@ class FITS_Sequence(Image_Sequence):
         if self._hdulists is not None:
             self._hdulists = self._hdulists[i]
 
-        self.time = np.asarray(self.time)[i]
+        self.time = self.time[i]
 
     @property
     def N(self):
