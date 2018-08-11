@@ -113,8 +113,8 @@ class FITS_Sequence(Image_Sequence):
             for k in this.keys():
                 self.temporal[k].append(this[k])
 
-            # move static things away from temporal
-            self._clean_temporal()
+        # move static things away from temporal
+        self._clean_temporal()
 
     @property
     def N(self):
