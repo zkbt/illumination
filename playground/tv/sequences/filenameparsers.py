@@ -23,7 +23,7 @@ def qlp_filenameparser(filename):
     d['ccd'] = int(components[5][3])
     return d
 
-def qlp_dehoc_filenameparser(filename):
+def qlp_fullcamera_filenameparser(filename):
     '''
     Parse a QLP-type file like
     "tess2018220104526-00005279-4-crm-ffi_dehoc.fits"
@@ -39,3 +39,10 @@ def qlp_dehoc_filenameparser(filename):
     d['crm'] = components[3]
     d['type'] = components[4]
     return d
+
+def flexible_filenameparser(filename):
+    try:
+        return qlp_filenameparser(filename)
+    except IndexError:
+        return qlp_fullcamera_filenameparser(filename)
+        

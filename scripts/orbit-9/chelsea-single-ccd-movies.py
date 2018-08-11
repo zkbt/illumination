@@ -9,27 +9,25 @@ camera = 1
 ccd = 1
 directory = '/pdo/ramp/qlp_data/orbit-9/ffi/cam{camera}/ccd{ccd}/FITS'.format(**locals())
 pattern = os.path.join(directory, 'tess*-*-{camera}-crm-ffi-ccd{ccd}.fits'.format(**locals()))
-files = np.sort(glob.glob(pattern))[0:10]
-
+files = list(np.sort(glob.glob(pattern)))
 sequence = make_sequence(files, ext_image=0, use_headers=False, use_filenames=True, timekey='cadence')
 
-i = CCDIllustration(data=sequence)
-i.plot()
-filename = 'qlp-orbit-{}-cam{}-ccd{}.pdf'.format(orbit, camera, ccd)
-i.savefig(filename, dpi=1000)
-i.animate(filename=filename.replace('.pdf', '.mp4'),
-          dpi=600,
-          cadence=1 * u.s)  # chelsea's FFIs have no time, so use 1s
+# load a median image, instead of computing it
+medianfilename = '/pdo/ramp/qlp_data/orbit-9/ffi/cam{camera}/ccd{ccd}/sub/Median.fits'.format(**locals())
+sequence.spatial['median']  = fits.open(medianfilename)[0].data
 
 
+# make both a raw, and a differenced movie
+for difference in [False, True]:
 
-i = CCDIllustration(data=sequence)
-for f in i.frames.values():
-    f.processingsteps = ['subtractmean']
+    i = CCDIllustration(data=sequence)
+    if difference:
+        for f in i.frames.values():
+            f.processingsteps = ['subtractmedian']
 
-i.plot()
-filename = 'difference-qlp-orbit-{}-cam{}-ccd{}.pdf'.format(orbit, camera, ccd)
-i.savefig(filename, dpi=1000)
-i.animate(filename=filename.replace('.pdf', '.mp4'),
-          dpi=600,
-          cadence=1 * u.s)
+    i.plot()
+    filename = '{}qlp-orbit-{}-cam{}-ccd{}.pdf'.format({True:'difference-', False:''}[difference], orbit, camera, ccd)
+    i.savefig(filename, dpi=1000)
+    i.animate(filename=filename.replace('.pdf', '.mp4'),
+              dpi=600,
+              cadence=1 * u.s)  # chelsea's FFIs have no time, so use 1s
