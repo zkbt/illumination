@@ -146,7 +146,3 @@ class CameraOfCCDsIllustration(CameraIllustration):
                                      camera=self._cameraframe,
                                      **kwargs)
             assert(self.frames[k].camera == self._cameraframe)
-
-class Camera1OfCCDSIllustration(CameraOfCCDsIllustration):
-    def __init__(self, *args, **kwargs):
-        self.cameraframe = cameras['cam1']

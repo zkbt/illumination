@@ -7,7 +7,7 @@ class FITS_Sequence(Image_Sequence):
     A sequence of FITS images, with a time associated with each.
     '''
 
-    def __init__(self, initial, ext_image=1, ext_primary=0, name='FITS', **kwargs):
+    def __init__(self, initial, ext_image=1, ext_primary=0, name='FITS', use_headers=True, **kwargs):
         '''
         Initialize a Sequence of FITS images. The goal is
         to create a list of FITS HDUs, one for each time.
@@ -69,10 +69,12 @@ class FITS_Sequence(Image_Sequence):
         # make up an imaginary GPS time (and keep track of whether it is fake)
         self.time = Time(np.arange(self.N), format='gps', scale='tdb')
         self._timeisfake = True
-        try:
-            self._populate_from_headers()
-        except:
-            self.speak('unable to populate headers for {}'.format(self))
+
+        if use_headers:
+            try:
+                self._populate_from_headers()
+            except:
+                self.speak('unable to populate headers for {}'.format(self))
 
     @property
     def N(self):

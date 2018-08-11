@@ -20,6 +20,7 @@ def make_sequence(initial, *args, **kwargs):
             This is the input that initializes an image sequence.
                     -single FITS filename, and an extension to use.
                     -list of FITS filenames, and an extension to use.
+                    -a glob pattern to search for FITS files (and extension)
                     -single FITS HDUList, and an extension to use.
                     -list of loaded FITS HDULists, and an extension to use.
                     -a Stamp object from the `cosmics` package.
