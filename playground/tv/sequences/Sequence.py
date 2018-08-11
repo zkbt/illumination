@@ -32,7 +32,7 @@ def guess_time_format(t, default='jd'):
     format : str
             A time format string appropriate for astropy times.
     '''
-    ranges = dict(	gps=[0.1e9, 2e9],  # valid between 1983-03-08 09:46:59.000 and 2043-05-23 03:33:39.000
+    ranges = dict( gps=[0.1e9, 2e9],  # valid between 1983-03-08 09:46:59.000 and 2043-05-23 03:33:39.000
                    # valid between 1858-11-16 12:00:00.000 and 3501-08-15 12:00:00.000
                    jd=[2.4e6, 3e6],
                    mjd=[4e4, 8e4])  # valid between 1968-05-24 00:00:00.000 and 2077-11-28 00:00:00.000
