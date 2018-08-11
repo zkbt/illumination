@@ -12,7 +12,6 @@ pattern = os.path.join(directory, 'tess*-*-{camera}-crm-ffi-ccd{ccd}.fits'.forma
 
 sequence = make_sequence(pattern, ext_image=0, use_headers=False, use_filenames=True)
 
-
 i = CCDIllustration(data=sequence)
 i.plot()
 filename = 'qlp-orbit-{}-cam{}-ccd{}.pdf'.format(orbit, camera, ccd)

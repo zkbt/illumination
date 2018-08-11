@@ -91,7 +91,7 @@ class FITS_Sequence(Image_Sequence):
         # make sure everything gets sorted by time
         self._sort()
 
-    def sort(self):
+    def _sort(self):
         '''
         Sort the images, and the temporals.
         '''
