@@ -18,7 +18,7 @@ sequence.spatial['median']  = fits.open(medianfilename)[0].data
 
 
 # make both a raw, and a differenced movie
-for difference in [False, True]:
+for difference in [True, False]:
 
     i = CCDIllustration(data=sequence)
     if difference:
@@ -27,7 +27,7 @@ for difference in [False, True]:
 
     i.plot()
     filename = '{}qlp-orbit-{}-cam{}-ccd{}.pdf'.format({True:'difference-', False:''}[difference], orbit, camera, ccd)
-    i.savefig(filename, dpi=1000)
+    i.savefig(filename, dpi=1200)
     i.animate(filename=filename.replace('.pdf', '.mp4'),
-              dpi=600,
+              dpi=1000,
               cadence=1 * u.s)  # chelsea's FFIs have no time, so use 1s
