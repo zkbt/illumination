@@ -59,6 +59,9 @@ class FITS_Sequence(Image_Sequence):
         # if we're starting frmo hdulists, then get their filenames
         if self._hdulists is not None:
             self.filenames = [h.filename() for h in self._hdulists]
+            self._hdulists = np.asarray(self._hdulists)
+            
+        self.filenames = np.asarray(self.filenames)
 
         # make sure this FITS_Sequence isn't empty
         #assert(len(self.filenames) > 0)
