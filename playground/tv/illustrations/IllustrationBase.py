@@ -246,7 +246,7 @@ class IllustrationBase(Talker):
         **savefigkw are passed to savefig
         '''
 
-        self.speak('about to save figure to {}'.format(filename))
+        self.speak('saving figure to {}'.format(filename))
         plt.savefig(filename, **savefigkw)
         self.speak('saved figure to {}'.format(filename))
 
