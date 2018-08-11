@@ -125,7 +125,7 @@ class FrameBase(Talker):
 
         if self.data._timeisfake:
             timestep = self._find_timestep(time)
-            return '#{}'.format(timestep)
+            return '#{}'.format(self._get_times()[timestep])
         else:
             days = time.jd - self.offset
             inunits = (days * u.day).to(self.timeunit)
