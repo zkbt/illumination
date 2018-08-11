@@ -57,6 +57,7 @@ class FourCameraIllustration(IllustrationBase):
                 name = 'cam{}'.format(i * cols + j + 1)
 
                 isfullofccds = type(locals()[name]) == dict
+
                 # if it's CCDs, make a four-CCD sub-illustration
                 if isfullofccds:
 
