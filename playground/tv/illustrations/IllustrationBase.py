@@ -8,33 +8,79 @@ class IllustrationBase:
     '''
     This contains the basic layout and organization
     for a linked visualization of images.
+
+    Other illustrations inherit from this basic one,
+    changing the
     '''
     illustrationtype = 'Base'
     plotted = {}
 
-    def __init__(self, nrows=1, ncols=1, figkw=dict(figsize=None, dpi=None), sharecolorbar=True, **kwargs):
+    def __init__(self, nrows=1,
+                       ncols=1,
+                       figkw=dict(figsize=None, dpi=None),
+                       sharecolorbar=True,
+                       subplot_spec=None,
+                       **gridspeckw):
         '''
         Initialize an Illustration,
         setting up its figure and basic layout.
+
+        nrows : int
+            The number of rows in the illustration.
+
+        ncols : int
+            The number of columns in the illustration.
+
+        figkw : dict
+            Keywords to pass along to create a figure.
+
+        **gridspeckw : dict
+            Any extra keywords are passed to the
+            gridspec
         '''
 
-        #
-        self.figure = plt.figure(**figkw)
-        self.grid = gs.GridSpec(nrows, ncols, **kwargs)
+        if subplot_spec is not None:
+            # if there's a subplot_spec specified, then populate that
+            self.figure = None
+
+            subset = {k:gridspeckw.get(k) for k in ['wspace', 'hspace', 'height_ratios', 'width_ratios']}
+            self.grid = gs.GridSpecFromSubplotSpec(nrows,
+                                                    ncols,
+                                                    subplot_spec=subplot_spec,
+                                                    **subset)
+            print('built {} into an existing gridspec'.format(self.illustrationtype))
+        else:
+            # by default, create a new figure and grid spec
+            self.figure = plt.figure(**figkw)
+            self.grid = gs.GridSpec(nrows, ncols, **gridspeckw)
+            print('built {} into a new figure'.format(self.illustrationtype))
+
+
+        # should this illustration have a shared colorbar, or separate ones?
         self.sharecolorbar = sharecolorbar
+
+        # create an empty dictionary, where frames will be stored
         self.frames = {}
 
     def __repr__(self):
+        '''
+        How should this illustration be represented?
+        '''
         return '<{} Illustration | ({} Frames) >'.format(self.illustrationtype, len(self.frames))
 
     def _get_times(self):
-        gps = [f._get_times().gps for f in self.frames.values()]
-        return Time(np.hstack(gps), format='gps', scale='tdb')
+        '''
+        Get *all* the times that are associated with this
+        illustration, in any frame.
+        '''
 
-        #alltimes = []
-        # for k, f in self.frames.items():
-        #	alltimes.extend(f._get_times())
-        # return alltimes
+        # it's faster to convert from gps to floats and back again
+
+        # make a list of gps times
+        gps = [f._get_times().gps for f in self.frames.values()]
+
+        # return that list, as times
+        return Time(np.hstack(gps), format='gps', scale='tdb')
 
     def _timesandcadence(self, round=1):
         '''
@@ -61,8 +107,8 @@ class IllustrationBase:
         except KeyError:
 
             gps = np.hstack([f._get_times().gps for f in self.frames.values()])
-            #alltimes =  Time(np.hstack(gps), format='gps')
-            #alltimes = []
+            # alltimes =  Time(np.hstack(gps), format='gps')
+            # alltimes = []
             # for k, f in self.frames.items():
             #	alltimes.extend(f._get_times())
 
@@ -75,7 +121,7 @@ class IllustrationBase:
             uniquegpstimes = np.unique(rounded)
             cadence = np.min(np.diff(uniquegpstimes)) * u.s
             # plt.figure('cadence!')
-            #plt.plot(uniquegpstimes[:-1], np.diff(uniquegpstimes), '.')
+            # plt.plot(uniquegpstimes[:-1], np.diff(uniquegpstimes), '.')
             # plt.show()
             times = Time(uniquegpstimes, format='gps')
             self._precaculatedtimesandcadence[round] = times, cadence
@@ -111,8 +157,11 @@ class IllustrationBase:
         '''
 
         try:
+            # are the cmap, normalization, and ticks already defined?
             self.cmap, self.norm, self.ticks
         except AttributeError:
+
+            # collect all the (first) images
             firstimages = []
             for name, frame in self.frames.items():
                 try:
@@ -120,9 +169,13 @@ class IllustrationBase:
                     print('including {} in shared colorbar'.format(frame))
                 except (TypeError, IndexError, AttributeError):
                     print('found no data for {}'.format(frame))
+
             # create the cmap from the given data
             self.cmap, self.norm, self.ticks = cmap_norm_ticks(
                 np.asarray(firstimages), **kwargs)
+            print('created colorbar with \n cmap={}\n norm={}\n ticks={}'.format(self.cmap,
+                                                                                 self.norm,
+                                                                                 self.ticks))
         return self.cmap, self.norm, self.ticks
 
     def _add_colorbar(self, imshowed, ax=None, ticks=None):
@@ -154,7 +207,7 @@ class IllustrationBase:
             pad=0.07,
             ticks=ticks)
 
-        #colorbarred = plt.colorbar(self.plotted['image'], ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.07, ticks=ticks)
+        # colorbarred = plt.colorbar(self.plotted['image'], ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.07, ticks=ticks)
         colorbar.ax.set_xticklabels(
             ['{:.0f}'.format(v) for v in ticks], fontsize=8, color='gray')
         colorbar.outline.set_visible(False)
