@@ -22,5 +22,5 @@ i.plot()
 filename = 'difference-orbit-{}-four-camera-illustrated.pdf'.format(orbit)
 plt.savefig(filename, dpi=1000)
 print("saved to {}".format(filename))
-animate(i, filename=filename.replace('.pdf', '.mp4'), dpi=300,
+i.animate(filename=filename.replace('.pdf', '.mp4'), dpi=300,
         cadence=1 * u.s)  # dehocs have no time, so use 1s

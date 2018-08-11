@@ -12,6 +12,26 @@ class FourCameraIllustration(IllustrationBase):
     illustrationtype = 'FourCamera'
 
     def __init__(self, cam1=[], cam2=[], cam3=[], cam4=[], orientation='horizontal', sizeofcamera=4, subplot_spec=None, **kwargs):
+        '''
+
+        Parameters
+        ----------
+        cam1, etc... : various
+            Anything that can initialize a sequence with
+            the make_sequence() helper function.
+
+            or
+
+            a dictionary with keys of 'ccd1', 'ccd2', 'ccd3', 'ccd4'
+            that each contain something that can initialize a sequence
+
+        orientation : str
+            'horizontal' = camera 2 is right of camera 1
+            'vertical'  = camera 2 is below camera 1
+
+        sizeofcamera : float
+            What's the size, in inches, to display a single camera?
+        '''
 
         # set up the basic geometry of the main axes
         sizeofcamera = 4
@@ -36,8 +56,9 @@ class FourCameraIllustration(IllustrationBase):
                 n = i * cols + j + 1
                 name = 'cam{}'.format(i * cols + j + 1)
 
+                isfullofccds = type(locals()[name]) == dict
                 # if it's CCDs, make a four-CCD sub-illustration
-                if type(locals()[name]) == dict:
+                if isfullofccds:
 
                     # make a camera frame to contain these CCDs
                     cameraframe = cameras[name](ax=None,
@@ -53,6 +74,7 @@ class FourCameraIllustration(IllustrationBase):
                             orientation=orientation,
                             sizeofcamera=sizeofcamera,
                             subplot_spec=self.grid[i,j],
+                            camera=name,
                             **ccds)
 
                     # register the CCD frames (but not the cameras)

@@ -138,6 +138,7 @@ class imshowFrame(FrameBase):
             try:
                 self.illustration.plotted['colorbar']
             except KeyError:
+                self.speak('added a shared colorbar for {}'.format(self.illustration))
                 c = self.illustration._add_colorbar(image,
                                                     ax=None,
                                                     ticks=self.ticks)
@@ -148,6 +149,8 @@ class imshowFrame(FrameBase):
             try:
                 self.plotted['colorbar']
             except:
+                self.speak('added a unique colorbar for {}'.format(self))
+
                 # create a colorbar for this illustration
                 c = self.illustration._add_colorbar(image,
                                                     ax=self.ax,
@@ -166,6 +169,7 @@ class imshowFrame(FrameBase):
         ratio : float
             What fraction of the (longest) axis should the arrows span?
         '''
+
 
         # figure out the length of the arrows (in data units)
         try:
@@ -220,6 +224,8 @@ class imshowFrame(FrameBase):
             The time to plot, defaults to the first with None.
         '''
 
+        self.speak('plotting {} for the first time'.format(self))
+
         # make sure we point back at this frame
         plt.sca(self.ax)
 
@@ -246,6 +252,8 @@ class imshowFrame(FrameBase):
             self.plotted['image'] = self.ax.imshow(
                 firstimage, extent=extent, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
 
+            self.speak('added image of shape {} to {}'.format(firstimage.shape, self))
+
         # plot the colorbar
         if ('colorbar' in self.plotingredients) and 'image' in self.plotted:
             # add the colorbar
@@ -261,14 +269,17 @@ class imshowFrame(FrameBase):
             # add a time label
             self.plotted['time'] = self.ax.text(
                 0.0, -0.02, timelabel, va='top', zorder=1e6, color='gray', transform=self.ax.transAxes)
+            self.speak('added time label of "{}" on {}'.format(timelabel, self))
 
         # plot the arrows
         if 'arrows' in self.plotingredients:
             self.plotted['arrows'] = self.draw_arrows()
+            self.speak('added arrows on {}'.format(self))
 
         # plot a title on this frame
         if 'title' in self.plotingredients:
             plt.title(self.titlefordisplay)
+            self.speak('added title of "{}" to {}'.format(self.titlefordisplay, self))
 
         # plot lines and ticks for axes only if requested
         if 'axes' not in self.plotingredients:
@@ -295,7 +306,7 @@ class imshowFrame(FrameBase):
 
         if 'subtractmedian' in self.processingsteps:
             processedimage = image - self.data.median()
-            #print('subtracted median image')
+            #self.speak('subtracted median image')
         elif 'subtractmean' in self.processingsteps:
             processedimage = image - self.data.mean()
         else:
@@ -317,8 +328,8 @@ class imshowFrame(FrameBase):
             processedimage = self.process_image(rawimage)
             image = self._transformimage(processedimage)
             actual_time = self._get_times()[timestep]
-            # print(" ")
-            # print(time, timestep)
+            # self.speak(" ")
+            # self.speak(time, timestep)
         except (IndexError, AssertionError, ValueError):
             return None, None
         return image, actual_time

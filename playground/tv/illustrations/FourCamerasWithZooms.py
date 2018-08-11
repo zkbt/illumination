@@ -17,14 +17,14 @@ class ZoomsIllustration(FourCameraIllustration):
             data_coords = col, row
 
             cam = s.static['CAM']
-            print(cam)
+            self.speak(cam)
             reference_ax = self.frames[cam].ax
             reference_fi = reference_ax.figure
 
             display_coords = reference_ax.transData.transform((data_coords))
             figure_coords = reference_fi.transFigure.inverted().transform(display_coords)
 
-            print(cam, data_coords, display_coords, figure_coords)
+            self.speak(cam, data_coords, display_coords, figure_coords)
 
             size = 0.2
             left, bottom = figure_coords

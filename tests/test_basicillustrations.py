@@ -2,7 +2,7 @@ from playground.imports import *
 from playground.tv.illustrations import *
 from playground.cartoons import *
 from playground.tv.zoom import *
-from playground.tv.tools import animate
+
 
 directory = 'examples/'
 mkdir(directory)
@@ -14,7 +14,7 @@ def test_CameraIllustration(N=10, **kw):
         data=[create_test_fits(rows=300, cols=300) for _ in range(N)], ext_image=1, **kw)
     illustration.plot()
     filename = os.path.join(directory, 'single-camera-animation.mp4')
-    animate(illustration, filename)
+    illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
@@ -26,7 +26,7 @@ def test_FourCameraIllustration():
     illustration = FourCameraIllustration(**data)
     illustration.plot()
     filename = os.path.join(directory, 'four-camera-animation.mp4')
-    animate(illustration, filename)
+    illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
@@ -38,7 +38,7 @@ def test_StampsIllustration():
     illustration = StampsIllustration(data, sharecolorbar=False)
     illustration.plot()
     filename = os.path.join(directory, 'stamps-animation.mp4')
-    animate(illustration, filename)
+    illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
@@ -50,7 +50,7 @@ def test_CameraIllustrationWithStamps():
 
     illustration.plot()
     filename = os.path.join(directory, 'single-camera-zoom-animation.mp4')
-    animate(illustration, filename)
+    illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 

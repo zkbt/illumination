@@ -1,7 +1,7 @@
 #tic = 248093171
 from playground.postage.stamps import *
 from playground.tv.illustrations import StampsIllustration
-from playground.tv.tools import animate
+
 
 path = '/pdo/ramp/zkbt/orbit-8196/stamps'
 possible = glob.glob(os.path.join(path, '/cam*/*.npy'))
@@ -50,7 +50,7 @@ def check_crm(tic=tics[0], movie=False, mintime = 1209031557, maxtimespan=600):
     ci.plot()
 
     if movie:
-        animate(ci, mintime=mintime, maxtimespan=maxtimespan, filename=os.path.join(basedirectory, '{}-crm.mp4'.format(tic)))
+        ci.animate(mintime=mintime, maxtimespan=maxtimespan, filename=os.path.join(basedirectory, '{}-crm.mp4'.format(tic)))
 
     return stamps, ci
 

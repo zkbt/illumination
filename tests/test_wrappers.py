@@ -24,7 +24,7 @@ def test_FITSwithZoom(zoomposition=(30, 70), zoomsize=(10, 10)):
     # plot and animate
     illustration.plot()
     filename = os.path.join(directory, 'illustatefits-zoom-animation.mp4')
-    animate(illustration, filename)
+    illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 

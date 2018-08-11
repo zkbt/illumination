@@ -19,11 +19,11 @@ class CCDFrame(imshowFrame):
                        camera=CameraFrame(),
                        **kwargs):
 
-        # make sure we're linked to a camera
-        self.camera=camera
-
         # initialize the base imshowFrame, with data and a name
         imshowFrame.__init__(self, name=name, ax=ax, data=data, **kwargs)
+
+        # make sure we're linked to a camera
+        self.camera = camera
 
         # set up the sizes
         self.xmin, self.ymin = 0, 0

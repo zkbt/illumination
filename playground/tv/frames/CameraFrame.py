@@ -101,7 +101,8 @@ class Camera4Frame(Camera3Frame):
     def __init__(self, name='cam4', **kwargs):
         CameraFrame.__init__(self, name=name, **kwargs)
 
-cameras = { 'cam1': Camera1Frame,
+cameras = { 'camera': CameraFrame,
+            'cam1': Camera1Frame,
             'cam2': Camera2Frame,
             'cam3': Camera3Frame,
             'cam4': Camera4Frame}

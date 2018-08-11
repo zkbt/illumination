@@ -1,7 +1,7 @@
 from playground.imports import *
 from playground.tv import *
 from playground.cartoons import *
-from playground.tv.tools import animate
+
 
 directory = 'examples/'
 mkdir(directory)
@@ -24,7 +24,7 @@ def test_hybrid(howmany=3):
     i.plot()
     for l, t in zip(lcs, timeseries):
         t.ax.plot(l.time - t.offset, l.flux)
-    animate(i)
+    i.animate(filename=os.path.join(directory, 'hybrid-illustration-test.mp4'))
     return i
 
 

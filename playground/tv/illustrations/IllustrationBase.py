@@ -3,8 +3,25 @@ from ..sequences import *
 from ..frames import *
 from ..colors import cmap_norm_ticks
 
+def get_writer(filename, fps=30):
+    '''
+    Try to get an appropriate animation writer,
+    given the filename provided.
+    '''
+    if '.mp4' in filename:
+        try:
+            writer = ani.writers['ffmpeg'](fps=fps)
+        except (RuntimeError, KeyError):
+            raise RuntimeError('This computer seems unable to ffmpeg.')
+    else:
+        try:
+            writer = ani.writers['pillow'](fps=fps)
+        except (RuntimeError, KeyError):
+            writer = ani.writers['imagemagick'](fps=fps)
+            raise RuntimeError('This computer seem unable to animate?')
+    return writer
 
-class IllustrationBase:
+class IllustrationBase(Talker):
     '''
     This contains the basic layout and organization
     for a linked visualization of images.
@@ -39,6 +56,8 @@ class IllustrationBase:
             gridspec
         '''
 
+        Talker.__init__(self, prefixformat='{:>32}')
+
         if subplot_spec is not None:
             # if there's a subplot_spec specified, then populate that
             self.figure = None
@@ -48,12 +67,12 @@ class IllustrationBase:
                                                     ncols,
                                                     subplot_spec=subplot_spec,
                                                     **subset)
-            print('built {} into an existing gridspec'.format(self.illustrationtype))
+            self.speak('built {} into an existing gridspec'.format(self.illustrationtype))
         else:
             # by default, create a new figure and grid spec
             self.figure = plt.figure(**figkw)
             self.grid = gs.GridSpec(nrows, ncols, **gridspeckw)
-            print('built {} into a new figure'.format(self.illustrationtype))
+            self.speak('built {} into a new figure'.format(self.illustrationtype))
 
 
         # should this illustration have a shared colorbar, or separate ones?
@@ -66,7 +85,7 @@ class IllustrationBase:
         '''
         How should this illustration be represented?
         '''
-        return '<{} Illustration | ({} Frames) >'.format(self.illustrationtype, len(self.frames))
+        return '<{} Illustration | ({} Frames)>'.format(self.illustrationtype, len(self.frames))
 
     def _get_times(self):
         '''
@@ -135,7 +154,6 @@ class IllustrationBase:
         '''
         for k, f in self.frames.items():
             f.plot(*args, **kwargs)
-            print('plotting {}'.format(k))
 
     def update(self, *args, **kwargs):
         '''
@@ -166,14 +184,14 @@ class IllustrationBase:
             for name, frame in self.frames.items():
                 try:
                     firstimages.extend(frame._get_image()[0].flatten())
-                    print('including {} in shared colorbar'.format(frame))
+                    self.speak('included {} in the shared color scheme'.format(frame))
                 except (TypeError, IndexError, AttributeError):
-                    print('found no data for {}'.format(frame))
+                    self.speak('found no color scheme data for {}'.format(frame))
 
             # create the cmap from the given data
             self.cmap, self.norm, self.ticks = cmap_norm_ticks(
                 np.asarray(firstimages), **kwargs)
-            print('created colorbar with \n cmap={}\n norm={}\n ticks={}'.format(self.cmap,
+            self.speak('defined color scheme with \n cmap={}\n norm={}\n ticks={}'.format(self.cmap,
                                                                                  self.norm,
                                                                                  self.ticks))
         return self.cmap, self.norm, self.ticks
@@ -214,6 +232,56 @@ class IllustrationBase:
 
         return colorbar
 
+    def animate(self, filename='test.mp4',
+                      mintime=None, maxtimespan=None, cadence=2 * u.s,
+                      fps=30, dpi=None, **kw):
+        '''
+        Create an animation from an Illustration,
+        using the time axes associated with each frame.
+
+        The Illustration needs to have been plotted once already.
+        '''
+
+        # figure out the times to display
+        if mintime is None:
+            actualtimes, actualcadence = self._timesandcadence(
+                round=cadence.to('s').value)
+            lower, upper = min(actualtimes.gps), max(
+                actualtimes.gps) + actualcadence.to('s').value
+        else:
+            lower = mintime.gps
+            upper = lower + maxtimespan.to('s').value
+
+        if cadence is None:
+            cadence = actualcadence.to('s').value
+        else:
+            # np.maximum(cadence.to('s').value, actualcadence.to('s').value)
+            cadence = cadence.to('s').value
+
+        if maxtimespan is not None:
+            upper = lower + np.minimum(upper - lower, maxtimespan.to('s').value)
+
+        times = np.arange(lower, upper, cadence)
+        self.speak('animating {} times at {}s cadence for {}'.format(
+            len(times), cadence, self))
+
+        # get the writer
+        writer = get_writer(filename, fps=fps)
+
+        self.speak('animation will be saved to {}'.format(filename))
+        # set up the animation writer
+        with writer.saving(self.figure,
+                           filename,
+                           dpi or self.figure.get_dpi()):
+
+            for i, t in enumerate(times):
+                self.speak('  {}/{} at {}'.format(i + 1,
+                            len(times), Time.now().iso), progress=True)
+
+                # update the illustration to a new time
+                self.update(Time(t, format='gps', scale='tdb'))
+
+                writer.grab_frame()
 
 """
 class Row(IllustrationBase):

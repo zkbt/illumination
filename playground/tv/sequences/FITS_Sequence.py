@@ -104,7 +104,7 @@ class FITS_Sequence(Image_Sequence):
         try:
             first[self.ext_image]
         except IndexError:
-            print('image extension {} not found, switching to 0'.format(self.ext_image))
+            self.speak('image extension {} not found, switching to 0'.format(self.ext_image))
             self.ext_image = 0
 
         # load the headers for the primary and the image
@@ -130,7 +130,7 @@ class FITS_Sequence(Image_Sequence):
             # compile all values from the headers
             for i in range(self.N):
                 hdulist = self._get_hdulist(i)
-                print("populating header {} of {}".format(i+1, self.N), end='\r')
+                self.speak("populating header {} of {}".format(i+1, self.N), progress=True)
                 for e in extensions:
                     h = hdulist[e].header
                     for k in h.keys():

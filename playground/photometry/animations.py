@@ -16,7 +16,7 @@ def animate_temporal_differences(tpf, maxtimespan=0.02*u.day, cadence=None, shar
         cadence = tpf.cadence
 
     # animate the
-    animate(i, maxtimespan=maxtimespan, cadence=cadence, **kw)
+    i.animate(maxtimespan=maxtimespan, cadence=cadence, **kw)
 
 def animate_both_cadences(tpfs, filename='both_cadences.mp4', maxtimespan=30*u.minute, **kw):
     '''
@@ -32,7 +32,7 @@ def animate_both_cadences(tpfs, filename='both_cadences.mp4', maxtimespan=30*u.m
         f.titlefordisplay = '{}\n{}'.format(k, f.titlefordisplay)
     i.plot()
 
-    animate(i, cadence=raw.cadence, maxtimespan=maxtimespan, filename=filename, **kw)
+    i.animate(cadence=raw.cadence, maxtimespan=maxtimespan, filename=filename, **kw)
 
 
 def animate_cosmics(tpfs, filename='mitigated_cosmics.mp4', maxtimespan=0.25*u.day, **kw):
@@ -50,4 +50,4 @@ def animate_cosmics(tpfs, filename='mitigated_cosmics.mp4', maxtimespan=0.25*u.d
     for k, f in i.frames.items():
         f.titlefordisplay = '{}\n{}'.format(k, f.titlefordisplay)
     i.plot()
-    animate(i, cadence=crm.cadence, maxtimespan=maxtimespan, filename=filename, **kw)
+    i.animate(cadence=crm.cadence, maxtimespan=maxtimespan, filename=filename, **kw)

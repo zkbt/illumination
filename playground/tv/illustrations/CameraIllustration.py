@@ -1,6 +1,6 @@
 from .IllustrationBase import *
-from ..frames import CameraFrame
-from ..frames import CCDFrame
+from ..frames import CameraFrame, cameras
+from ..frames import CCDFrame, ccds
 __all__ = ['CameraIllustration', 'CameraOfCCDsIllustration']
 
 
@@ -27,7 +27,6 @@ class CameraIllustration(IllustrationBase):
 
             a dictionary with keys of 'ccd1', 'ccd2', 'ccd3', 'ccd4'
             that each contain something that can initialize a sequence
-
 
         orientation : str
             'horizontal' = camera 2 is right of camera 1
@@ -65,6 +64,7 @@ class CameraIllustration(IllustrationBase):
                                             data=make_sequence(data),
                                             **kwargs)
 
+
 class CameraOfCCDsIllustration(CameraIllustration):
     '''
     An illustration for displaying a single Camera (unrotated, untransformed).
@@ -77,6 +77,7 @@ class CameraOfCCDsIllustration(CameraIllustration):
                  orientation='horizontal',
                  sizeofcamera=4,
                  subplot_spec=None,
+                 camera='camera',
                  **kwargs):
         '''
         Parameters
@@ -95,6 +96,18 @@ class CameraOfCCDsIllustration(CameraIllustration):
         sizeofcamera : float
             What's the size, in inches, to display a single camera?
             (Each CCD will be half this.)
+
+        subplot_spec : matplotlib.gridspec.SubplotSpec
+            Should this illustration go into an
+            existing SubplotSpec somewhere? (Useful for
+            making subillustrations of other illustrations.)
+
+        camera : str
+            We need a CameraFrame associated with this
+            illustration, to be able to handle transformations
+            from Camera coordinates to display coordinates.
+            Specify it here via 'camera' (default, no transformation)
+            or 'cam1', 'cam2', 'cam3', 'cam4'.
 
         **kwargs are passed to make_sequence
         '''
@@ -122,8 +135,18 @@ class CameraOfCCDsIllustration(CameraIllustration):
                 'ccd3':plt.subplot(self.grid[1,0]),
                 'ccd4':plt.subplot(self.grid[1,1])}
 
+        self._cameraframe = cameras[camera](illustration=self)
+        assert(self._cameraframe.name == camera)
+
         # loop through, create a frame for each CCD
         for k in ax.keys():
             self.frames[k] = ccds[k](illustration=self,
                                      ax=ax[k],
-                                     data=make_sequence(locals()[k], **kwargs))
+                                     data=make_sequence(locals()[k]),
+                                     camera=self._cameraframe,
+                                     **kwargs)
+            assert(self.frames[k].camera == self._cameraframe)
+
+class Camera1OfCCDSIllustration(CameraOfCCDsIllustration):
+    def __init__(self, *args, **kwargs):
+        self.cameraframe = cameras['cam1']

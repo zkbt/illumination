@@ -1,7 +1,7 @@
 from ...imports import *
 
 
-class FrameBase:
+class FrameBase(Talker):
 
     data = None
     plotted = None
@@ -53,6 +53,9 @@ class FrameBase:
             calling `i.plot()` from the illustration.
         '''
 
+        # initialize the Talker
+        Talker.__init__(self, prefixformat='{:>32}')
+
         # store a name for this frame
         self.name = name
 
@@ -99,6 +102,7 @@ class FrameBase:
                     self._offset = np.min(self._get_times().jd)
                 except ValueError:
                     self._offset = 0.0
+            self.speak('defining {} as the time offset'.format(self._offset))
 
             return self._offset
 
@@ -235,4 +239,4 @@ class FrameBase:
         try:
             return self.illustration.orientation
         except:
-            return 'vertical'
+            return 'horizontal' #'vertical'

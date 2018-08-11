@@ -2,7 +2,7 @@ from playground.imports import *
 from playground.tv.illustrations import *
 from playground.cartoons import *
 from playground.tv.zoom import *
-from playground.tv.tools import animate
+
 
 directory = 'examples/'
 mkdir(directory)
@@ -20,7 +20,7 @@ def test_subtraction(N=10, **kw):
 
     illustration.plot()
     filename = os.path.join(directory, 'median-subtraction-animation.mp4')
-    animate(illustration, filename)
+    illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 

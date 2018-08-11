@@ -2,7 +2,7 @@ from playground.imports import *
 from playground.tv.illustrations import *
 from playground.tv.zoom import *
 from playground.cartoons import *
-from playground.tv.tools import animate
+
 
 directory = 'examples/'
 mkdir(directory)
@@ -20,7 +20,7 @@ def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50, 50)):
     # plot and animate
     illustration.plot()
     filename = os.path.join(directory, 'single-camera-zoom-animation.mp4')
-    animate(illustration, filename)
+    illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
@@ -64,7 +64,7 @@ def test_CameraIllustrationLocalZoom(N=3,
 
     # plot and animate
     illustration.plot()
-    animate(illustration, filename)
+    illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
@@ -91,7 +91,7 @@ def test_FourCameraLocalZoom(N=3, zoom=3, size=(50, 50)):
     # plot and animate
     filename = os.path.join(directory, 'four-camera-local-zoom-animation.mp4')
     illustration.plot()
-    animate(illustration, filename)
+    illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 

@@ -139,25 +139,9 @@ def illustratestamps(pattern='stamps/spm*/*.npy', get_camera=camera_from_filenam
             frame = add_stamp(illustration, s, zoom=zoom, camera=camera)
     return illustration
 
-def get_writer(filename, fps=30):
-    '''
-    Try to get an appropriate writer,
-    given the filename provided.
-    '''
-    if '.mp4' in filename:
-        try:
-            writer = ani.writers['ffmpeg'](fps=fps)
-        except (RuntimeError, KeyError):
-            raise RuntimeError('This computer seems unable to ffmpeg.')
-    else:
-        try:
-            writer = ani.writers['pillow'](fps=fps)
-        except (RuntimeError, KeyError):
-            writer = ani.writers['imagemagick'](fps=fps)
-    return writer
 
 
-def animate(illustration, filename='test.mp4',
+def nolongerneeded_animate(illustration, filename='test.mp4',
             mintime=None, maxtimespan=None, cadence=2 * u.s,
             fps=30, dpi=None, **kw):
     '''
@@ -198,8 +182,8 @@ def animate(illustration, filename='test.mp4',
     with writer.saving(illustration.figure, filename, dpi or illustration.figure.get_dpi()):
 
         for i, t in enumerate(times):
-            print('  {}/{} at {}'.format(i + 1,
-                                         len(times), Time.now().iso), end='\r')
+            self.speak('  {}/{} at {}'.format(i + 1,
+                                         len(times), Time.now().iso), progress=True)
 
             # update the illustration to a new time
             illustration.update(Time(t, format='gps', scale='tdb'))

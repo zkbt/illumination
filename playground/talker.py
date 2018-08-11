@@ -1,7 +1,10 @@
+from __future__ import print_function
+
 '''
 If something inherits from Talker, then we can print
 text to the terminal in a relatively standard way.
 '''
+
 import textwrap
 import numpy as np
 import pprint
@@ -16,15 +19,16 @@ line = np.inf
 class Talker:
     '''
     Objects the inherit from Talker have "mute" and "pithy" attributes,
-    a report('uh-oh!') method that prints when unmuted,
-    a speak('yo!') method that prints only when unmuted and unpithy,
-    and an input("what's up?") method that takes input from the prompt.
+        a report('uh-oh!') method that prints when unmuted,
+        a speak('yo!') method that prints only when unmuted and unpithy,
+        and an input("what's up?") method that takes input from the prompt.
     '''
 
-    def __init__(self, nametag=None, mute=False, pithy=False, line=line):
+    def __init__(self, nametag=None, mute=False, pithy=False, line=line, prefixformat="{0:>16}"):
         self._mute = mute
         self._pithy = pithy
         self._line = line
+        self._prefixformat = prefixformat
         if nametag is None:
             self.nametag = self.__class__.__name__.lower()
         else:
@@ -51,7 +55,7 @@ class Talker:
             self._prefix = prelude + \
                 '{spacing}[{name}] '.format(
                     name=self.nametag, spacing=' ' * level)
-            self._prefix = "{0:>16}".format(self._prefix)
+            self._prefix = self._prefixformat.format(self._prefix)
             equalspaces = ' ' * len(self._prefix)
             toprint = string + ''
             if abbreviate:
@@ -60,12 +64,11 @@ class Talker:
                         toprint = toprint.replace(k, shortcuts[k])
 
             if progress:
-                print('\r' + self._prefix +
-                      toprint.replace('\n', '\n' + equalspaces),)
+                end = '\r'
             else:
-                print(self._prefix + toprint.replace('\n', '\n' + equalspaces))
+                end = '\n'
+            print(self._prefix + toprint.replace('\n', '\n' + equalspaces), end=end)
 
-            # print textwrap.fill(self._prefix + toprint.replace('\n', '\n' + equalspaces), self._line, subsequent_indent=equalspaces + '... ')
 
     def summarize(self):
         '''Print a summary of the contents of this object.'''

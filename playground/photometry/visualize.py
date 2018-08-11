@@ -228,7 +228,7 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, yl
     filename = 'tic{}_{:.0f}m_{}'.format(tpfs['crm'].tic_id, tpfs['crm'].cadence.to('minute').value, summary['name'].replace(' ',''))
     plt.savefig(os.path.join(d, filename+'.pdf'))
     if animation:
-        animate(i, cadence=tpfs['crm'].cadence, filename=os.path.join(d, filename+'.mp4'), mintime=Time(summary['start'], format='jd', scale='tdb'), maxtimespan=(summary['end'] - summary['start'])*u.day, **kw)
+        i.animate(cadence=tpfs['crm'].cadence, filename=os.path.join(d, filename+'.mp4'), mintime=Time(summary['start'], format='jd', scale='tdb'), maxtimespan=(summary['end'] - summary['start'])*u.day, **kw)
     return i
 
 

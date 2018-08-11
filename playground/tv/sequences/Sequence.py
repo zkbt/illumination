@@ -59,7 +59,7 @@ class Sequence(Talker):
     _timeisfake = False
 
     def __init__(self, name='generic', *args, **kwargs):
-        Talker.__init__(self)
+        Talker.__init__(self, prefixformat='{:>32}')
         self.name = name
 
     def cadence(self):

@@ -15,7 +15,7 @@ i.figure.set_figheight(5)
 i.figure.set_figwidth(8)
 i.plot()
 i.frames['camera'].plotted['time'].set_visible(False)
-animate(i, fps=fps, cadence=1*u.s, filename='mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
+i.animate(fps=fps, cadence=1*u.s, filename='mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
 
 
 code = '_diff'
@@ -25,7 +25,7 @@ files = [f for f in files if '121650' not in f]
 i = illustratefits(files, ext_image=0)
 i.plot()
 i.frames['camera'].plotted['time'].set_visible(False)
-animate(i, fps=fps, cadence=1*u.s, filename='mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
+i.animate(fps=fps, cadence=1*u.s, filename='mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
 
 
 code = ''
@@ -36,7 +36,7 @@ files = [f for f in files if '121650' not in f]
 i = illustratefits(files, ext_image=0)
 i.plot()
 i.frames['camera'].plotted['time'].set_visible(False)
-animate(i, fps=fps, cadence=1*u.s, filename='mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
+i.animate(fps=fps, cadence=1*u.s, filename='mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
 
 
 
@@ -51,7 +51,7 @@ files = list(np.sort(glob.glob(path)))
 files = [f for f in files if '121650' not in f]
 i = illustratefits(files, ext_image=0, zoomposition=(400, 3800), zoomsize=(700, 700))
 i.plot()
-animate(i, fps=fps, cadence=1*u.s, filename='ghost-mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
+i.animate(fps=fps, cadence=1*u.s, filename='ghost-mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
 
 
 from playground.tv import *
@@ -62,4 +62,4 @@ files = list(np.sort(glob.glob(path)))
 files = [f for f in files if '121650' not in f]
 i = illustratefits(files, ext_image=0, zoomposition=(400, 3800), zoomsize=(700, 700))
 i.plot()
-animate(i, fps=fps, cadence=1*u.s, filename='ghost-mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
+i.animate(fps=fps, cadence=1*u.s, filename='ghost-mars{}-fps{}.mp4'.format(code.replace('_', '-'), fps), dpi=300)
