@@ -251,7 +251,7 @@ class IllustrationBase(Talker):
 
 
     def animate(self, filename='test.mp4',
-                      mintime=None, maxtimespan=None, cadence=2 * u.s,
+                      mintime=None, maxtimespan=None, cadence=1 * u.s,
                       fps=30, dpi=None, **kw):
         '''
         Create an animation from an Illustration,

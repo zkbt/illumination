@@ -34,9 +34,9 @@ class Image_Sequence(Sequence):
         '''
 
         s = np.zeros(self.shape)
-        self.speak('gathering the sequence cube of shape {}'.format(self.shape))
+        self.speak('gathering the sequence cube, with shape {}'.format(self.shape))
         for i in range(self.N):
-            self.speak(' loaded frame {}/{}'.format(i+1, self.N))
+            self.speak(' loaded frame {}/{}'.format(i+1, self.N), progress=True)
             s[i, :, :] = self[i]
         return s
 
@@ -92,7 +92,7 @@ class Image_Sequence(Sequence):
             # calculate the mean in a running fashion (less memory)
             total = np.zeros_like(self[0])
             for i in range(self.N):
-                self.speak(' included frame {}/{} in mean'.format(i+1, self.N))
+                self.speak(' included frame {}/{} in mean'.format(i+1, self.N), progress=True)
                 total += self[i]
 
             self.spatial['mean'] = total/self.N

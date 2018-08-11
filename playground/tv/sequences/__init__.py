@@ -32,7 +32,7 @@ def make_sequence(initial, *args, **kwargs):
     if issubclass(initial.__class__, Sequence):
         return initial
     # is it empty?
-    elif initial == [] or initial == None:
+    elif initial is [] or initial is None:
         return Sequence()
     # is it a Stamp?
     elif type(initial) == Stamp:
