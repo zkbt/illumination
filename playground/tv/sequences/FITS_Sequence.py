@@ -84,37 +84,31 @@ class FITS_Sequence(Image_Sequence):
                 self._populate_from_filenames(filenameparser=filenameparser)
             except:
                 self.speak('unable to extract temporal things from filenames for {}'.format(self))
+
         # make sure a time axis gets defined
         self._define_time_axis(timekey=timekey, timeformat=timeformat)
 
+        # make sure everything gets sorted by time
+        self._sort()
 
-    def _clean_temporal(self):
+    def sort(self):
         '''
-        Move anything that's non-changing from temporal to static.
+        Sort the images, and the temporals.
         '''
-        # move non-changing things to static
-        for k in list(self.temporal.keys()):
-            if len(np.unique(self.temporal[k])) == 1:
-                self.static[k] = self.temporal.pop(k)[0]
 
-    def _populate_from_filenames(self, filenameparser=qlp_filenameparser):
-        '''
-        Pull the basic information and temporal axis from the filenames.
-        '''
-        for i, f in enumerate(self.filenames):
-            this = filenameparser(f)
+        # calculate sorting indices
+        i = np.argsort(self.time.gps)
 
-            # create empty lists, if necessary
-            if i == 0:
-                for k in this.keys():
-                    self.temporal[k] = []
+        # sort the temporal values
+        for k in self.temporal.keys():
+            self.temporal[k] = self.temporal[k][i]
 
-            # tack this file onto the list
-            for k in this.keys():
-                self.temporal[k].append(this[k])
+        # sort the images
+        self.filenames = self.filenames[i]
+        if self._hdulists is not None:
+            self._hdulists = self._hdulists[i]
 
-        # move static things away from temporal
-        self._clean_temporal()
+
 
     @property
     def N(self):
@@ -134,10 +128,43 @@ class FITS_Sequence(Image_Sequence):
         else:
             return fits.open(self.filenames[i], memmap=False)
 
+    def _clean_temporal(self):
+        '''
+        Move anything that's non-changing from temporal to static.
+        '''
+        # move non-changing things to static
+        for k in list(self.temporal.keys()):
+            if len(np.unique(self.temporal[k])) == 1:
+                self.static[k] = self.temporal.pop(k)[0]
+        self.speak('the temporal keys for {} are {}'.format(self, self.temporal.keys()))
+        self.speak('the static keys for {} are {}'.format(self, self.static.keys()))
+
+    def _populate_from_filenames(self, filenameparser=qlp_filenameparser):
+        '''
+        Pull the basic information and temporal axis from the filenames.
+        '''
+        self.speak('populating {} information from the filenames (like {})'.format(self, self.filenames[0]))
+        for i, f in enumerate(self.filenames):
+            this = filenameparser(f)
+
+            # create empty lists, if necessary
+            if i == 0:
+                for k in this.keys():
+                    self.temporal[k] = []
+
+            # tack this file onto the list
+            for k in this.keys():
+                self.temporal[k].append(this[k])
+
+        # move static things away from temporal
+        self._clean_temporal()
+
     def _populate_from_headers(self):
         '''
         Attempt to populate the sequence from the headers.
         '''
+
+        self.speak('populating {} information from the headers'.format(self))
 
         # pull out the first HDUList in the sequence
         first = self._get_hdulist(0)
