@@ -19,6 +19,9 @@ class CCDFrame(imshowFrame):
                        camera=CameraFrame(),
                        **kwargs):
 
+        if camera.name != 'camera':
+            name = '{}-{}'.format(camera.name, name)
+
         # initialize the base imshowFrame, with data and a name
         imshowFrame.__init__(self, name=name, ax=ax, data=data, **kwargs)
 
