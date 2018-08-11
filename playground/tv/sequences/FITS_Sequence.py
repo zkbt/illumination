@@ -223,7 +223,7 @@ class FITS_Sequence(Image_Sequence):
         # try to pull out a specific key
         if timekey is not None:
             self.time = Time(np.asarray(self.temporal[timekey]),
-                        format=timeformat or guess_time_format(self.temporal[timekey]),
+                        format=timeformat or 'gps',
                         scale=timescale)
             self.speak('using "{}" as the time axis'.format(timekey))
         else:
