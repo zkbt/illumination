@@ -49,12 +49,15 @@ class EmptyTimeseriesFrame(FrameBase):
         # should this frame have a histrogram attached to it?
         self.histogram = histogram
 
-    def plot(self,  **kwargs):
+    def plot(self, t=None, y=None, **kwargs):
         '''
         Make an empty plot, with a vertical line waiting in it.
         '''
 
         self.plotted = {}
+
+        if t is not None:
+            self.plotted['data'] = self.ax.plot(t-self.offset, y, **kwargs)
 
         if self.histogram:
             b = self.ax.get_position()
@@ -95,7 +98,8 @@ class EmptyTimeseriesFrame(FrameBase):
         # add a vertical line
         v = time.jd - self.offset
         self.plotted['vline'].set_xdata(v)
-
+        #self.speak('offset is {}'.format(self.offset))
+        #self.speak('drew vertical line at {}'.format(v))
         # add a time label
         #s = self._timestring(time)
         # try:

@@ -13,7 +13,7 @@ if sys.version_info[0] < 3:
     input = raw_input
 
 shortcuts = None
-line = np.inf
+line = 80
 
 
 class Talker:
@@ -67,7 +67,8 @@ class Talker:
                 end = '\r'
             else:
                 end = '\n'
-            print(self._prefix + toprint.replace('\n', '\n' + equalspaces), end=end)
+
+            print(self._prefix + '\n'.join(textwrap.wrap(toprint, width=self._line - len(self._prefix))).replace('\n', '\n' + equalspaces), end=end)
 
 
     def summarize(self):

@@ -30,7 +30,7 @@ class IllustrationBase(Talker):
     changing the
     '''
     illustrationtype = 'Base'
-    plotted = {}
+
 
     def __init__(self, nrows=1,
                        ncols=1,
@@ -81,11 +81,17 @@ class IllustrationBase(Talker):
         # create an empty dictionary, where frames will be stored
         self.frames = {}
 
+        # has this illustration been plotted yet?
+        self.hasbeenplotted = False
+
     def __repr__(self):
         '''
         How should this illustration be represented?
         '''
         return '<{} Illustration | ({} Frames)>'.format(self.illustrationtype, len(self.frames))
+
+    def __str__(self):
+        return '<I"{}">'.format(self.illustrationtype)
 
     def _get_times(self):
         '''
@@ -152,8 +158,12 @@ class IllustrationBase(Talker):
 
         *args, **kwargs are passed to frames' .plot()
         '''
+
+        self.plotted = {}
         for k, f in self.frames.items():
             f.plot(*args, **kwargs)
+        self.hasbeenplotted = True
+
 
     def update(self, *args, **kwargs):
         '''
@@ -176,8 +186,11 @@ class IllustrationBase(Talker):
 
         try:
             # are the cmap, normalization, and ticks already defined?
-            self.cmap, self.norm, self.ticks
-        except AttributeError:
+            (self.plotted['cmap'],
+             self.plotted['norm'],
+             self.plotted['ticks'])
+
+        except KeyError:
 
             # collect all the (first) images
             firstimages = []
@@ -189,12 +202,16 @@ class IllustrationBase(Talker):
                     self.speak('found no color scheme data for {}'.format(frame))
 
             # create the cmap from the given data
-            self.cmap, self.norm, self.ticks = cmap_norm_ticks(
-                np.asarray(firstimages), **kwargs)
-            self.speak('defined color scheme with \n cmap={}\n norm={}\n ticks={}'.format(self.cmap,
-                                                                                 self.norm,
-                                                                                 self.ticks))
-        return self.cmap, self.norm, self.ticks
+            (self.plotted['cmap'],
+             self.plotted['norm'],
+             self.plotted['ticks']) = cmap_norm_ticks(np.asarray(firstimages),
+                                                      **kwargs)
+            self.speak('defined color scheme with \n cmap={}\n norm={}\n ticks={}'.format(self.plotted['cmap'],
+                                                                                          self.plotted['norm'],
+                                                                                          self.plotted['ticks']))
+        return  (self.plotted['cmap'],
+                 self.plotted['norm'],
+                 self.plotted['ticks'])
 
     def _add_colorbar(self, imshowed, ax=None, ticks=None):
         '''
@@ -212,7 +229,8 @@ class IllustrationBase(Talker):
         '''
 
         if ax is None:
-            ax = [f.ax for f in self.frames.values() if f.ax is not None]
+            ax = [f.ax for f in self.frames.values() if isinstance(f, imshowFrame)]
+        self.speak('adding a new colorbar for {} frame(s)'.format(len(np.atleast_1d(ax))))
 
         # make a colorbar attached to the frame
         #	axes =
@@ -222,7 +240,7 @@ class IllustrationBase(Talker):
             orientation='horizontal',
             # label=self.data.colorbarlabelfordisplay,
             fraction=0.04,
-            pad=0.07,
+            pad=0.08,
             ticks=ticks)
 
         # colorbarred = plt.colorbar(self.plotted['image'], ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.07, ticks=ticks)
@@ -266,6 +284,9 @@ class IllustrationBase(Talker):
         filename : str
         '''
 
+        if self.hasbeenplotted == False:
+            self.plot()
+
         # figure out the times to display
         if mintime is None:
             actualtimes, actualcadence = self._timesandcadence(
@@ -305,6 +326,7 @@ class IllustrationBase(Talker):
                 # update the illustration to a new time
                 self.update(Time(t, format='gps', scale='tdb'))
                 writer.grab_frame()
+        self.speak('')
         self.speak('the animation is finished!')
 
 """

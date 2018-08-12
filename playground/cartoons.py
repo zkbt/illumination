@@ -14,7 +14,7 @@ def create_test_times(N=100, cadence=2):
     return Time('2018-01-01 00:00:00.000', scale='tdb') + np.arange(N) * cadence * u.s
 
 
-def create_test_array(N=100, xsize=5, ysize=5, nstars=None, single=False):
+def create_test_array(N=100, xsize=5, ysize=5, nstars=None, single=False, seed=None):
     '''
     Create a fake stack of images of stars
     (with no cosmics injected, no jitter, Gaussian PDF).
@@ -30,6 +30,9 @@ def create_test_array(N=100, xsize=5, ysize=5, nstars=None, single=False):
     single : bool
             Should this be just a single star, or should it be many?
     '''
+
+    # seed the random number generator
+    np.random.seed(seed)
 
     # create images of x, y, and an empty one to fill with stars
     x1d = np.arange(0, xsize)
@@ -152,3 +155,17 @@ def create_test_fits(rows=400, cols=600, circlescale=100, visualize=False, noise
         plt.imshow(z, origin='lower')
 
     return hdulist
+
+def create_directory_of_fits(base='someplace', N=10, xsize=100, ysize=100, **kw):
+
+    mkdir(base)
+    for camera in [1,2,3,4]:
+        directory = os.path.join(base, 'cam{}'.format(camera))
+        mkdir(directory)
+        for i in range(N):
+            filename = os.path.join(directory, 'cam{}-{:04}.fits'.format(camera, i))
+            if os.path.exists(filename):
+                continue
+            f = create_test_fits(rows=ysize, cols=xsize, circlescale=(i+1)*6, **kw)
+            f.writeto(filename, overwrite=True)
+            print(' saved cartoon image to {}'.format(filename))

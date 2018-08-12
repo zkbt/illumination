@@ -1,6 +1,6 @@
 from .IllustrationBase import *
 
-__all__ = ['HybridIllustration']
+__all__ = ['GenericIllustration']
 
 
 class SideBySideIllustration(IllustrationBase):
@@ -16,14 +16,14 @@ class SideBySideIllustration(IllustrationBase):
         # set up the geometry (imshows on time, timeseries below)
         rows = len(imshows)
         cols = 2
-        width_ratios = [1, 7]
+        width_ratios = [5, 1]
         each = 1.0
         hspace, wspace = 0.15, 0.08
         left, right = 0.1, 0.95
-        bottom, top = 0.1, 0.9
+        bottom, top = 0.3, 0.9
         wsize = each * np.sum(width_ratios) * \
             (1 + (cols - 1) * wspace) / (right - left)
-        hsize = each * rows * (1 + (rows - 1) * hspace) / (top - bottom)
+        hsize = 1.2* each * rows * (1 + (rows - 1) * hspace) / (top - bottom)
 
         IllustrationBase.__init__(self, rows, cols,
                                   figkw=dict(figsize=(wsize, hsize)),
@@ -64,7 +64,7 @@ class SideBySideIllustration(IllustrationBase):
                 plt.setp(t.ax.get_xticklabels(), visible=False)
             # register this in the frames dictionary
             try:
-                n = i.name
+                n = t.name
             except AttributeError:
                 n = (row, col)
             self.frames[n] = t

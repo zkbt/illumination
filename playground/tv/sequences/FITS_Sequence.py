@@ -43,7 +43,7 @@ class FITS_Sequence(Image_Sequence):
         elif type(initial) == str:
             # a search string
             if '*' in initial:
-                self.filenames = glob.glob(initial)
+                self.filenames = sort(glob.glob(initial))
                 #self.hdulists = [fits.open(f) for f in glob.glob(initial)]
             # a single file
             elif 'fit' in initial.lower():
@@ -104,7 +104,7 @@ class FITS_Sequence(Image_Sequence):
 
         # sort the temporal values
         for k in self.temporal.keys():
-            self.temporal[k] = self.temporal[k][i]
+            self.temporal[k] = np.atleast_1d(self.temporal[k])[i]
 
         # sort the images
         self.filenames = self.filenames[i]
@@ -142,8 +142,8 @@ class FITS_Sequence(Image_Sequence):
             else:
                 self.temporal[k] = np.asarray(self.temporal[k])
 
-        self.speak('the temporal keys for {} are {}'.format(self, self.temporal.keys()))
-        self.speak('the static keys for {} are {}'.format(self, self.static.keys()))
+        self.speak('the temporal keys for {} are {}'.format(self, list(self.temporal.keys())))
+        self.speak('the static keys for {} are {}'.format(self, list(self.static.keys())))
 
     def _populate_from_filenames(self, filenameparser=qlp_filenameparser):
         '''

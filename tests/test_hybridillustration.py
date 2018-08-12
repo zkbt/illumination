@@ -19,7 +19,7 @@ def test_hybrid(howmany=3):
         imshows[x].titlefordisplay = 'TIC{}\n{}'.format(
             tpfs[x].tic_id, names[x])
 
-    i = HybridIllustration(imshows=imshows, timeseries=timeseries,
+    i = GenericIllustration(imshows=imshows, timeseries=timeseries,
                            sharecolorbar=False, dpi=50)
     i.plot()
     for l, t in zip(lcs, timeseries):

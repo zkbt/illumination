@@ -6,6 +6,7 @@ notebooks/
 *.fits
 *.npy
 *.pdf
+*.png
 *.gz
 .pytest_cache/
 examples

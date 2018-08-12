@@ -19,7 +19,7 @@ for camera in [1, 2, 3, 4]:
         normal = CCDFrame(data=sequences['qlp'], title='- Background')
         subtracted = CCDFrame(data=sequences['subqlp'], title='- Median (bg-subtracted) Image')
 
-        i = HybridIllustration(imshows=[raw, normal, subtracted], sharecolorbar=False, left=0.02, right=0.98, hspace=0.01)
+        i = GenericIllustration(imshows=[raw, normal, subtracted], sharecolorbar=False, left=0.02, right=0.98, hspace=0.01)
         i.plot()
         filename = 'test-qlptrio-orbit{}-cam{}-ccd{}.pdf'.format(orbit, camera, ccd)
         i.savefig(filename, dpi=1200)

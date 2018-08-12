@@ -16,6 +16,7 @@ class Stamp(Cube):
 	def __init__(self, path=None, extension=1, limit=None,
 				 photons=None, spatial={}, static={}, temporal={}, **kw):
 		'''
+		Basically a light-weight version of a TPF.
 
 		Parameters
 		----------
@@ -53,7 +54,7 @@ class Stamp(Cube):
 		self.spm = self.static['SPM']
 		self.cam = self.static['CAM']
 
-		self.identifier= 'TIC{TIC_ID}\n(CAM{CAM} | {ROW_CENT}, {COL_CENT})'.format(**self.static)
+		self.identifier= 'TIC{TIC_ID} (CAM{CAM} | {ROW_CENT}, {COL_CENT})'.format(**self.static)
 		self.label = 'SPM{SPM} | {INT_TIME}s'.format(**self.static)
 
 		# default to some particular view

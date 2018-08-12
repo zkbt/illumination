@@ -3,8 +3,6 @@ from ...imports import *
 
 class FrameBase(Talker):
 
-    data = None
-    plotted = None
     frametype = 'base'
     timeunit = 'day'
     aspectratio = 1
@@ -125,7 +123,7 @@ class FrameBase(Talker):
 
         if self.data._timeisfake:
             timestep = self._find_timestep(time)
-            return '#{}'.format(self._get_times()[timestep])
+            return '#{:.0f}'.format(self._get_times()[timestep].gps)
         else:
             days = time.jd - self.offset
             inunits = (days * u.day).to(self.timeunit)
@@ -138,6 +136,8 @@ class FrameBase(Talker):
         return '<{} Frame | data={} | name={}>'.format(self.frametype,
                                                        self.data,
                                                        self.name)
+    def __str__(self):
+        return '<F"{}">'.format(self.name)
 
     def plot(self):
         '''

@@ -125,7 +125,7 @@ def visualize_strategy(tpfs, lcs, summary, jitter, animation=False, nsigma=5, yl
                   EmptyTimeseriesFrame(name='intraexposure', ylabel='intra-\nexposure\njitter\n(pix)', histogram=False)]
 
     # put them all together
-    i = HybridIllustration(imshows=imshows, timeseries=timeseries, sharecolorbar=False)
+    i = GenericIllustration(imshows=imshows, timeseries=timeseries, sharecolorbar=False)
     i.plot()
 
     # add the aperture onto its imshow frame

@@ -16,7 +16,7 @@ def test_subtraction(N=10, **kw):
     subtracted = imshowFrame(data=sequence, title='median-subtracted')
     subtracted.processingsteps = ['subtractmedian']
 
-    illustration = HybridIllustration(imshows=[normal, subtracted], **kw)
+    illustration = GenericIllustration(imshows=[normal, subtracted], **kw)
 
     illustration.plot()
     filename = os.path.join(directory, 'median-subtraction-animation.mp4')

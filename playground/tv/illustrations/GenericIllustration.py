@@ -1,7 +1,7 @@
 from .IllustrationBase import *
 
-class HybridIllustration(IllustrationBase):
-    illustrationtype = 'Timeseries'
+class GenericIllustration(IllustrationBase):
+    illustrationtype = 'Generic'
 
     def __init__(self,  imshows=[],
                         timeseries=[],
@@ -14,8 +14,8 @@ class HybridIllustration(IllustrationBase):
                         wspace = 0.08,
                         left=0.1,
                         right=0.9,
-                        bottom=0.1,
-                        top=0.9,
+                        bottom=0.2,
+                        top=0.8,
                         **illkw):
         '''
         Initialize an illustration from list of frames.
@@ -46,12 +46,14 @@ class HybridIllustration(IllustrationBase):
         hastimeseries = int(len(timeseries) > 0)
 
         # one column for each imshow
-        imshowcols = int(np.ceil(float(len(imshows))/imshowrows))
+        imshowcols = np.maximum(int(np.ceil(float(len(imshows))/imshowrows)), 1)
         rows = hasimshow * imshowrows + len(timeseries) + hastimeseries
         cols = np.maximum(1, imshowcols)
 
         # use the frame aspect ratios to set the width ratios
         width_ratios = [f.aspectratio for f in imshows][0:imshowcols]
+        if len(width_ratios) == 0:
+            width_ratios = [1]
 
         # set the height ratios, including a gap between imshows and timeseries
         height_ratios = (   hasimshow * imshowrows * [imshowheight] +

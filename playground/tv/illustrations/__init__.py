@@ -4,6 +4,6 @@ from .FourCameraIllustration import *
 from .CameraIllustration import *
 from .CCDIllustration  import *
 from .SingleCameraWithZoomIllustration import *
-from .HybridIllustration import HybridIllustration
+from .GenericIllustration import GenericIllustration
 from .SideBySideIllustration import SideBySideIllustration
 from ..zoom import *

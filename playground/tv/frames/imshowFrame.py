@@ -83,7 +83,7 @@ class imshowFrame(FrameBase):
             self.titlefordisplay = self.data.titlefordisplay
         except AttributeError:
             self.titlefordisplay = ''
-            
+
         if title is not None:
             self.titlefordisplay = title
 
@@ -110,18 +110,28 @@ class imshowFrame(FrameBase):
 
         if self.illustration.sharecolorbar:
             # pull the cmap and normalization from the illustration
-            self.cmap, self.norm, self.ticks = self.illustration._cmap_norm_ticks(**kwargs)
-            return self.cmap, self.norm, self.ticks
+            (self.plotted['cmap'],
+             self.plotted['norm'],
+             self.plotted['ticks']) = self.illustration._cmap_norm_ticks(**kwargs)
+            return (self.plotted['cmap'],
+                    self.plotted['norm'],
+                    self.plotted['ticks'])
         else:
             # use already-defined properties, or make new ones
             try:
-                return self.cmap, self.norm, self.ticks
-            except AttributeError:
-                # create the cmap from the given data
-                self.cmap, self.norm, self.ticks = cmap_norm_ticks(
-                    *args, **kwargs)
+                return  (self.plotted['cmap'],
+                         self.plotted['norm'],
+                         self.plotted['ticks'])
+            except KeyError:
 
-                return self.cmap, self.norm, self.ticks
+                # create the cmap from the given data
+                (self.plotted['cmap'],
+                 self.plotted['norm'],
+                 self.plotted['ticks']) = cmap_norm_ticks(*args, **kwargs)
+
+                return  (self.plotted['cmap'],
+                         self.plotted['norm'],
+                         self.plotted['ticks'])
 
     def _ensure_colorbar_exists(self, image):
         '''
@@ -135,28 +145,34 @@ class imshowFrame(FrameBase):
         '''
         # do we use a shared colorbar for the whole illustration?
         if self.illustration.sharecolorbar:
-
+            self.speak('making sure a shared colorbar is set up for {}'.format(self))
             try:
+                # if the illustration already has a colorbar, don't remake
                 self.illustration.plotted['colorbar']
             except KeyError:
+                # if the illustration needs a colorbar, make one!
                 self.speak('added a shared colorbar for {}'.format(self.illustration))
                 c = self.illustration._add_colorbar(image,
                                                     ax=None,
-                                                    ticks=self.ticks)
+                                                    ticks=self.plotted['ticks'])
                 self.illustration.plotted['colorbar'] = c
-
+            return self.illustration.plotted['colorbar']
         # or do we just give this one frame its own colorbar?
         else:
+            self.speak('making sure a unique colorbar is set up for {}'.format(self))
             try:
+
                 self.plotted['colorbar']
-            except:
+            except KeyError:
                 self.speak('added a unique colorbar for {}'.format(self))
 
                 # create a colorbar for this illustration
                 c = self.illustration._add_colorbar(image,
                                                     ax=self.ax,
-                                                    ticks=self.ticks)
+                                                    ticks=self.plotted['ticks'])
                 self.plotted['colorbar'] = c
+            return self.plotted['colorbar']
+
 
     def draw_arrows(self, origin=(0, 0), ratio=0.05):
         '''
@@ -230,11 +246,14 @@ class imshowFrame(FrameBase):
         # make sure we point back at this frame
         plt.sca(self.ax)
 
+        # kind of a kludge (to make the plots and cmaps reset)?
+        self.plotted = {}
+
         # pull out the array to work on
         image, actual_time = self._get_image(time)
 
         # plot the image, as an imshow
-        if ('image' in self.plotingredients) and (image is not None):
+        if ('image' in self.plotingredients):# and (image is not None):
 
             # pull out the cmap, normalization, and suggested ticks
 
@@ -360,6 +379,8 @@ class imshowFrame(FrameBase):
             return
 
         if timestep != self.currenttimestep:
-            self.plotted['image'].set_data(image)
-            self.plotted['time'].set_text(self._timestring(actual_time))
+            if 'image' in self.plotingredients:
+                self.plotted['image'].set_data(image)
+            if 'time' in self.plotingredients:
+                self.plotted['time'].set_text(self._timestring(actual_time))
         self.currenttimestep = timestep
