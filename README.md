@@ -1,6 +1,6 @@
 # playground
 
-These are some tools for playing around with early TESS pixels.
+These are some tools for playing around with early TESS pixels. Documentation can be found at [zkbt.github.io/tv/](https://zkbt.github.io/tv/)
 
 ### Installation
 You can clone this into your own space and install directly from that editable package. From some base directory where you like to store code, run
