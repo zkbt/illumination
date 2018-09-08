@@ -19,7 +19,7 @@ for camera in [1,2,3,4]:
         pattern = os.path.join(directory, 'tess*-*-{camera}-crm-ffi-ccd{ccd}.fits'.format(**locals()))
         files = list(np.sort(glob.glob(pattern)))
 
-
+        
         sequence = make_sequence(files, ext_image=0, use_headers=False, use_filenames=True, timekey='cadence')
 
         # load a median image, instead of computing it

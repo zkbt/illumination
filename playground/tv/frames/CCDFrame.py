@@ -39,10 +39,13 @@ class CCDFrame(CameraFrame):
             self.ymax = 2078
             self.xmax = 2136
 
+        # set the default translation for this CCD
         self.transpose = False
         self.flipy     = False
         self.flipx     = False
-        self.titlefordisplay = self.name
+
+        # give a non-empty string title for this CCD
+        # self.titlefordisplay = self.name
 
     def _transformimage(self, image):
         '''

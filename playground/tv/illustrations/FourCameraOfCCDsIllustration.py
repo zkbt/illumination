@@ -13,7 +13,7 @@ class FourCameraOfCCDsIllustration(IllustrationBase):
     '''
     illustrationtype = 'FourCameraOfCCDs'
 
-    def __init__(self, cam1=[], cam2=[], cam3=[], cam4=[], orientation='horizontal', sizeofcamera=4, subplot_spec=None, **kwargs):
+    def __init__(self, cam1=[], cam2=[], cam3=[], cam4=[], orientation='horizontal', sizeofcamera=4, subplot_spec=None, sharecolorbar=True, **kwargs):
         '''
 
         Parameters
@@ -39,11 +39,12 @@ class FourCameraOfCCDsIllustration(IllustrationBase):
             rows = 1
         IllustrationBase.__init__(self, rows, cols,
                                   figkw=dict(
-                                      figsize=(sizeofcamera * cols, sizeofcamera * rows * 1.2)),
+                                      figsize=(sizeofcamera * cols, sizeofcamera * rows * 1.25)),
                                   hspace=0.02, wspace=0.02,
                                   left=0.05, right=0.95,
                                   bottom=0.1, top=0.9,
-                                  subplot_spec=subplot_spec)
+                                  subplot_spec=subplot_spec,
+                                  sharecolorbar=sharecolorbar)
 
         # initiate the axes for each camera
         for i in range(rows):
@@ -76,8 +77,12 @@ class FourCameraOfCCDsIllustration(IllustrationBase):
                         **ccds)
 
                 # kludge?! this illustration doesn't get plotted when the supersceding one is
-                thiscameraillustration.plotted = {}
+                # thiscameraillustration.plotted = {}
 
                 # register the CCD frames (but not the cameras)
                 for k in thiscameraillustration.frames.keys():
-                    self.frames['{}-{}'.format(name,k)] = thiscameraillustration.frames[k]
+                    framekey = '{}-{}'.format(name,k)
+                    self.frames[framekey] = thiscameraillustration.frames[k]
+                    self.frames[framekey].illustration = self
+
+        self._condense_timelabels()

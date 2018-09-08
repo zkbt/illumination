@@ -69,7 +69,7 @@ class FrameBase(Talker):
         self.illustration = illustration
 
         # what ingredients should be included when plotting?
-        self.plotingredients = plotingredients
+        self.plotingredients = list(plotingredients)
 
         # keep track of a list of frames included in this one (e.g. zooms)
         self.includes = []

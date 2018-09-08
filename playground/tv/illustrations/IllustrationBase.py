@@ -144,7 +144,13 @@ class IllustrationBase(Talker):
             baseline = np.min(gps)
             rounded = round * np.round((gps - baseline) / round) + baseline
             uniquegpstimes = np.unique(rounded)
-            cadence = np.min(np.diff(uniquegpstimes)) * u.s
+
+            # make sure there's a cadence, even if there's only one element in the sequence
+            try:
+                cadence = np.min(np.diff(uniquegpstimes)) * u.s
+            except ValueError:
+                cadence = 1.0*u.s
+
             # plt.figure('cadence!')
             # plt.plot(uniquegpstimes[:-1], np.diff(uniquegpstimes), '.')
             # plt.show()
@@ -254,6 +260,31 @@ class IllustrationBase(Talker):
         colorbar.outline.set_visible(False)
 
         return colorbar
+
+    def _condense_timelabels(self):
+        '''
+        Remove all but a single time label.
+        Don't do this if you have staggered time-series.
+        '''
+
+        # remove all but the lower left time indicator
+        x, y = np.inf, np.inf
+        N = 0
+        for k in self.frames.keys():
+            if 'time' in self.frames[k].plotingredients:
+                # remove the time label
+                self.frames[k].plotingredients.remove('time')
+                N +=1
+
+                # keep track of whether this is the lower left corner
+                bbox = self.frames[k].ax.get_position()
+                if bbox.x0 <= x and bbox.y0 <=y:
+                    corner = k
+                    x, y = bbox.x0, bbox.y0
+
+        # add a time to the lower left corner
+        self.frames[corner].plotingredients.append('time')
+        self.speak('condensing {} time labels into 1'.format(N))
 
     def savefig(self, filename, **savefigkw):
         '''

@@ -17,6 +17,7 @@ class CameraOfCCDsIllustration(CameraIllustration):
                  sizeofcamera=4,
                  subplot_spec=None,
                  camera='camera',
+                 sharecolorbar=True,
                  **framekw):
         '''
         Parameters
@@ -62,11 +63,12 @@ class CameraOfCCDsIllustration(CameraIllustration):
         IllustrationBase.__init__(self, rows, cols,
                                   figkw=dict(
                                       figsize=( sizeofcamera,
-                                                sizeofcamera*1.2)),
+                                                sizeofcamera*1.25)),
                                   hspace=0.02, wspace=0.02,
                                   left=0.05, right=0.95,
                                   bottom=0.1, top=0.9,
-                                  subplot_spec=subplot_spec)
+                                  subplot_spec=subplot_spec,
+                                  sharecolorbar=sharecolorbar)
 
         # FIXME -- make some more precise adjustments to this
         # to ensure that the spacing between CCDs doesn't get wonky
@@ -112,3 +114,5 @@ class CameraOfCCDsIllustration(CameraIllustration):
 
             # by linking this CCD to a camera, we can use its transformations
             assert(self.frames[k].camera == self._cameraframe)
+
+        self._condense_timelabels()
