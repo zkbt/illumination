@@ -13,7 +13,7 @@ class FourCameraOfCCDsIllustration(IllustrationBase):
     '''
     illustrationtype = 'FourCameraOfCCDs'
 
-    def __init__(self, cam1=[], cam2=[], cam3=[], cam4=[], orientation='horizontal', sizeofcamera=4, subplot_spec=None, sharecolorbar=True, **kwargs):
+    def __init__(self, cam1=[], cam2=[], cam3=[], cam4=[], orientation='horizontal', sizeofcamera=4, subplot_spec=None, sharecolorbar=True, processingsteps=[], **kwargs):
         '''
 
         Parameters
@@ -74,6 +74,7 @@ class FourCameraOfCCDsIllustration(IllustrationBase):
                         sizeofcamera=sizeofcamera,
                         subplot_spec=self.grid[i,j],
                         camera=name,
+                        processingsteps=processingsteps,
                         **ccds)
 
                 # kludge?! this illustration doesn't get plotted when the supersceding one is
