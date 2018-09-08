@@ -21,12 +21,40 @@ class FITS_Sequence(Image_Sequence):
 
         Parameters
         ----------
-        initial : (many possible types)
-                -single FITS filename, and an extension to use.
-                -list of FITS filenames, and an extension to use.
-                -a glob-like search string containing '*'.
-                -single FITS HDUList, and an extension to use.
-                -list of loaded FITS HDULists, and an extension to use.
+
+            initial : many possible types
+                This is a flexible type of input, which could be...
+                    - single FITS filename, and an extension to use.
+                    - list of FITS filenames, and an extension to use.
+                    - a glob-like search string containing '*'.
+                    - single FITS HDUList, and an extension to use.
+                    - list of loaded FITS HDULists, and an extension to use.
+
+            ext_image : int
+                The extension that is the image.
+
+            ext_primary : int
+                The extension that is the primary for the FITS.
+
+            name : str
+                The name of this sequence.
+
+            use_headers : bool
+                Should we extract (time) information from the headers?
+
+            use_filenames : bool
+                Should we extract (time) information from the filenames?
+
+            filenameparser : function
+                This function takes a filename as input, and returns a
+                dictionary containing parsed keys and values derived from it.
+
+            timekey : string
+                Which temporal key should define the time axis?
+
+            timeformt : string
+                What's the time format for defining the time axis?
+
         '''
 
         # initialize the basic sequence
@@ -138,7 +166,11 @@ class FITS_Sequence(Image_Sequence):
         # move non-changing things to static
         for k in list(self.temporal.keys()):
             if len(np.unique(self.temporal[k])) == 1:
-                self.static[k] = self.temporal.pop(k)[0]
+                # if we have a one-element sequence, repeat it in both static and temporal
+                if len(self.temporal[k]) == 1:
+                    self.static[k] = self.temporal[k][0]
+                else:
+                    self.static[k] = self.temporal.pop(k)[0]
             else:
                 self.temporal[k] = np.asarray(self.temporal[k])
 

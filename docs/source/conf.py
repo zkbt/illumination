@@ -33,8 +33,11 @@
 # ones.
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.viewcode',
-              'nbsphinx']
+              'sphinx.ext.napoleon',
+              'sphinx.ext.githubpages',
+              'nbsphinx', 'numpydoc']
 
+autoclass_content = 'both'
 # ZKBT -- don't run the notebooks before rendering them
 nbsphinx_execute = 'never'
 
@@ -102,10 +105,16 @@ html_theme = 'alabaster'
 html_static_path = ['_static']
 
 
+# from https://stackoverflow.com/questions/18969093/how-to-include-the-toctree-in-the-sidebar-of-each-page
+html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'] }
+
+
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'tvTESSViewerdoc'
+
+
 
 
 # -- Options for LaTeX output ---------------------------------------------

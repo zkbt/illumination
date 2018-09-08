@@ -20,14 +20,9 @@ class FourCameraIllustration(IllustrationBase):
             Anything that can initialize a sequence with
             the make_sequence() helper function.
 
-            or
-
-            a dictionary with keys of 'ccd1', 'ccd2', 'ccd3', 'ccd4'
-            that each contain something that can initialize a sequence
-
         orientation : str
             'horizontal' = camera 2 is right of camera 1
-            'vertical'  = camera 2 is below camera 1
+            'vertical'  = camera 2 is below camera 1 (not yet implemented)
 
         sizeofcamera : float
             What's the size, in inches, to display a single camera?
@@ -56,37 +51,8 @@ class FourCameraIllustration(IllustrationBase):
                 n = i * cols + j + 1
                 name = 'cam{}'.format(i * cols + j + 1)
 
-                isfullofccds = type(locals()[name]) == dict
+                # populate the axes on the main camera grid
+                ax = plt.subplot(self.grid[i, j])
 
-                # if it's CCDs, make a four-CCD sub-illustration
-                if isfullofccds:
-
-                    # make a camera frame to contain these CCDs
-                    cameraframe = cameras[name](ax=None,
-                                                data=None,
-                                                illustration=self,
-                                                **kwargs)
-
-                    # this should be a dictionary of CCDs
-                    ccds = locals()[name]
-
-                    # use an illustration to place a camera in this subplot spec
-                    thiscameraillustration = CameraOfCCDsIllustration(
-                            orientation=orientation,
-                            sizeofcamera=sizeofcamera,
-                            subplot_spec=self.grid[i,j],
-                            camera=name,
-                            **ccds)
-
-                    # register the CCD frames (but not the cameras)
-                    for k in thiscameraillustration.frames.keys():
-                        self.frames['{}-{}'.format(name,k)] = thiscameraillustration.frames[k]
-
-                # otherwise, simply make a frame for each camera
-                else:
-
-                    # populate the axes on the main camera grid
-                    ax = plt.subplot(self.grid[i, j])
-
-                    self.frames[name] = cameras[name](
-                        ax=ax, data=locals()[name], illustration=self, **kwargs)
+                self.frames[name] = cameras[name](
+                    ax=ax, data=locals()[name], illustration=self, **kwargs)

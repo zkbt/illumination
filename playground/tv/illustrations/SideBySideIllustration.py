@@ -6,7 +6,9 @@ __all__ = ['GenericIllustration']
 class SideBySideIllustration(IllustrationBase):
     illustrationtype = 'Timeseries'
 
-    def __init__(self, imshows=[], timeseries=[], aspectratio=np.inf, **kwargs):
+    def __init__(self, imshows=[], timeseries=[], width_ratios = [5, 1], each = 1.0,
+                                hspace=0.15, wspace =  0.08, left=0.15, right =  0.95,
+                                bottom = 0.3, top=0.9, fudge=1.2, **kwargs):
         '''
         Initialize an illustration from list of frames.
         '''
@@ -16,14 +18,11 @@ class SideBySideIllustration(IllustrationBase):
         # set up the geometry (imshows on time, timeseries below)
         rows = len(imshows)
         cols = 2
-        width_ratios = [5, 1]
-        each = 1.0
-        hspace, wspace = 0.15, 0.08
-        left, right = 0.1, 0.95
-        bottom, top = 0.3, 0.9
+
+
         wsize = each * np.sum(width_ratios) * \
             (1 + (cols - 1) * wspace) / (right - left)
-        hsize = 1.2* each * rows * (1 + (rows - 1) * hspace) / (top - bottom)
+        hsize = fudge * each * rows * (1 + (rows - 1) * hspace) / (top - bottom)
 
         IllustrationBase.__init__(self, rows, cols,
                                   figkw=dict(figsize=(wsize, hsize)),

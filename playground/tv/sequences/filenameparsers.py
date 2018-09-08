@@ -20,7 +20,7 @@ def qlp_filenameparser(filename):
     d['camera'] = int(components[2])
     d['crm'] = components[3]
     d['type'] = components[4]
-    d['ccd'] = int(components[5][3])
+    d['ccd'] = s[s.index('ccd'):][3]
     return d
 
 def qlp_fullcamera_filenameparser(filename):
@@ -45,4 +45,3 @@ def flexible_filenameparser(filename):
         return qlp_filenameparser(filename)
     except IndexError:
         return qlp_fullcamera_filenameparser(filename)
-        

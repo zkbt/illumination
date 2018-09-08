@@ -49,9 +49,7 @@ def guess_time_format(t, default='jd'):
 
 class Sequence(Talker):
     '''
-    A sequence of one or more images,
-    which can be viewed (and animated)
-    in a tv frame.
+    A sequence of one or more images, which can be viewed (and animated) in a tv frame.
     '''
 
     titlefordisplay = ''

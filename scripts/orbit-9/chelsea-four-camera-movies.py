@@ -5,15 +5,21 @@ orbit = 9
 #for camera in [1, 2, 3, 4]:
 #    for ccd in [1, 2, 3, 4]:
 
-camera = 1
-ccd = 1
+
+# compile a dictionary of cameras, with a subdictionary of ccds
 cameras = {}
 for camera in [1,2,3,4]:
+
+    # include each CCD inidividually
     ccds = {}
     for ccd in [1,2,3,4]:
+
+        # pull out the files for this single CCD
         directory = '/pdo/ramp/qlp_data/orbit-9/ffi/cam{camera}/ccd{ccd}/FITS'.format(**locals())
         pattern = os.path.join(directory, 'tess*-*-{camera}-crm-ffi-ccd{ccd}.fits'.format(**locals()))
         files = list(np.sort(glob.glob(pattern)))
+
+
         sequence = make_sequence(files, ext_image=0, use_headers=False, use_filenames=True, timekey='cadence')
 
         # load a median image, instead of computing it
