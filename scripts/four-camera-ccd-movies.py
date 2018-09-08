@@ -40,6 +40,6 @@ for N in [25, None]:
             for cam in cameras.keys():
                 i = CameraOfCCDsIllustration(processingsteps=processingsteps,**cameras[cam])
                 i.plot()
-                filename = 'orbit{}-{}-{}-limit{}.pdf'.format(orbit, cam, '-'.join(processingsteps), N))
+                filename = 'orbit{}-{}-{}-limit{}.pdf'.format(orbit, cam, '-'.join(processingsteps), N)
                 i.savefig(filename, dpi=300)
                 i.animate(filename.replace('pdf', 'mp4'), cadence=1.0*u.s)
