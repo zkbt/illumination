@@ -152,6 +152,7 @@ class imshowFrame(FrameBase):
             except KeyError:
                 # if the illustration needs a colorbar, make one!
                 self.speak('added a shared colorbar for {}'.format(self.illustration))
+
                 c = self.illustration._add_colorbar(image,
                                                     ax=None,
                                                     ticks=self.plotted['ticks'])
@@ -165,6 +166,7 @@ class imshowFrame(FrameBase):
                 self.plotted['colorbar']
             except KeyError:
                 self.speak('added a unique colorbar for {}'.format(self))
+
 
                 # create a colorbar for this illustration
                 c = self.illustration._add_colorbar(image,
@@ -298,7 +300,7 @@ class imshowFrame(FrameBase):
 
         # plot a title on this frame
         if 'title' in self.plotingredients:
-            plt.title(self.titlefordisplay)
+            self.plotted['title'] = plt.title(self.titlefordisplay)
             self.speak('added title of "{}" to {}'.format(self.titlefordisplay, self))
 
         # plot lines and ticks for axes only if requested

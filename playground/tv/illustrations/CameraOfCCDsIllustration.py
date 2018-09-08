@@ -75,15 +75,32 @@ class CameraOfCCDsIllustration(CameraIllustration):
         # much more self-contained control over the layout within
         # this camera.
 
-        # populate the axes on the main camera grid
-        ax = {  'ccd1':plt.subplot(self.grid[0,1]),
-                'ccd2':plt.subplot(self.grid[0,0]),
-                'ccd3':plt.subplot(self.grid[1,0]),
-                'ccd4':plt.subplot(self.grid[1,1])}
-
         # create a hidden frame, which we'll use for transformations
         self._cameraframe = cameras[camera](illustration=self)
+
         assert(self._cameraframe.name == camera)
+
+
+        if self.orientation == 'horizontal':
+            # start the CCDs in the orientation of
+            # 2 1
+            # 3 4
+            loc = np.array([[0,1], [0,0], [1,0], [1,1]])
+
+            if self._cameraframe.transpose:
+                # swap CCDs diagonally
+                loc = loc[[0, 3, 2, 1]]
+
+            if self._cameraframe.flipx:
+                # swap CCDs along rows
+                loc = loc[[1, 0, 3, 2]]
+
+            if self._cameraframe.flipy:
+                # swap CCDs along cols
+                loc = loc[[3, 2, 1, 0]]
+
+        # populate the axes on the main camera grid
+        ax = {'ccd{}'.format(i+1):plt.subplot(self.grid[loc[i][0], loc[i][1]]) for i in range(4)}
 
         # loop through, create a frame for each CCD
         for k in ax.keys():

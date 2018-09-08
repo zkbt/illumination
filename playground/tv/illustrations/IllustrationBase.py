@@ -228,8 +228,13 @@ class IllustrationBase(Talker):
 
         '''
 
+        # (this means we have a shared colorbar)
         if ax is None:
+            # pull all the different ax together
             ax = [f.ax for f in self.frames.values() if isinstance(f, imshowFrame)]
+            # if an imshow doesn't have its own actual ax, don't include it
+            ax = [a for a in ax if a != None]
+
         self.speak('adding a new colorbar for {} frame(s)'.format(len(np.atleast_1d(ax))))
 
         # make a colorbar attached to the frame

@@ -46,12 +46,10 @@ class CameraFrame(imshowFrame):
             self.ymax = 4156
             self.xmax = 4272
 
-
-### FIXME -- make sure I understand the geometry here (I don't think I do now)
-class Camera1Frame(CameraFrame):
-
-    def __init__(self, name='cam1', **kwargs):
-        CameraFrame.__init__(self, name=name, **kwargs)
+        # by default, this camera frame doesn't do any transformation
+        self.transpose = False
+        self.flipy     = False
+        self.flipx     = False
 
     def _transformimage(self, image):
         '''
@@ -60,7 +58,18 @@ class Camera1Frame(CameraFrame):
                 (looks like) +x is up, +y is right
         '''
         if self._get_orientation() == 'horizontal':
-            return image.T[:, :]
+            if self.transpose:
+                displayimage = image.T
+            else:
+                displayimage = image
+            if self.flipy:
+                displayimage = displayimage[::-1, :]
+            if self.flipx:
+                displayimage = displayimage[:, ::-1]
+        else:
+            raise RuntimeError("Sorry! No orientations besides 'horizontal' have been defined yet!")
+
+        return displayimage
 
     def _transformxy(self, x, y):
         '''
@@ -68,41 +77,56 @@ class Camera1Frame(CameraFrame):
         transform image, but for x and y arrays.
         '''
         if self._get_orientation() == 'horizontal':
-            displayy = x
-            displayx = y  # self.ymax-y
+            if self.transpose:
+
+                if self.flipx:
+                    displayx = self.ymax - y
+                else:
+                    displayx = y
+
+                if self.flipy:
+                    displayy = self.xmax - x
+                else:
+                    displayy = x
+
+            else:
+                if self.flipx:
+                    displayx = self.xmax - x
+                else:
+                    displayx = x
+
+                if self.flipy:
+                    displayy = self.ymax - y
+                else:
+                    displayy = y
+        else:
+            raise RuntimeError("Sorry! No orientations besides 'horizontal' have been defined yet!")
+
         return displayx, displayy
 
 
+class Camera1Frame(CameraFrame):
+
+    def __init__(self, name='cam1', **kwargs):
+        CameraFrame.__init__(self, name=name, **kwargs)
+        self.transpose = True
+        self.flipy     = False
+        self.flipx     = False
+
 class Camera2Frame(Camera1Frame):
     def __init__(self, name='cam2', **kwargs):
-        CameraFrame.__init__(self, name=name, **kwargs)
+        Camera1Frame.__init__(self, name=name, **kwargs)
 
 class Camera3Frame(CameraFrame):
     def __init__(self, name='cam3', **kwargs):
         CameraFrame.__init__(self, name=name, **kwargs)
-
-    def _transformimage(self, image):
-        '''
-        horizontal:
-                (should be) +x is down, +y is right
-                (looks like) +x is down, +y is left
-        '''
-        if self._get_orientation() == 'horizontal':
-            return image.T[::-1, ::-1]
-
-    def _transformxy(self, x, y):
-        '''
-        This handles the same transformation as that which goes into
-        transform image, but for x and y arrays.
-        '''
-        if self._get_orientation() == 'horizontal':
-            displayy = self.xmax - x
-            displayx = self.ymax - y
-        return displayx, displayy
+        self.transpose = True
+        self.flipy     = True
+        self.flipx     = True
 
 class Camera4Frame(Camera3Frame):
     def __init__(self, name='cam4', **kwargs):
-        CameraFrame.__init__(self, name=name, **kwargs)
+        Camera3Frame.__init__(self, name=name, **kwargs)
 
 # define a dictionary, so these cameras are easier to access
 cameras = { 'camera': CameraFrame,
