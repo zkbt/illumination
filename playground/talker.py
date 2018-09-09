@@ -13,7 +13,7 @@ if sys.version_info[0] < 3:
     input = raw_input
 
 shortcuts = None
-line = 80
+line = 100
 
 
 class Talker:

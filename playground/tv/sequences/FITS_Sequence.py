@@ -11,7 +11,7 @@ class FITS_Sequence(Image_Sequence):
     def __init__(self, initial, ext_image=1, ext_primary=0, name='FITS',
                        use_headers=True,
                        use_filenames=False,
-                       filenameparser=qlp_filenameparser,
+                       filenameparser=flexible_filenameparser,
                        timekey=None, timeformat=None,
                        **kwargs):
         '''
@@ -177,7 +177,7 @@ class FITS_Sequence(Image_Sequence):
         self.speak('the temporal keys for {} are {}'.format(self, list(self.temporal.keys())))
         self.speak('the static keys for {} are {}'.format(self, list(self.static.keys())))
 
-    def _populate_from_filenames(self, filenameparser=qlp_filenameparser):
+    def _populate_from_filenames(self, filenameparser=flexible_filenameparser):
         '''
         Pull the basic information and temporal axis from the filenames.
         '''

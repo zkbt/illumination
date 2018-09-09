@@ -22,19 +22,16 @@ for processingsteps in [[], ['subtractmean']]:
                         files = list(np.sort(glob.glob(pattern)))[:N]
 
                         # make a sequence out of these images
-                        sequence = make_sequence(files, ext_image=0, use_headers=False, use_filenames=True, timekey='cadence')
+                        sequence = make_sequence(files, ext_image=0, use_headers=False, use_filenames=True, filenameparser=flexible_filenameparser, timekey='cadence')
 
                         cameras['cam{}'.format(camera)] = sequence
 
                 # create an illustration
-                i = FourCameras(processingsteps=processingsteps,
+                i = FourCameraIllustration(processingsteps=processingsteps,
                                 plotingredients=['image', 'time','colorbar'],
                                 **cameras)
                 if gray:
                     i.cmapkw['cmap'] = 'gray_r'
-                if processingsteps == []:
-                    i.cmapkw['vmin'] = 3e4
-                    i.cmapkw['vmax'] = 1e6
 
                 i.plot()
                 filename = 'orbit{}-four-camera'.format(orbit)
