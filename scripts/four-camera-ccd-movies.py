@@ -42,12 +42,12 @@ for processingsteps in [[], ['subtractmean']]:
                     i.cmapkw['vmax'] = 1e6
 
                 i.plot()
-                filename = 'orbit{}-four-camera'
+                filename = 'orbit{}-four-camera'.format(orbit)
                 if gray:
                     filename += '-gray'
                 if N is not None:
-                    filename += 'limit-{}'.format(N)
-                if processingsteps is not []:
+                    filename += '-limit-{}'.format(N)
+                if len(processingsteps) > 0:
                     filename += '-{}'.format('-'.join(processingsteps))
                 filename += '.pdf'
                 i.savefig(filename, dpi=300)
