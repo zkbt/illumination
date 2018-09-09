@@ -6,7 +6,7 @@ for processingsteps in [[], ['subtractmean']]:
         # do short and long
         for N in [25, None]:
             # do three orbits
-            for orbit in [11,10,9]:
+            for orbit in [10,9]:
 
                 # base directory
                 directory = '/pdo/poc-data/orbits/orbit-{}/cal_ffi'.format(orbit)
