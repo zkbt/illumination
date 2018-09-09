@@ -96,7 +96,7 @@ class imshowFrame(FrameBase):
         # should we plot something special for the first frame?
         self.firstframe = firstframe
 
-    def _cmap_norm_ticks(self, *args, **kwargs):
+    def _cmap_norm_ticks(self, *args, **cmapkw):
         '''
         Return the cmap and normalization.
 
@@ -112,7 +112,7 @@ class imshowFrame(FrameBase):
             # pull the cmap and normalization from the illustration
             (self.plotted['cmap'],
              self.plotted['norm'],
-             self.plotted['ticks']) = self.illustration._cmap_norm_ticks(**kwargs)
+             self.plotted['ticks']) = self.illustration._cmap_norm_ticks(**self.illustration.cmapkw)
             return (self.plotted['cmap'],
                     self.plotted['norm'],
                     self.plotted['ticks'])
@@ -127,7 +127,7 @@ class imshowFrame(FrameBase):
                 # create the cmap from the given data
                 (self.plotted['cmap'],
                  self.plotted['norm'],
-                 self.plotted['ticks']) = cmap_norm_ticks(*args, **kwargs)
+                 self.plotted['ticks']) = cmap_norm_ticks(*args, **cmapkw)
 
                 return  (self.plotted['cmap'],
                          self.plotted['norm'],

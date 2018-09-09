@@ -37,6 +37,7 @@ class IllustrationBase(Talker):
                        figkw=dict(figsize=None, dpi=None),
                        sharecolorbar=True,
                        subplot_spec=None,
+                       cmapkw={},
                        **gridspeckw):
         '''
         Initialize an Illustration,
@@ -77,6 +78,9 @@ class IllustrationBase(Talker):
 
         # should this illustration have a shared colorbar, or separate ones?
         self.sharecolorbar = sharecolorbar
+
+        # keep track of any keywords for generating a cmap (shared for the illustration)
+        self.cmapkw = cmapkw
 
         # create an empty dictionary, where frames will be stored
         self.frames = {}
@@ -180,7 +184,7 @@ class IllustrationBase(Talker):
         for k, f in self.frames.items():
             f.update(*args, **kwargs)
 
-    def _cmap_norm_ticks(self, **kwargs):
+    def _cmap_norm_ticks(self, remake=False, **cmapkw):
         '''
         Return the cmap and normalization.
 
@@ -196,7 +200,8 @@ class IllustrationBase(Talker):
              self.plotted['norm'],
              self.plotted['ticks'])
 
-        except KeyError:
+            assert(remake == False)
+        except (KeyError, AssertionError):
 
             # collect all the (first) images
             firstimages = []
@@ -211,7 +216,7 @@ class IllustrationBase(Talker):
             (self.plotted['cmap'],
              self.plotted['norm'],
              self.plotted['ticks']) = cmap_norm_ticks(np.asarray(firstimages),
-                                                      **kwargs)
+                                                      **cmapkw)
             self.speak('defined color scheme with \n cmap={}\n norm={}\n ticks={}'.format(self.plotted['cmap'],
                                                                                           self.plotted['norm'],
                                                                                           self.plotted['ticks']))

@@ -2,7 +2,7 @@ from ..imports import *
 from matplotlib.colors import SymLogNorm, LogNorm
 
 
-def cmap_norm_ticks(a, whatpercentiles=[1, 99], howmanysigmaarelinear=1.5, whatfractionislinear=0.15, vmax=None):
+def cmap_norm_ticks(a, whatpercentiles=[1, 99], howmanysigmaarelinear=1.5, whatfractionislinear=0.15, vmax=None, vmin=None, cmap=None):
     '''
     Return a probably pretty-OK colormap, a color normalization,
     and suggested tick marks for a colorbar, based on an input array.
@@ -14,13 +14,18 @@ def cmap_norm_ticks(a, whatpercentiles=[1, 99], howmanysigmaarelinear=1.5, whatf
             The cmap and norm will be set on the basis of values in this array.
     '''
 
+    if vmin is None:
+        gonegative = (a <= 0).any()
+    else:
+        gonegative = vmin < 0
+
     # figure out a decent color scale
-    if (a <= 0).any():
+    if gonegative:
         # go diverging, if this is a difference that crosses zero
         if vmax is not None:
             vmin = -vmax
         else:
-            vmin, vmax = np.percentile(a, whatpercentiles)            
+            vmin, vmax = np.percentile(a, whatpercentiles)
             scale = np.maximum(np.abs(vmin), np.abs(vmax))
             vmin, vmax = -scale, scale
         span = np.log10(vmax)
@@ -29,19 +34,20 @@ def cmap_norm_ticks(a, whatpercentiles=[1, 99], howmanysigmaarelinear=1.5, whatf
         norm = SymLogNorm(howmanysigmaarelinear * sigma,
                           linscale=span * whatfractionislinear,
                           vmin=vmin, vmax=vmax)
-
-        cmap = 'RdBu'
+        if cmap is None:
+            cmap = 'RdBu'
         ticks = [vmin, -howmanysigmaarelinear * sigma,
                  0, howmanysigmaarelinear * sigma, vmax]
     else:
-        if vmax is not None:
+        if vmax is None:
+            vmax = np.percentile(a, whatpercentiles[1])
+        if vmin is None:
             vmin = np.percentile(a, whatpercentiles[0])
-        else:
-            vmin, vmax = np.percentile(a, whatpercentiles)
 
         # go simple logarithmic, if this is all positive
         norm = LogNorm(vmin=vmin, vmax=vmax)
-        cmap = 'Blues'
+        if cmap is None:
+            cmap = 'Blues'
         ticks = [vmin, vmin * np.sqrt(vmax / vmin), vmax]
 
     return cmap, norm, ticks
