@@ -49,5 +49,6 @@ for processingsteps in [[], ['subtractmean']]:
                     filename += 'limit-{}'.format(N)
                 if processingsteps is not []:
                     filename += '-{}'.format('-'.join(processingsteps))
+                filename += '.pdf'
                 i.savefig(filename, dpi=300)
                 i.animate(filename.replace('pdf', 'mp4'), cadence=1.0*u.s)
