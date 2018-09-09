@@ -44,7 +44,6 @@ class FourCameraOfCCDsIllustration(IllustrationBase):
                                   left=0.05, right=0.95,
                                   bottom=0.1, top=0.9,
                                   subplot_spec=subplot_spec,
-                                  plotingredients=plotingredients,
                                   sharecolorbar=sharecolorbar)
 
         # initiate the axes for each camera
@@ -76,6 +75,7 @@ class FourCameraOfCCDsIllustration(IllustrationBase):
                         subplot_spec=self.grid[i,j],
                         camera=name,
                         processingsteps=processingsteps,
+                        plotingredients=plotingredients,
                         **ccds)
 
                 # kludge?! this illustration doesn't get plotted when the supersceding one is
