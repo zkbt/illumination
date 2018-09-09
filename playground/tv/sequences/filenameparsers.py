@@ -43,5 +43,5 @@ def qlp_fullcamera_filenameparser(filename):
 def flexible_filenameparser(filename):
     try:
         return qlp_filenameparser(filename)
-    except IndexError:
+    except:
         return qlp_fullcamera_filenameparser(filename)
