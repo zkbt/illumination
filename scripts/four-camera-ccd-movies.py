@@ -43,6 +43,11 @@ for processingsteps in [[], ['subtractmean']]:
 
                 i.plot()
                 filename = 'orbit{}-four-camera'
-                if '-{}-limit{}.pdf'.format(orbit, '-'.join(processingsteps), N)
+                if gray:
+                    filename += '-gray'
+                if N is not None:
+                    filename += 'limit-{}'.format(N)
+                if processingsteps is not []:
+                    filename += '-{}'.format('-'.join(processingsteps))
                 i.savefig(filename, dpi=300)
                 i.animate(filename.replace('pdf', 'mp4'), cadence=1.0*u.s)
