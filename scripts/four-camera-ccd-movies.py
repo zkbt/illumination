@@ -38,7 +38,7 @@ for processingsteps in [[], ['subtractmean']]:
                 if gray:
                     i.cmapkw['cmap'] = 'gray_r'
                 if processingsteps == []:
-                    i.cmapkw['vmin'] = 1
+                    i.cmapkw['vmin'] = 3e4
                     i.cmapkw['vmax'] = 1e6
 
                 i.plot()
