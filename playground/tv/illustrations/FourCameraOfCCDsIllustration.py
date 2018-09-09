@@ -13,7 +13,7 @@ class FourCameraOfCCDsIllustration(IllustrationBase):
     '''
     illustrationtype = 'FourCameraOfCCDs'
 
-    def __init__(self, cam1=[], cam2=[], cam3=[], cam4=[], orientation='horizontal', sizeofcamera=4, subplot_spec=None, sharecolorbar=True, processingsteps=[], **kwargs):
+    def __init__(self, cam1=[], cam2=[], cam3=[], cam4=[], orientation='horizontal', sizeofcamera=4, subplot_spec=None, sharecolorbar=True, processingsteps=[],  plotingredients=['image', 'time','colorbar'], **kwargs):
         '''
 
         Parameters
@@ -44,6 +44,7 @@ class FourCameraOfCCDsIllustration(IllustrationBase):
                                   left=0.05, right=0.95,
                                   bottom=0.1, top=0.9,
                                   subplot_spec=subplot_spec,
+                                  plotingredients=plotingredients,
                                   sharecolorbar=sharecolorbar)
 
         # initiate the axes for each camera
