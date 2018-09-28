@@ -14,13 +14,22 @@ from setuptools import setup, find_packages
 # a little kludge to be able to get the version number from the package
 from illumination.version import __version__
 
+# running `python setup.py release` from the command line will post to PyPI
+if "release" in sys.argv[-1]:
+    os.system("python setup.py sdist")
+    # uncomment the next line to test out on test.pypi.com/project/tess-zap
+    #os.system("twine upload --repository-url https://test.pypi.org/legacy/ dist/*")
+    os.system("twine upload dist/*")
+    os.system("rm -rf dist/henrietta*")
+    sys.exit()
+
 setup(name = "illumination",
     version = __version__,
     description = "Python tools for visualizing astronomical images, particularly from the NASA TESS mission.",
     long_description = "", # need to add
     author = "Zach Berta-Thompson",
     author_email = "zach.bertathompson@colorado.edu",
-    url = "https://tessgit.mit.edu/zkbt/playground",
+    url = "https://github.com/zkbt/illumination",
     packages = find_packages(),
     package_data = {'illumination':[]},
     include_package_data=False,
