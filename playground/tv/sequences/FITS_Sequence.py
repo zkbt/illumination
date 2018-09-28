@@ -71,7 +71,7 @@ class FITS_Sequence(Image_Sequence):
         elif type(initial) == str:
             # a search string
             if '*' in initial:
-                self.filenames = sort(glob.glob(initial))
+                self.filenames = np.sort(glob.glob(initial))
                 #self.hdulists = [fits.open(f) for f in glob.glob(initial)]
             # a single file
             elif 'fit' in initial.lower():

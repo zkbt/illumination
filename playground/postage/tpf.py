@@ -58,7 +58,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
     @property
     def background_mask(self):
         return self.hdu[-1].data == 2
-        
+
     def filelabel(self, label=None):
         '''
         TESS-specific file label.
@@ -450,199 +450,6 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
     def keplerid(self):
         return None
 
-    def interact(self, lc=None):
-        """
-        (
-        ZKBT -- made some tiny kludges to this to make it work.
-        Long term, it'd be good to make it be a bit more mission
-        agnostic, so it's easier to inherit from.
-        )
-        Display an interactive IPython Notebook widget to inspect the data.
-
-        The widget will show both the lightcurve and pixel data.  By default,
-        the lightcurve shown is obtained by calling the `to_lightcurve()` method,
-        unless the user supplies a custom `LightCurve` object.
-
-        Note: at this time, this feature only works inside an active Jupyter
-        Notebook, and tends to be too slow when more than ~30,000 cadences
-        are contained in the TPF (e.g. short cadence data).
-
-        Parameters
-        ----------
-        lc : LightCurve object
-            An optional pre-processed lightcurve object to show.
-        """
-        try:
-            from ipywidgets import interact
-            import ipywidgets as widgets
-            from bokeh.io import push_notebook, show, output_notebook
-            from bokeh.plotting import figure, ColumnDataSource
-            from bokeh.models import Span, LogColorMapper
-            from bokeh.layouts import row
-            from bokeh.models.tools import HoverTool
-            from IPython.display import display
-            output_notebook()
-        except ImportError:
-            raise ImportError('The quicklook tool requires Bokeh and ipywidgets. '
-                              'See the .interact() tutorial')
-
-        ytitle = 'Flux'
-        if lc is None:
-            lc = self.to_lightcurve()
-            ytitle = 'Flux (counts)'
-
-        # Bokeh cannot handle many data points
-        # https://github.com/bokeh/bokeh/issues/7490
-        if len(lc.cadenceno) > 30000:
-            raise RuntimeError('Interact cannot display more than 20000 cadences.')
-
-        # Map cadence to index for quick array slicing.
-        n_lc_cad = len(lc.cadenceno)
-        n_cad, nx, ny = self.flux.shape
-        lc_cad_matches = np.in1d(self.cadenceno, lc.cadenceno)
-        if lc_cad_matches.sum() != n_lc_cad:
-            raise ValueError("The lightcurve provided has cadences that are not "
-                             "present in the Target Pixel File.")
-        min_cadence, max_cadence = np.min(self.cadenceno), np.max(self.cadenceno)
-        cadence_lookup = {cad: j for j, cad in enumerate(self.cadenceno)}
-        cadence_full_range = np.arange(min_cadence, max_cadence, 1, dtype=np.int)
-        missing_cadences = list(set(cadence_full_range)-set(self.cadenceno))
-
-        # Convert binary quality numbers into human readable strings
-        qual_strings = []
-        for bitmask in lc.quality:
-            flag_str_list = KeplerQualityFlags.decode(bitmask)
-            if len(flag_str_list) == 0:
-                qual_strings.append(' ')
-            if len(flag_str_list) == 1:
-                qual_strings.append(flag_str_list[0])
-            if len(flag_str_list) > 1:
-                qual_strings.append("; ".join(flag_str_list))
-
-        # Convert time into human readable strings, breaks with NaN time
-        # See https://github.com/KeplerGO/lightkurve/issues/116
-        if (self.time == self.time).all():
-            human_time = self.astropy_time.isot[lc_cad_matches]
-        else:
-            human_time = [' '] * n_lc_cad
-
-        # Each data source will later become a hover-over tooltip
-        source = ColumnDataSource(data=dict(
-            time=lc.time,
-            time_iso=human_time,
-            flux=lc.flux,
-            cadence=lc.cadenceno,
-            quality_code=lc.quality,
-            quality=np.array(qual_strings)))
-
-        # Provide extra metadata in the title
-        if self.mission == 'K2':
-            title = "Quicklook lightcurve for EPIC {} (K2 Campaign {})".format(
-                self.keplerid, self.campaign)
-        elif self.mission == 'Kepler':
-            title = "Quicklook lightcurve for KIC {} (Kepler Quarter {})".format(
-                self.keplerid, self.quarter)
-        elif self.mission == 'TESS':
-            title = "Quicklook lightcurve for TIC{}".format(self.tic_id)
-
-        # Figure 1 shows the lightcurve with steps, tooltips, and vertical line
-        fig1 = figure(title=title, plot_height=300, plot_width=600,
-                      tools="pan,wheel_zoom,box_zoom,save,reset")
-        fig1.yaxis.axis_label = ytitle
-        fig1.xaxis.axis_label = 'Time (days)'
-        fig1.step('time', 'flux', line_width=1, color='gray', source=source,
-                  nonselection_line_color='gray', mode="center")
-
-        r = fig1.circle('time', 'flux', source=source, fill_alpha=0.3, size=8,
-                        line_color=None, selection_color="firebrick",
-                        nonselection_fill_alpha=0.0, nonselection_line_color=None,
-                        nonselection_line_alpha=0.0, fill_color=None,
-                        hover_fill_color="firebrick", hover_alpha=0.9,
-                        hover_line_color="white")
-
-        fig1.add_tools(HoverTool(tooltips=[("Cadence", "@cadence"),
-                                           ("Time (JD)", "@time{0,0.000}"),
-                                           ("Time (ISO)", "@time_iso"),
-                                           ("Flux", "@flux"),
-                                           ("Quality Code", "@quality_code"),
-                                           ("Quality Flag", "@quality")],
-                                 renderers=[r],
-                                 mode='mouse',
-                                 point_policy="snap_to_data"))
-        # Vertical line to indicate the cadence shown in Fig 2
-        vert = Span(location=0, dimension='height', line_color='firebrick',
-                    line_width=4, line_alpha=0.5)
-        fig1.add_layout(vert)
-
-        # Figure 2 shows the Target Pixel File stamp with log screen stretch
-        fig2 = figure(plot_width=300, plot_height=300,
-                      tools="pan,wheel_zoom,box_zoom,save,reset",
-                      title='Pixel data | CAM{} | {}'.format(
-                          self.cam, (self.col_cent, self.row_cent)))
-        fig2.yaxis.axis_label = 'Pixel Row Number'
-        fig2.xaxis.axis_label = 'Pixel Column Number'
-
-        pedestal = np.nanmin(self.flux[lc_cad_matches, :, :])
-        stretch_dims = np.prod(self.flux[lc_cad_matches, :, :].shape)
-        screen_stretch = self.flux[lc_cad_matches, :, :].reshape(stretch_dims) - pedestal
-        screen_stretch = screen_stretch[np.isfinite(screen_stretch)]  # ignore NaNs
-        screen_stretch = screen_stretch[screen_stretch > 0.0]
-        vlo = np.min(screen_stretch)
-        vhi = np.max(screen_stretch)
-        vstep = (np.log10(vhi) - np.log10(vlo)) / 300.0  # assumes counts >> 1.0!
-        lo, med, hi = np.nanpercentile(screen_stretch, [1, 50, 95])
-        color_mapper = LogColorMapper(palette="Viridis256", low=lo, high=hi)
-
-        fig2_dat = fig2.image([self.flux[0, :, :] - pedestal], x=self.column,
-                              y=self.row, dw=self.shape[2], dh=self.shape[1],
-                              dilate=False, color_mapper=color_mapper)
-
-        # The figures appear before the interactive widget sliders
-        show(row(fig1, fig2), notebook_handle=True)
-
-        # The widget sliders call the update function each time
-        def update(cadence, log_stretch):
-            """Function that connects to the interact widget slider values"""
-            fig2_dat.glyph.color_mapper.high = 10**log_stretch[1]
-            fig2_dat.glyph.color_mapper.low = 10**log_stretch[0]
-            if cadence not in missing_cadences:
-                index_val = cadence_lookup[cadence]
-                vert.update(line_alpha=0.5)
-                if self.time[index_val] == self.time[index_val]:
-                    vert.update(location=self.time[index_val])
-                else:
-                    vert.update(line_alpha=0.0)
-                fig2_dat.data_source.data['image'] = [self.flux[index_val, :, :]
-                                                      - pedestal]
-            else:
-                vert.update(line_alpha=0)
-                fig2_dat.data_source.data['image'] = [self.flux[0, :, :] * np.NaN]
-            push_notebook()
-
-        # Define the widgets that enable the interactivity
-        play = widgets.Play(interval=10, value=min_cadence, min=min_cadence,
-                            max=max_cadence, step=1, description="Press play",
-                            disabled=False)
-        play.show_repeat, play._repeat = False, False
-        cadence_slider = widgets.IntSlider(
-            min=min_cadence, max=max_cadence,
-            step=1, value=min_cadence, description='Cadence',
-            layout=widgets.Layout(width='40%', height='20px'))
-        screen_slider = widgets.FloatRangeSlider(
-            value=[np.log10(lo), np.log10(hi)],
-            min=np.log10(vlo),
-            max=np.log10(vhi),
-            step=vstep,
-            description='Pixel Stretch (log)',
-            style={'description_width': 'initial'},
-            continuous_update=False,
-            layout=widgets.Layout(width='30%', height='20px'))
-        widgets.jslink((play, 'value'), (cadence_slider, 'value'))
-        ui = widgets.HBox([play, cadence_slider, screen_slider])
-        out = widgets.interactive_output(update, {'cadence': cadence_slider,
-                                                  'log_stretch': screen_slider})
-        display(ui, out)
-
 
 class EarlyTessTargetPixelFileFactory(KeplerTargetPixelFileFactory):
     def add_cadence(self, frameno, raw_cnts=None, flux=None, flux_err=None,
@@ -693,7 +500,7 @@ class EarlyTessTargetPixelFileFactory(KeplerTargetPixelFileFactory):
 
 
     ### FIXME! You need to understand the header templates!
-    def _make_primary_hdu(self, keywords={}):
+    def _make_primary_hdu(self, hdu0_keywords={}, keywords={}, **kw):
         """Returns the primary extension (#0)."""
         hdu = fits.PrimaryHDU()
         # Copy the default keywords from a template file from the MAST archive
@@ -728,7 +535,7 @@ class EarlyTessTargetPixelFileFactory(KeplerTargetPixelFileFactory):
 
         return hdu
 
-    def _make_target_extension(self):
+    def _make_target_extension(self, **kw):
         """Create the 'TARGETTABLES' extension (i.e. extension #1)."""
         # Turn the data arrays into fits columns and initialize the HDU
         coldim = '({},{})'.format(self.n_cols, self.n_rows)
