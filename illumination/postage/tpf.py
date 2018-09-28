@@ -1,6 +1,7 @@
+from ..imports import *
+
 from lightkurve.targetpixelfile import TargetPixelFile, KeplerTargetPixelFile, KeplerTargetPixelFileFactory, KeplerQualityFlags
 from lightkurve import KeplerLightCurve, TessLightCurve
-from ..imports import *
 import datetime, warnings
 from tqdm import tqdm
 

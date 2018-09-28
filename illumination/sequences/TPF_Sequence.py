@@ -1,5 +1,8 @@
-from .Image_Sequence import *
+'''
+Define a sequence of images from a TPF.
+'''
 
+from .Image_Sequence import *
 
 class TPF_Sequence(Image_Sequence):
     def __init__(self, initial, name='TPF', **kwargs):

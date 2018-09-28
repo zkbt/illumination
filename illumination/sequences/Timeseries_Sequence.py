@@ -1,9 +1,13 @@
-from .Sequence import *
+'''
+Define a timeseries sequence.
+'''
 
+from .Sequence import *
 
 class Timeseries_Sequence(Sequence):
     '''
     NOT CURRENTLY BEING USED.
+    FIXME -- add support for updating the points in a plot in time.
     '''
 
     def __init__(self, initial, y=None, yuncertainty=None, name='timeseries', **kwargs):

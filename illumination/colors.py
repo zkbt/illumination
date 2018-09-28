@@ -1,6 +1,9 @@
-from ..imports import *
-from matplotlib.colors import SymLogNorm, LogNorm
+'''
+Tools for setting up colors for display.
+'''
 
+from .imports import *
+from matplotlib.colors import SymLogNorm, LogNorm
 
 def cmap_norm_ticks(a, whatpercentiles=[1, 99], howmanysigmaarelinear=1.5, whatfractionislinear=0.15, vmax=None, vmin=None, cmap=None):
     '''

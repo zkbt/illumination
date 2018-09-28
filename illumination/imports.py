@@ -1,4 +1,10 @@
 from __future__ import print_function
+
+'''
+These define a common set of imports, which can be used by other modules
+throughout the entire package.
+'''
+
 import os
 import copy
 import subprocess
@@ -21,6 +27,10 @@ import astropy.units as u
 from .talker import Talker
 
 
+'''
+FIXME -- Move these to a separate utilities.py file?
+'''
+ 
 def mkdir(path):
     '''
     A mkdir that doesn't complain if it already exists.

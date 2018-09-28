@@ -6,7 +6,6 @@ from .imports import *
 from .postage.stamps import Stamp
 from .postage.tpf import EarlyTessTargetPixelFile, EarlyTessLightCurve
 
-
 def create_test_times(N=100, cadence=2):
     '''
     Create a fake array of times.

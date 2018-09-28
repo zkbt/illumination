@@ -1,5 +1,7 @@
+'''
+Define a generic sequence of images.
+'''
 from .Sequence import *
-
 
 class Image_Sequence(Sequence):
     '''

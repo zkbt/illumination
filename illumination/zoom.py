@@ -1,4 +1,8 @@
-from ..imports import *
+'''
+Tools for adding zoom frames to an illustration.
+'''
+
+from .imports import *
 from .illustrations import *
 from .frames import ZoomFrame, LocalZoomFrame, LocalStampFrame
 

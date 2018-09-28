@@ -15,7 +15,6 @@ if sys.version_info[0] < 3:
 shortcuts = None
 line = 100
 
-
 class Talker:
     '''
     Objects the inherit from Talker have "mute" and "pithy" attributes,

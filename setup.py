@@ -12,24 +12,17 @@ from setuptools import setup, find_packages
 
 
 # a little kludge to be able to get the version number from the package
-import sys
-if sys.version_info[0] < 3:
-    import __builtin__ as builtins
-else:
-    import builtins
-builtins.__PLAYGROUNDSETUP__ = True
-import playground
-version = playground.__version__
+from illumination.version import __version__
 
-setup(name = "playground",
+setup(name = "illumination",
     version = version,
-    description = "Space to play with early TESS pixels.",
-    long_description = "For usage, installation, and discussion, please visit https://tessgit.mit.edu/zkbt/playground",
+    description = "Python tools for visualizing astronomical images, particularly from the NASA TESS mission.",
+    long_description = "", # need to add
     author = "Zach Berta-Thompson",
     author_email = "zach.bertathompson@colorado.edu",
     url = "https://tessgit.mit.edu/zkbt/playground",
     packages = find_packages(),
-    package_data = {'playground':[]},
+    package_data = {'illumination':[]},
     include_package_data=False,
     scripts = [],
     classifiers=[

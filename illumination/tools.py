@@ -1,10 +1,13 @@
+'''
+Wrappers to define some default visualizations.
+'''
+
 from __future__ import print_function
 
-from ..imports import *
+from .imports import *
 from .zoom import *
 from .illustrations import CameraIllustration, FourCameraIllustration, SingleCameraWithZoomIllustration
-from playground.postage.stamps import *
-
+from .postage.stamps import *
 
 def camera_from_filename(f):
     try:

@@ -1,5 +1,5 @@
-from ..tv import *
-from ..imports import *
+from ... import *
+from ...imports import *
 
 def plot_aperture_definition(tpf):
     '''

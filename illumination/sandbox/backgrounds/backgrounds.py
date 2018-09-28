@@ -1,4 +1,4 @@
-from ..imports import *
+from ...imports import *
 
 from astropy.modeling import models, fitting
 from matplotlib.patches import Ellipse

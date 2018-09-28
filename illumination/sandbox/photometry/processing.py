@@ -1,6 +1,6 @@
-from ..imports import *
 from .visualize import *
-from ..postage import *
+from ...imports import *
+from ...postage import *
 
 def bin_jitter(lc, binwidth=30.0/60./24, robust=False):
     '''

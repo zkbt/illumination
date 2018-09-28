@@ -3,7 +3,7 @@ Define some filename parsers than can pull details from filenames,
 and convert them to dictionaries.
 '''
 
-from ...imports import *
+from ..imports import *
 
 def qlp_filenameparser(filename):
     '''

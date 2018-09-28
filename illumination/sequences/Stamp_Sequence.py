@@ -1,5 +1,7 @@
+'''
+Define a sequence of images from a Stamp object.
+'''
 from .Image_Sequence import *
-
 
 class Stamp_Sequence(Image_Sequence):
     def __init__(self, initial, name='Stamp', **kwargs):

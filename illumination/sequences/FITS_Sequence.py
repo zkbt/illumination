@@ -1,7 +1,10 @@
+'''
+Define a sequence of FITS images.
+'''
+
 from __future__ import print_function
 from .filenameparsers import *
 from .Image_Sequence import *
-
 
 class FITS_Sequence(Image_Sequence):
     '''

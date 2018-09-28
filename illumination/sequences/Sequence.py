@@ -1,7 +1,11 @@
-from ...imports import *
-from ...postage.stamps import Stamp
+'''
+Define a generic sequence.
+'''
+
+from ..imports import *
+from ..postage.stamps import Stamp
 try:
-    from ...postage.tpf import EarlyTessTargetPixelFile
+    from ..postage.tpf import EarlyTessTargetPixelFile
     from lightkurve.lightcurve import LightCurve
     from lightkurve.targetpixelfile import TargetPixelFile
 except:
