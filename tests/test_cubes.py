@@ -1,5 +1,5 @@
-from playground.postage.cubes import *
-from playground.cartoons import *
+from illumination.postage.cubes import *
+from illumination.cartoons import *
 
 directory = 'examples/'
 mkdir(directory)

@@ -1,6 +1,6 @@
-from playground.imports import *
-from playground.cartoons import *
-from playground.postage.tpf import EarlyTessTargetPixelFile
+from illumination.imports import *
+from illumination.cartoons import *
+from illumination.postage.tpf import EarlyTessTargetPixelFile
 
 directory = 'examples/'
 mkdir(directory)

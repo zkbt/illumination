@@ -15,7 +15,7 @@ from setuptools import setup, find_packages
 from illumination.version import __version__
 
 setup(name = "illumination",
-    version = version,
+    version = __version__,
     description = "Python tools for visualizing astronomical images, particularly from the NASA TESS mission.",
     long_description = "", # need to add
     author = "Zach Berta-Thompson",

@@ -1,8 +1,8 @@
-from playground.imports import *
-from playground.tv import *
-from playground.postage import *
-from playground.photometry import *
-from playground.cartoons import *
+from illumination import *
+from illumination.imports import *
+from illumination.postage import *
+from illumination.sandbox.photometry import *
+from illumination.cartoons import *
 
 directory = 'examples/'
 mkdir(directory)
