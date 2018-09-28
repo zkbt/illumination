@@ -1,7 +1,7 @@
-from playground.imports import *
-from playground.tv.illustrations import *
-from playground.tv.zoom import *
-from playground.cartoons import *
+from illumination.imports import *
+from illumination.illustrations import *
+from illumination.zoom import *
+from illumination.cartoons import *
 
 
 directory = 'examples/'

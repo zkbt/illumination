@@ -1,6 +1,6 @@
-from playground.tv.sequences import *
-from playground.cartoons import *
-from playground.imports import *
+from illumination.sequences import *
+from illumination.cartoons import *
+from illumination.imports import *
 
 
 def test_Stamps():
