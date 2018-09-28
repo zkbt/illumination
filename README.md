@@ -1,6 +1,6 @@
 # illumination
 
-Sometimes it can be really helpful to take your image of the sky, set it up on your light box, and illuminate it you can investigate it closely with your loupe and fly-swatter. This package provides tools to make pretty illustrations and animations from time-series imaging data. Documentation and examples can be found at [zkbt.github.io/illumination/](https://zkbt.github.io/illumination/)
+Sometimes it can be really helpful to take your image of the sky, set it up on your light box, and illuminate it so you can investigate it closely with your loupe and fly-swatter. This package provides tools to make pretty illustrations and animations from time-series imaging data. Documentation and examples can be found at [zkbt.github.io/illumination/](https://zkbt.github.io/illumination/)
 
 ### Installation
 
