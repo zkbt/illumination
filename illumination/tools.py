@@ -15,7 +15,6 @@ def camera_from_filename(f):
     except IndexError:
         return '?'
 
-
 def illustratefits(pattern='*.fits', get_camera=camera_from_filename, zoomposition=None, zoomsize=(10,10), **illustrationkw):
     '''
     Make an Illustration from a group of FITS files.
