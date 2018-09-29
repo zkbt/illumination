@@ -42,6 +42,8 @@ def make_image_sequence(initial, *args, **kwargs):
     # is it a Stamp?
     elif type(initial) == Stamp:
         return Stamp_Sequence(initial, *args, **kwargs)
+    elif type(initial) == np.ndarray:
+        return Image_Sequence(initial, **kwargs)
     else:
         # try:
         #	# is initial a 1D thing?

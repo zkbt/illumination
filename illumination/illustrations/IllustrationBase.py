@@ -2,24 +2,7 @@ from ..imports import *
 from ..sequences import *
 from ..frames import *
 from ..colors import cmap_norm_ticks
-
-def get_writer(filename, fps=30):
-    '''
-    Try to get an appropriate animation writer,
-    given the filename provided.
-    '''
-    if '.mp4' in filename:
-        try:
-            writer = ani.writers['ffmpeg'](fps=fps)
-        except (RuntimeError, KeyError):
-            raise RuntimeError('This computer seems unable to ffmpeg.')
-    else:
-        try:
-            writer = ani.writers['pillow'](fps=fps)
-        except (RuntimeError, KeyError):
-            writer = ani.writers['imagemagick'](fps=fps)
-            raise RuntimeError('This computer seem unable to animate?')
-    return writer
+from ..utilities import *
 
 class IllustrationBase(Talker):
     '''
