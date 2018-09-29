@@ -41,7 +41,7 @@ def test_TPF():
     Run a test of the TPF_Sequence.
     '''
     tpf = create_test_tpf()
-    a = make_sequence(tpf)
+    a = make_image_sequence(tpf)
     assert(isinstance(a, TPF_Sequence))
     return a
 
@@ -53,7 +53,7 @@ def test_timeseries():
 	'''
 	x = (np.linspace(0, 1)*u.day + Time.now()).jd
 	y = np.random.normal(0, 1, len(x))
-	a = make_sequence(x, y)
+	a = make_image_sequence(x, y)
 	assert(isinstance(a, Timeseries_Sequence))
 	return a
 """

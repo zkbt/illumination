@@ -21,7 +21,7 @@ class CameraIllustration(IllustrationBase):
         ----------
         data : various
             Anything that can initialize a sequence with
-            the make_sequence() helper function.
+            the make_image_sequence() helper function.
 
             or
 
@@ -62,5 +62,5 @@ class CameraIllustration(IllustrationBase):
         # create a CameraFrame for this camera
         self.frames['camera'] = CameraFrame(illustration=self,
                                             ax=ax,
-                                            data=make_sequence(data),
+                                            data=make_image_sequence(data),
                                             **framekw)

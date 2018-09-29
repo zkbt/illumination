@@ -11,7 +11,7 @@ mkdir(directory)
 def test_subtraction(N=10, **kw):
     print("\nTesting a Single Camera illustration.")
 
-    sequence = make_sequence([create_test_fits(rows=300, cols=300) for _ in range(N)], ext_image=1)
+    sequence = make_image_sequence([create_test_fits(rows=300, cols=300) for _ in range(N)], ext_image=1)
     normal = imshowFrame(data=sequence, title='normal')
     subtracted = imshowFrame(data=sequence, title='median-subtracted')
     subtracted.processingsteps = ['subtractmedian']

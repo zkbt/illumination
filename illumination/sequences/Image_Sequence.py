@@ -100,3 +100,9 @@ class Image_Sequence(Sequence):
             self.spatial['mean'] = total/self.N
 
         return self.spatial['mean']
+
+    def __repr__(self):
+        '''
+        How should this sequence be represented, by default, as a string.
+        '''
+        return '<{} of {} images of shape {}>'.format(self.nametag, self.N, self.shape[1:] )

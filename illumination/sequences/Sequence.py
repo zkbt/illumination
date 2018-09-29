@@ -118,7 +118,7 @@ class Sequence(Talker):
         '''
         How should this sequence be represented, by default, as a string.
         '''
-        return '<{} of {} images>'.format(self.nametag, self.N)
+        return '<{} of {} elements>'.format(self.nametag, self.N)
 
     @property
     def N(self):
