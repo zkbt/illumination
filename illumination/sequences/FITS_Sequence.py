@@ -21,7 +21,6 @@ class FITS_Sequence(Image_Sequence):
         Initialize a Sequence of FITS images. The goal is
         to create a list of FITS HDUs, one for each time.
 
-
         Parameters
         ----------
 
