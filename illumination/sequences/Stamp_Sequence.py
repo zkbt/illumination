@@ -28,6 +28,7 @@ class Stamp_Sequence(Image_Sequence):
         elif (type(initial) == str) or (type(initial) == list):
             stamp = Stamp(initial, **kwargs)
 
+
         # create a sequence out of that stamp
         Sequence.__init__(self, name=name)
 

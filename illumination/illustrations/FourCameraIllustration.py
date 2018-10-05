@@ -18,7 +18,7 @@ class FourCameraIllustration(IllustrationBase):
         ----------
         cam1, etc... : various
             Anything that can initialize a sequence with
-            the make_sequence() helper function.
+            the make_image_sequence() helper function.
 
         orientation : str
             'horizontal' = camera 2 is right of camera 1

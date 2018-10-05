@@ -41,9 +41,33 @@ def test_TPF():
     Run a test of the TPF_Sequence.
     '''
     tpf = create_test_tpf()
-    a = make_sequence(tpf)
+    a = make_image_sequence(tpf)
     assert(isinstance(a, TPF_Sequence))
     return a
+
+
+def test_make():
+    # a single image
+    singleimage = create_test_array(N=1, xsize=20, ysize=10)[0]
+    print(singleimage.shape, type(singleimage))
+    make_image_sequence(singleimage)
+
+    #multiple images
+    manyimages = create_test_array(N=10, xsize=100, ysize=50)
+    print(manyimages.shape, type(manyimages))
+    make_image_sequence(manyimages)
+
+    # stamp
+    stamp = create_test_stamp()
+    make_image_sequence(stamp)
+
+    # fits
+    fits = create_test_fits()
+    make_image_sequence(fits)
+
+    # multiple fits
+    fits = [create_test_fits() for _ in range(10)]
+    make_image_sequence(fits)
 
 
 """
@@ -53,31 +77,13 @@ def test_timeseries():
 	'''
 	x = (np.linspace(0, 1)*u.day + Time.now()).jd
 	y = np.random.normal(0, 1, len(x))
-	a = make_sequence(x, y)
+	a = make_image_sequence(x, y)
 	assert(isinstance(a, Timeseries_Sequence))
 	return a
 """
 
 if __name__ == '__main__':
-    test_timeseries()
     test_TPF()
     test_FITS()
     test_Stamps()
-"""
-def test_many_FITS(N=30):
-	'''
-	Run a test of the FITS_Sequence.
-	'''
-
-	for i in range(N):
-
-		filename = 'temporarytest_{:04}.fits'.format(i)
-		pattern = 'temporarytest_*.fits'
-		hdulist = create_test_fits(rows=4, cols=6)
-		hdulist.writeto(filename, overwrite=True)
-		ext_image = 1
-		print('saved {}'.format(filename))
-		a = FITS_Sequence(pattern, ext_image=ext_image)
-
-	return a
-"""
+    test_make()

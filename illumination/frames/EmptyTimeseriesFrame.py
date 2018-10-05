@@ -1,5 +1,5 @@
 from .FrameBase import *
-from ..sequences import make_sequence
+from ..sequences import make_image_sequence
 
 
 class EmptyTimeseriesFrame(FrameBase):

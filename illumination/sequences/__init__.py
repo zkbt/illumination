@@ -4,7 +4,7 @@ from .Stamp_Sequence import *
 from .TPF_Sequence import *
 from .Timeseries_Sequence import *
 
-def make_sequence(initial, *args, **kwargs):
+def make_image_sequence(initial, *args, **kwargs):
     '''
     Initialize a Sequence for viewing with tv.
 
@@ -36,12 +36,14 @@ def make_sequence(initial, *args, **kwargs):
     # is it already a sequence?
     if issubclass(initial.__class__, Sequence):
         return initial
-    # is it empty?
+    # is it empty? return an empty sequence
     elif initial is [] or initial is None:
         return Sequence()
     # is it a Stamp?
     elif type(initial) == Stamp:
         return Stamp_Sequence(initial, *args, **kwargs)
+    elif type(initial) == np.ndarray:
+        return Image_Sequence(initial, **kwargs)
     else:
         # try:
         #	# is initial a 1D thing?
