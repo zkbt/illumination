@@ -5,7 +5,7 @@ so you can pull out your loupe and flyswatter and start looking at stars.
 '''
 
 # make sure we keep track of the version
-from .version import *
+from .version import __version__
 
 # import some of the basics to be generally available
 from .illustrations import *
