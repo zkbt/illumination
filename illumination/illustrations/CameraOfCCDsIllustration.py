@@ -24,7 +24,7 @@ class CameraOfCCDsIllustration(CameraIllustration):
         ----------
         ccd1, ccd2, ccd3, ccd4
             Each should be able to initialize a sequence with
-            the make_sequence() helper function.
+            the make_image_sequence() helper function.
 
         data
             Will be ignored.
@@ -108,7 +108,7 @@ class CameraOfCCDsIllustration(CameraIllustration):
         for k in ax.keys():
             self.frames[k] = ccds[k](illustration=self,
                                      ax=ax[k],
-                                     data=make_sequence(locals()[k]),
+                                     data=make_image_sequence(locals()[k]),
                                      camera=self._cameraframe,
                                      **framekw)
 

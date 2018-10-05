@@ -1,14 +1,17 @@
+'''
+This duplicates "CameraIllustration". Do we need both?
+'''
+
 from .IllustrationBase import *
-from ..frames import CameraFrame, cameras
-from ..frames import CCDFrame, ccds
-__all__ = ['CameraIllustration']
+from ..frames import imshowFrame
+__all__ = ['imshowIllustration']
 
 
-class CameraIllustration(IllustrationBase):
+class imshowIllustration(IllustrationBase):
     '''
-    An illustration for displaying a single Camera (unrotated, untransformed).
+    An illustration for displaying a single image (unrotated, untransformed).
     '''
-    illustrationtype = 'CameraIllustration'
+    illustrationtype = 'imshowIllustration'
 
     def __init__(self,
                  data=[],
@@ -60,7 +63,7 @@ class CameraIllustration(IllustrationBase):
 
 
         # create a CameraFrame for this camera
-        self.frames['camera'] = CameraFrame(illustration=self,
+        self.frames['image'] = imshowFrame(illustration=self,
                                             ax=ax,
                                             data=make_image_sequence(data),
                                             **framekw)

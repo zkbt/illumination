@@ -2,12 +2,71 @@
 Define a generic sequence of images.
 '''
 from .Sequence import *
+from ..cartoons import create_test_times
 
 class Image_Sequence(Sequence):
-    '''
-    This isn't a standalone. Other image sequences inherit from it.
-    '''
-    spatial = {}
+    def __init__(self, initial, name='cube', time=None, temporal={}, spatial={}, **kwargs):
+        '''
+        Initialize a Sequence from a Cube.
+        (a Cube is a custom, simplified, set of images)
+
+        Parameters
+        ----------
+        initial : (many possible types)
+            - a (ysize x = xsize)-shaped array
+            - a (ntimes x ysize x = xsize)-shaped array
+
+        time : array, None
+            An array of times for the sequence.
+
+        '''
+
+
+        # create a sequence
+        Sequence.__init__(self, name=name)
+
+        # make sure we're dealing with an array
+        array = np.atleast_2d(initial)
+
+        # handle a single image as a 1-element array
+        if len(array.shape) == 2:
+            array = array[np.newaxis, :, :]
+        elif len(array.shape) != 3:
+            raise RuntimeError("The inputs to Image_Sequence seem to be the wrong shape.")
+
+        # pull out the shape of the array
+        N, ysize, xsize = array.shape
+        self.images = array
+
+        self.temporal = temporal
+        self.spatial = spatial
+
+        if time is None:
+            self.time = Time(np.arange(N), format='gps', scale='tdb')
+            self._timeisfake = True
+        else:
+            self._timeisfake = False
+            assert(len(time) == N)
+            if isinstance(time, Time):
+                self.time = time
+            else:
+                self.time = Time(time, format=guess_time_format(time), scale=timescale)
+
+    def __getitem__(self, timestep):
+        '''
+        Return the image data for a given timestep.
+
+        This function is called when you say `sequence[timestep]`.
+
+        Parameters
+        ----------
+        timestep : int
+            A timestep index (which element in the sequence do you want?)
+        '''
+        if timestep is None:
+            return None
+        else:
+            return self.images[timestep, :, :]
 
     @property
     def shape(self):
@@ -100,3 +159,9 @@ class Image_Sequence(Sequence):
             self.spatial['mean'] = total/self.N
 
         return self.spatial['mean']
+
+    def __repr__(self):
+        '''
+        How should this sequence be represented, by default, as a string.
+        '''
+        return '<{} of {} images of shape {}>'.format(self.nametag, self.shape[0], self.shape[1:] )

@@ -1,6 +1,6 @@
 from .FrameBase import *
 from ..colors import cmap_norm_ticks
-from ..sequences import make_sequence
+from ..sequences import make_image_sequence
 
 
 class imshowFrame(FrameBase):
@@ -69,7 +69,7 @@ class imshowFrame(FrameBase):
                                  **kwargs)
 
         # ensure that the data are a sequence of images
-        self.data = make_sequence(self.data, **kwargs)
+        self.data = make_image_sequence(self.data, **kwargs)
 
         # if there's an image, use it to set the size
         try:

@@ -13,12 +13,12 @@ class SingleCameraWithZoomIllustration(GenericIllustration):
 
     def __init__(self, data=[], zoomposition=(0, 0), zoomsize=(10, 10), **kwargs):
         '''
-        **kwargs are passed to both make_sequence and the frames
+        **kwargs are passed to both make_image_sequence and the frames
         '''
 
         # create a CameraFrame for this camera
         i_camera = CameraFrame( illustration=self,
-                                data=make_sequence(data, **kwargs),
+                                data=make_image_sequence(data, **kwargs),
                                 **kwargs)
 
         # add the ZoomFrame, connected to the camera

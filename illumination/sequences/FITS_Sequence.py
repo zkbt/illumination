@@ -21,7 +21,6 @@ class FITS_Sequence(Image_Sequence):
         Initialize a Sequence of FITS images. The goal is
         to create a list of FITS HDUs, one for each time.
 
-
         Parameters
         ----------
 
@@ -99,8 +98,8 @@ class FITS_Sequence(Image_Sequence):
 
         self.ext_primary = ext_primary
         self.ext_image = ext_image
-        # if len(self.hdulists) > 0:
-        #	self.ext_image = np.minimum(self.ext_image, len(self.hdulists[0]))
+        if len(self.filenames) > 0:
+        	self.ext_image = np.minimum(self.ext_image, len(self._get_hdulist(0))-1)
 
         self.temporal = {}
         self.static = {}
@@ -263,7 +262,7 @@ class FITS_Sequence(Image_Sequence):
             self.speak('using "{}" as the time axis'.format(timekey))
         else:
             # try to pull a time axis from these
-            for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB']:
+            for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB', 'DATE-OBS']:
                 try:
                     # treat some value as a time
                     t = self.temporal[k]

@@ -12,3 +12,4 @@ from .illustrations import *
 from .zoom import *
 from .sequences import *
 from .tools import *
+from .cartoons import *
