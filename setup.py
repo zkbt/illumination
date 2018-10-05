@@ -11,8 +11,8 @@ import sys
 from setuptools import setup, find_packages
 
 
-# a little kludge to be able to get the version number from the package
-from illumination.version import __version__
+# a little kludge to get the version number from __version__
+exec(open('illumination/version.py').read())
 
 # running `python setup.py release` from the command line will post to PyPI
 if "release" in sys.argv[-1]:
