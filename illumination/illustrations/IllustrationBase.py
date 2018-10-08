@@ -51,12 +51,12 @@ class IllustrationBase(Talker):
                                                     ncols,
                                                     subplot_spec=subplot_spec,
                                                     **subset)
-            self.speak('built {} into an existing gridspec'.format(self.illustrationtype))
+            #self.speak('built {} into an existing gridspec'.format(self.illustrationtype))
         else:
             # by default, create a new figure and grid spec
             self.figure = plt.figure(**figkw)
             self.grid = gs.GridSpec(nrows, ncols, **gridspeckw)
-            self.speak('built {} into a new figure'.format(self.illustrationtype))
+            #self.speak('built {} into a new figure'.format(self.illustrationtype))
 
 
         # should this illustration have a shared colorbar, or separate ones?
