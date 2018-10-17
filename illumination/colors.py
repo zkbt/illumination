@@ -28,8 +28,8 @@ def cmap_norm_ticks(a, whatpercentiles=[1, 99], howmanysigmaarelinear=1.5, whatf
         if vmax is not None:
             vmin = -vmax
         else:
-            vmin, vmax = np.percentile(a, whatpercentiles)
-            scale = np.maximum(np.abs(vmin), np.abs(vmax))
+            vmin, vmax = np.nanpercentile(a, whatpercentiles)
+            scale = np.nanmaximum(np.abs(vmin), np.abs(vmax))
             vmin, vmax = -scale, scale
         span = np.log10(vmax)
         sigma = mad(a)
@@ -43,9 +43,9 @@ def cmap_norm_ticks(a, whatpercentiles=[1, 99], howmanysigmaarelinear=1.5, whatf
                  0, howmanysigmaarelinear * sigma, vmax]
     else:
         if vmax is None:
-            vmax = np.percentile(a, whatpercentiles[1])
+            vmax = np.nanpercentile(a, whatpercentiles[1])
         if vmin is None:
-            vmin = np.percentile(a, whatpercentiles[0])
+            vmin = np.nanpercentile(a, whatpercentiles[0])
 
         # go simple logarithmic, if this is all positive
         norm = LogNorm(vmin=vmin, vmax=vmax)

@@ -30,7 +30,7 @@ from .talker import Talker
 '''
 FIXME -- Move these to a separate utilities.py file?
 '''
- 
+
 def mkdir(path):
     '''
     A mkdir that doesn't complain if it already exists.
@@ -49,8 +49,8 @@ def mad(x):
 
                     For a Gaussian distribution, sigma~1.48*MAD.
     '''
-    med = np.median(x)
-    return np.median(np.abs(x - med))
+    med = np.nanmedian(x)
+    return np.nanmedian(np.abs(x - med))
 
 
 def shared_directory(files, verbose=False):
