@@ -116,7 +116,7 @@ class Image_Sequence(Sequence):
         except KeyError:
             self.speak('creating a median image for {}'.format(self))
             s = self._gather_3d()
-            self.spatial['median'] = np.median(s, axis=0)
+            self.spatial['median'] = np.nanmedian(s, axis=0)
         return self.spatial['median']
 
     def sum(self):
@@ -130,7 +130,7 @@ class Image_Sequence(Sequence):
         '''
 
         s = self._gather_3d()
-        return np.sum(s, axis=0)
+        return np.nansum(s, axis=0)
 
     def mean(self):
         '''
@@ -154,7 +154,9 @@ class Image_Sequence(Sequence):
             total = np.zeros_like(self[0])
             for i in range(self.N):
                 self.speak(' included frame {}/{} in mean'.format(i+1, self.N), progress=True)
-                total += self[i]
+                thisimage = self[i]
+                ok = np.isfinite(thisimage)
+                total[ok] += thisimage[ok]
 
             self.spatial['mean'] = total/self.N
 
