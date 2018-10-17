@@ -29,7 +29,7 @@ def cmap_norm_ticks(a, whatpercentiles=[1, 99], howmanysigmaarelinear=1.5, whatf
             vmin = -vmax
         else:
             vmin, vmax = np.nanpercentile(a, whatpercentiles)
-            scale = np.nanmaximum(np.abs(vmin), np.abs(vmax))
+            scale = np.maximum(np.abs(vmin), np.abs(vmax))
             vmin, vmax = -scale, scale
         span = np.log10(vmax)
         sigma = mad(a)
