@@ -1,20 +1,33 @@
 from .imports import *
 
-def get_writer(filename, fps=30):
+def get_writer(filename, fps=30, **kw):
     '''
     Try to get an appropriate animation writer,
     given the filename provided.
+
+    Parameters
+    ----------
+
+    filename : str
+        The output filename string for the animation.
+
+    fps : float
+        Frames/second.
+
+    kw : dict
+        All other keywords will be passed to the initialization
+        of the animation writer.
     '''
     if '.mp4' in filename:
         try:
-            writer = ani.writers['ffmpeg'](fps=fps)
+            writer = ani.writers['ffmpeg'](fps=fps, **kw)
         except (RuntimeError, KeyError):
             raise RuntimeError('This computer seems unable to ffmpeg.')
     else:
         try:
-            writer = ani.writers['pillow'](fps=fps)
+            writer = ani.writers['pillow'](fps=fps, **kw)
         except (RuntimeError, KeyError):
-            writer = ani.writers['imagemagick'](fps=fps)
+            writer = ani.writers['imagemagick'](fps=fps, **kw)
             raise RuntimeError('This computer seem unable to animate?')
     return writer
 
@@ -27,7 +40,8 @@ def guess_time_format(t, default='jd'):
     Parameters
     ----------
     t : array, float
-            A time, in any format. This will try to guess the format, assuming we're in the 2000s
+            A time, in any format. This will try to guess the format,
+            assuming we're dealing with data generally in the 2000s.
 
     default : str
             The default format, if no actual choice can be made.

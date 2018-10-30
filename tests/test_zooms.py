@@ -84,7 +84,7 @@ def test_FourCameraLocalZoom(N=3, zoom=3, size=(50, 50)):
     # add some random zoom to it
     for i in range(N):
         row, col = np.random.randint(0, nrows), np.random.randint(0, ncols)
-        f = add_zoom(illustration, camera='cam{}'.format(np.random.randint(1, 5)),
+        f = add_zoom(illustration, frame='cam{}'.format(np.random.randint(1, 5)),
                      position=(col, row), zoom=zoom, size=size)
         f.titlefordisplay = ''
 

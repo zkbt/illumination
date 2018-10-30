@@ -10,17 +10,30 @@ from .illustrations import CameraIllustration, FourCameraIllustration, SingleCam
 from .postage.stamps import *
 
 def camera_from_filename(f):
+    '''
+    Try to guess the camera from the filename.
+
+    Parameters
+    ----------
+
+    filename : str
+        The name of a fits file, with 'cam?' in it somewhere.
+    '''
+    
     try:
         return os.path.basename(f).split('cam')[1][0]
     except IndexError:
         return '?'
 
-def illustratefits(pattern='*.fits', get_camera=camera_from_filename, zoomposition=None, zoomsize=(10,10), **illustrationkw):
+def illustratefits( pattern='*.fits',
+                    get_camera=camera_from_filename,
+                    zoomposition=None, zoomsize=(10,10),
+                    **illustrationkw):
     '''
     Make an Illustration from a group of FITS files.
 
-    If one (or fewer) cameras are found through
-    the 'cam{}' substring, a CameraIllustration illustration is returned.
+    If one (or fewer) camera is found through the 'cam{}' substring,
+    then a CameraIllustration illustration is returned.
 
     If more than on cameras are found through
     the 'cam{}' substring, a FourCameraIllustration illustration is returned.
@@ -42,7 +55,6 @@ def illustratefits(pattern='*.fits', get_camera=camera_from_filename, zoompositi
 
     **illustrationkw : dict
         Keyword arguments will be passed to the Illustration
-
     '''
 
     # pull out the files
