@@ -27,7 +27,7 @@ class imshowFrame(FrameBase):
                                     'title'], # other options might be 'filename', 'axes', what else?
                  processingsteps=[],
                  firstframe=None,
-                 cmapkw={},
+                 cmapkw=dict(),
                  **kwargs):
         '''
         Initialize this imshowFrame, will can show a sequence of 2D images.

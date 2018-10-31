@@ -9,7 +9,7 @@ class ZoomFrame(imshowFrame):
                         position=(0, 0),
                         size=(10, 10),
                         name='zoom',
-                        cmapkw={},
+                        cmapkw=dict(),
                         plotingredients=[   'image',
                                             'colorbar'], #'arrows','title'],
                         **kwargs):
@@ -63,7 +63,8 @@ class ZoomFrame(imshowFrame):
 
         self.titlefordisplay = '{} | {}'.format(self.frametype, self.position)
 
-        self.cmapkw = cmapkw
+        self.cmapkw = copy.copy(cmapkw) # why do I have to do this?
+
     def _get_times(self):
         '''
         Get the available times associated with this frame.

@@ -63,7 +63,7 @@ class IllustrationBase(Talker):
         self.sharecolorbar = sharecolorbar
 
         # keep track of any keywords for generating a cmap (shared for the illustration)
-        self.cmapkw = cmapkw
+        self.cmapkw = copy.copy(cmapkw) # why do I have to do this?
 
         # create an empty dictionary, where frames will be stored
         self.frames = {}
