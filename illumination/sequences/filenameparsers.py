@@ -50,8 +50,14 @@ def explicit_filenameparser(filename):
     d = {}
     d['filename'] = os.path.basename(filename)
     s = d['filename'].split('.fit')[0]
-    d['camera'] = s[s.index('cam'):][3]
-    d['ccd'] = s[s.index('ccd'):][3]
+    try:
+        d['camera'] = s[s.index('cam'):][3]
+    except ValueError:
+        pass
+    try:
+        d['ccd'] = s[s.index('ccd'):][3]
+    except ValueError:
+        pass
     return d
 
 def tessqlp_filenameparser(filename):
