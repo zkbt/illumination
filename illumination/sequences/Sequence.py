@@ -100,3 +100,6 @@ class Sequence(Talker):
             return len(self.time)
         except AttributeError:
             return 0
+
+    def __len__(self):
+        return self.N

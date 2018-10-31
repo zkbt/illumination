@@ -8,7 +8,7 @@ directory = 'examples/'
 mkdir(directory)
 
 
-def test_CameraIllustration(N=10, **kw):
+def test_CameraIllustration(N=3, **kw):
     print("\nTesting a Single Camera Illustration with CCDs.")
 
     separateccds = {'ccd{}'.format(i):[create_test_fits(rows=300, cols=300, circlescale=(i + 1)*40) for _ in range(N)] for i in [1,2,3,4]}
@@ -20,7 +20,7 @@ def test_CameraIllustration(N=10, **kw):
     return illustration
 
 
-def test_FourCameraIllustration(N=10, **kw):
+def test_FourCameraIllustration(N=3, **kw):
     print("\nTesting a Four Camera Illustration with CCDs.")
 
     separatecameras = {'cam{}'.format(i):{'ccd{}'.format(i):[create_test_fits(rows=300, cols=300, circlescale=(i + 1)*40) for _ in range(N)] for i in [1,2,3,4]} for i in [1,2,3,4]}
@@ -31,7 +31,7 @@ def test_FourCameraIllustration(N=10, **kw):
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
-def test_FourCameraIllustrationProcessing(N=10, **kw):
+def test_FourCameraIllustrationProcessing(N=3, **kw):
     print("\nTesting a median-subtracted Four Camera Illustration with CCDs.")
 
     separatecameras = {'cam{}'.format(i):{'ccd{}'.format(i):[create_test_fits(rows=300, cols=300, circlescale=(i + 1)*40) for _ in range(N)] for i in [1,2,3,4]} for i in [1,2,3,4]}
@@ -44,11 +44,11 @@ def test_FourCameraIllustrationProcessing(N=10, **kw):
 
 
 
-def test_cmap(N=10, **kw):
+def test_cmap(N=3, **kw):
     print("\nTesting a custom color map with CCDs.")
 
     separatecameras = {'cam{}'.format(i):{'ccd{}'.format(i):[create_test_fits(rows=300, cols=300, circlescale=(i + 1)*40) for _ in range(N)] for i in [1,2,3,4]} for i in [1,2,3,4]}
-    illustration = FourCameraOfCCDsIllustration(**separatecameras, ext_image=1,  **kw)
+    illustration = FourCameraOfCCDsIllustration(**separatecameras, **kw)
     illustration.cmapkw['cmap'] = 'gray_r'
     illustration.cmapkw['vmin'] = 100
     illustration.cmapkw['vmax'] = 500

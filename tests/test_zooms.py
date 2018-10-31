@@ -107,7 +107,7 @@ def test_CameraIllustrationWithStamps():
     camera = illustration.frames['camera']
     xmax, ymax = camera.xmax, camera.ymax
     stamps = [create_test_stamp(col_cent=np.random.randint(1, xmax),
-                                row_cent=np.random.randint(1, ymax), N=10)
+                                row_cent=np.random.randint(1, ymax), N=3)
                     for i in range(10)]
 
     # add the stamps to the illustration
@@ -132,7 +132,7 @@ def test_FourCameraWithStamps(N=3):
         camera = illustration.frames['cam{}'.format(c)]
         xmax, ymax = camera.xmax, camera.ymax
         stamps = [create_test_stamp(col_cent=np.random.randint(1, xmax),
-                                    row_cent=np.random.randint(1, ymax), N=10)
+                                    row_cent=np.random.randint(1, ymax), N=3)
                         for i in range(N)]
 
         for s in stamps:

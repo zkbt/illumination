@@ -8,7 +8,7 @@ directory = 'examples/'
 mkdir(directory)
 
 
-def test_CameraIllustration(N=10, **kw):
+def test_CameraIllustration(N=3, **kw):
     print("\nTesting a Single Camera illustration.")
     illustration = CameraIllustration(
         data=[create_test_fits(rows=300, cols=300) for _ in range(N)], ext_image=1, **kw)

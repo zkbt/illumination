@@ -1,36 +1,57 @@
+#FIXME -- add comments, make sure many/many test works
+
 from illumination.imports import *
 from illumination.cartoons import *
-from illumination.tools import *
-from illumination.tools import *
+from illumination.wrappers import *
 
-filetemplate = 'cam{}-ccd{}.fits'
+filetemplate = 'cam{}-ccd{}-{}.fits'
 directory = 'examples/'
 mkdir(directory)
 
+imagedirectory = os.path.join(directory, 'images')
+mkdir(imagedirectory)
+
 def create_some_files():
+    '''
+    Create a little ensemble of files.
+    '''
     for cam in [1,2,3,4]:
         for ccd in [1,2,3,4]:
-            filename = os.path.join(directory, filetemplate.format(cam, ccd))
-            try:
-                create_test_fits(100,100).writeto(filename)
-            except OSError:
-                print('{} already exists'.format(filename))
+            for n in range(3):
+                filename = os.path.join(imagedirectory, filetemplate.format(cam, ccd, n))
+                try:
+                    create_test_fits(400,400).writeto(filename)
+                except OSError:
+                    print('{} already exists'.format(filename))
 
 def test_organize():
+    '''
+    Test the tool for organizing filenames into
+    a reasonably organized collection of sequences.
+    '''
+
     create_some_files()
-    pattern = os.path.join(directory, 'cam*-ccd*-0000.fits')
+    pattern = os.path.join(imagedirectory, 'cam*-ccd*-0000.fits')
     return organize_sequences(pattern)
 
 def test_illustratefits():
+    '''
+    Test the basic functionality of `illustratefits`.
+    Can it handle one/many cameras, and one/many CCDs?
+    '''
+
+
     create_some_files()
 
     x = {'many':'*', 'one':1}
-    for camera in ['one', 'many']:#, 'many']:
-        for ccd in ['one']:#, 'many']:
-            pattern = os.path.join(directory, filetemplate.format(x[camera], x[ccd]))
+    for camera in ['one', 'many']:
+        for ccd in ['one', 'many']:
+            pattern = os.path.join(imagedirectory, filetemplate.format(x[camera], x[ccd], '*'))
             i = illustratefits(pattern)
             i.plot()
             i.savefig(os.path.join(directory, 'camera={}-ccd={}.png'.format(camera, ccd)))
+            i.animate(filename=os.path.join(directory, 'camera={}-ccd={}.mp4').format(camera, ccd))
+            #i.savefig()
 
 
 def test_FITSwithZoom(zoomposition=(30, 70), zoomsize=(10, 10)):
@@ -57,4 +78,4 @@ def test_FITSwithZoom(zoomposition=(30, 70), zoomsize=(10, 10)):
 
 if __name__ == '__main__':
     test_illustratefits()
-    #test_FITSwithZoom()
+    test_FITSwithZoom()

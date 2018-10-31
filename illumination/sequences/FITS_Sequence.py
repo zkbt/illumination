@@ -263,7 +263,7 @@ class FITS_Sequence(Image_Sequence):
                         format=timeformat or 'gps',
                         scale=timescale)
             self.speak('using "{}" as the time axis'.format(timekey))
-        except (AttributeError, KeyError):
+        except (AssertionError, KeyError):
             # try to pull a time axis from these
             for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB', 'DATE-OBS']:
                 try:

@@ -8,7 +8,7 @@ directory = 'examples/'
 mkdir(directory)
 
 
-def test_subtraction(N=10, **kw):
+def test_subtraction(N=3, **kw):
     print("\nTesting a Single Camera illustration.")
 
     sequence = make_image_sequence([create_test_fits(rows=300, cols=300) for _ in range(N)], ext_image=1)

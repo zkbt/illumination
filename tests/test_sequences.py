@@ -53,7 +53,7 @@ def test_make():
     make_image_sequence(singleimage)
 
     #multiple images
-    manyimages = create_test_array(N=10, xsize=100, ysize=50)
+    manyimages = create_test_array(N=3, xsize=100, ysize=50)
     print(manyimages.shape, type(manyimages))
     make_image_sequence(manyimages)
 

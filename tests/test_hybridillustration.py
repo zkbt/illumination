@@ -8,7 +8,7 @@ mkdir(directory)
 
 
 def test_hybrid(howmany=3):
-    tpfs = [create_test_tpf(N=10, xsize=8, ysize=8) for i in range(howmany)]
+    tpfs = [create_test_tpf(N=3, xsize=8, ysize=8) for i in range(howmany)]
     lcs = [t.to_lightcurve() for t in tpfs]
     timeseries = [EmptyTimeseriesFrame(
         name='timeseries-{}'.format(i)) for i, l in enumerate(lcs)]

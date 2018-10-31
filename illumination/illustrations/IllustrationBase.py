@@ -20,7 +20,7 @@ class IllustrationBase(Talker):
                        figkw=dict(figsize=None, dpi=None),
                        sharecolorbar=True,
                        subplot_spec=None,
-                       cmapkw={},
+                       cmapkw=dict(),
                        **gridspeckw):
         '''
         Initialize an Illustration,

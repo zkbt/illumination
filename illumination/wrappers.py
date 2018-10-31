@@ -151,30 +151,53 @@ def illustratefits( pattern='*.fits',
 
     # make a "group" of filenames (either a list, a dictionary, a dictionary of dictionares)
     data = organize_sequences(pattern, filenameparser=filenameparser)
+    assert(type(data) == dict)
+
+    # is there only a single camera represented?
+    singlecamera = len(data) == 1
+
+    def merge_inputs(kw):
+        # a small tool to merge dictionaries of inputs
+        # (because Python 2 can't handle `**data,**inputs` in functions)
+        inputs = dict(**kw)
+        for k in illustrationkw.keys():
+            inputs[k] = illustrationkw[k]
+        return inputs
 
     # display these data, one way or another
-    if len(data) == 1:
-        # (there's only one camera/ccd/image we're trying to display)
+    if singlecamera:
+        # (there's only one camera we're trying to display)
 
         # pull out the (only) sequence
         cam = list(data.keys())[0]
-        seq = data[cam]
-        if zoomposition is not None:
-            # display the single image, with a zoom box added
-            illustration = SingleCameraWithZoomIllustration(seq, zoomposition=zoomposition, zoomsize=zoomsize, **illustrationkw)
+        if type(data[cam]) is dict:
+            # (one camera, and it has multiple CCDs)
+            illustration = CameraOfCCDsIllustration(**merge_inputs(data[cam]))
         else:
-            # display the single image, just by itself
-            illustration = CameraIllustration(seq, **illustrationkw)
+            # (one camera, with one pseudo-CCD)
+            seq = data[cam]
+            if zoomposition is not None:
+                # display the single image, with a zoom box added
+                illustration = SingleCameraWithZoomIllustration(seq, zoomposition=zoomposition, zoomsize=zoomsize, **illustrationkw)
+            else:
+                # display the single image, just by itself
+                illustration = CameraIllustration(seq, **illustrationkw)
+            # the zoom option works only for single-frame illustrations (FIXME?)
     elif len(data) > 1:
         # (there are multiple cameras to display)
 
-        inputs = dict(**data)
+        # figure out if there's one or more CCDs
+        multipleccds = False
+        for k in data.keys():
+            multipleccds = multipleccds or (type(data[k]) is dict)
 
-        # (this is a kludge to merge the dictionaries of inputs,
-        #  because Python 2 can't handle `**data,**inputs` in functions)
-        for k in illustrationkw.keys():
-            inputs[k] = illustrationkw[k]
-        illustration = FourCameraIllustration(**inputs)
+        if multipleccds:
+            # (multiple cameras, and each is multiple CCDs)
+            illustration = FourCameraOfCCDsIllustration(**merge_inputs(data))
+        else:
+            # (multiple cameras, and each is one psuedo-CCD)
+            illustration = FourCameraIllustration(**merge_inputs(data))
+
 
     return illustration
 
