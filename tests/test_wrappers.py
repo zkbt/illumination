@@ -3,8 +3,34 @@ from illumination.cartoons import *
 from illumination.tools import *
 from illumination.tools import *
 
+filetemplate = 'cam{}-ccd{}.fits'
 directory = 'examples/'
 mkdir(directory)
+
+def create_some_files():
+    for cam in [1,2,3,4]:
+        for ccd in [1,2,3,4]:
+            filename = os.path.join(directory, filetemplate.format(cam, ccd))
+            try:
+                create_test_fits(100,100).writeto(filename)
+            except OSError:
+                print('{} already exists'.format(filename))
+
+def test_organize():
+    create_some_files()
+    pattern = os.path.join(directory, 'cam*-ccd*-0000.fits')
+    return organize_sequences(pattern)
+
+def test_illustratefits():
+    create_some_files()
+
+    x = {'many':'*', 'one':1}
+    for camera in ['one', 'many']:#, 'many']:
+        for ccd in ['one']:#, 'many']:
+            pattern = os.path.join(directory, filetemplate.format(x[camera], x[ccd]))
+            i = illustratefits(pattern)
+            i.plot()
+            i.savefig(os.path.join(directory, 'camera={}-ccd={}.png'.format(camera, ccd)))
 
 
 def test_FITSwithZoom(zoomposition=(30, 70), zoomsize=(10, 10)):
@@ -30,4 +56,5 @@ def test_FITSwithZoom(zoomposition=(30, 70), zoomsize=(10, 10)):
 
 
 if __name__ == '__main__':
-    test_FITSwithZoom()
+    test_illustratefits()
+    #test_FITSwithZoom()

@@ -3,6 +3,7 @@ from .FITS_Sequence import *
 from .Stamp_Sequence import *
 from .TPF_Sequence import *
 from .Timeseries_Sequence import *
+from .filenameparsers import *
 
 def make_image_sequence(initial, *args, **kwargs):
     '''

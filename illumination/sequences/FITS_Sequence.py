@@ -6,6 +6,8 @@ from __future__ import print_function
 from .filenameparsers import *
 from .Image_Sequence import *
 
+__all__ = ['FITS_Sequence']
+
 class FITS_Sequence(Image_Sequence):
     '''
     A sequence of FITS images, with a time associated with each.
@@ -255,12 +257,13 @@ class FITS_Sequence(Image_Sequence):
         self._timeisfake = True
 
         # try to pull out a specific key
-        if timekey is not None:
+        try:
+            assert(timekey is not None)
             self.time = Time(np.asarray(self.temporal[timekey]),
                         format=timeformat or 'gps',
                         scale=timescale)
             self.speak('using "{}" as the time axis'.format(timekey))
-        else:
+        except (AttributeError, KeyError):
             # try to pull a time axis from these
             for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB', 'DATE-OBS']:
                 try:
