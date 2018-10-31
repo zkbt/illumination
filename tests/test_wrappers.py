@@ -1,5 +1,3 @@
-#FIXME -- add comments, make sure many/many test works
-
 from illumination.imports import *
 from illumination.cartoons import *
 from illumination.wrappers import *
@@ -14,6 +12,8 @@ mkdir(imagedirectory)
 def create_some_files():
     '''
     Create a little ensemble of files.
+
+    This is a helper for the tests below.
     '''
     for cam in [1,2,3,4]:
         for ccd in [1,2,3,4]:
@@ -30,6 +30,7 @@ def test_organize():
     a reasonably organized collection of sequences.
     '''
 
+    # create a bunch of files
     create_some_files()
     pattern = os.path.join(imagedirectory, 'cam*-ccd*-0000.fits')
     return organize_sequences(pattern)
@@ -40,12 +41,13 @@ def test_illustratefits():
     Can it handle one/many cameras, and one/many CCDs?
     '''
 
-
+    # create a bunch of files
     create_some_files()
-
     x = {'many':'*', 'one':1}
     for camera in ['one', 'many']:
         for ccd in ['one', 'many']:
+
+            # create, plot, save, and animate the illustration
             pattern = os.path.join(imagedirectory, filetemplate.format(x[camera], x[ccd], '*'))
             i = illustratefits(pattern)
             i.plot()
@@ -54,7 +56,7 @@ def test_illustratefits():
             i.animate(filename=filename.replace('png', 'mp4'))
 
 
-def test_FITSwithZoom(zoomposition=(30, 70), zoomsize=(10, 10)):
+def test_illustratefitswithzoom(zoomposition=(30, 70), zoomsize=(10, 10)):
 
     print("\nTesting a Single Camera with a Zoom.")
     create_some_files()
@@ -63,7 +65,6 @@ def test_FITSwithZoom(zoomposition=(30, 70), zoomsize=(10, 10)):
     illustration = illustratefits(  os.path.join(imagedirectory, filetemplate.format(1, 1, '*')),
                                     zoomposition=zoomposition,
                                     zoomsize=zoomsize)
-
     # plot and animate
     illustration.plot()
     filename = os.path.join(directory, 'illustatefits-zoom-animation.mp4')
@@ -71,7 +72,6 @@ def test_FITSwithZoom(zoomposition=(30, 70), zoomsize=(10, 10)):
     print("Take a look at {} and see what you think!".format(filename))
     return illustration
 
-
 if __name__ == '__main__':
     test_illustratefits()
-    test_FITSwithZoom()
+    test_illustratefitswithzoom()

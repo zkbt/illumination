@@ -88,7 +88,7 @@ class imshowFrame(FrameBase):
             self.titlefordisplay = title
 
         # keep track of an extra keywords for generating the cmaps
-        self.cmapkw = cmapkw
+        self.cmapkw = copy.copy(cmapkw) # why do I have to do this?
 
         # are there steps to apply to the image before displaying?
         self.processingsteps = processingsteps
