@@ -49,22 +49,18 @@ def test_illustratefits():
             pattern = os.path.join(imagedirectory, filetemplate.format(x[camera], x[ccd], '*'))
             i = illustratefits(pattern)
             i.plot()
-            i.savefig(os.path.join(directory, 'camera={}-ccd={}.png'.format(camera, ccd)))
-            i.animate(filename=os.path.join(directory, 'camera={}-ccd={}.mp4').format(camera, ccd))
-            #i.savefig()
+            filename = os.path.join(directory, 'illustratefits-camera={}-ccd={}.png'.format(camera, ccd))
+            i.savefig(filename)
+            i.animate(filename=filename.replace('png', 'mp4'))
 
 
 def test_FITSwithZoom(zoomposition=(30, 70), zoomsize=(10, 10)):
 
     print("\nTesting a Single Camera with a Zoom.")
-
-    for i in range(10):
-        f = create_test_fits(rows=300, cols=300)
-        f.writeto('test-{:04f}.fits'.format(i), overwrite=True)
+    create_some_files()
 
     # create the illustration
-    illustration = illustratefits(  'test-*.fits',
-                                    ext_image=1,
+    illustration = illustratefits(  os.path.join(imagedirectory, filetemplate.format(1, 1, '*')),
                                     zoomposition=zoomposition,
                                     zoomsize=zoomsize)
 
