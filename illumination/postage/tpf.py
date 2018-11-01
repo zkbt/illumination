@@ -113,7 +113,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
         aperture_mask = self._parse_aperture_mask(aperture_mask)
         if aperture_mask.sum() == 0:
             log.warning('Warning: aperture mask contains zero pixels.')
-        centroid_col, centroid_row = self.centroids(aperture_mask)
+        centroid_col, centroid_row = self.estimate_centroids(aperture_mask=aperture_mask)
         keys = {'centroid_col': centroid_col,
                 'centroid_row': centroid_row,
                 'quality': self.quality,
@@ -197,23 +197,23 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
 
     @property
     def tic_id(self):
-        return self.header()['TIC_ID']
+        self.header['TIC_ID']
 
     @property
     def cam(self):
-        return self.header()['CAM']
+        return self.header['CAM']
 
     @property
     def spm(self):
-        return self.header()['SPM']
+        return self.header['SPM']
 
     @property
     def col_cent(self):
-        return self.header()['COL_CENT']
+        return self.header['COL_CENT']
 
     @property
     def row_cent(self):
-        return self.header()['ROW_CENT']
+        return self.header['ROW_CENT']
 
     # add a thing to make reasonable WCS for each stamp -- can this be tied to TIC location + aperture definition?
 

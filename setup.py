@@ -39,7 +39,7 @@ setup(name = "illumination",
       'Programming Language :: Python',
       'Topic :: Scientific/Engineering :: Astronomy'
       ],
-    install_requires=['numpy', 'matplotlib', 'scipy', 'astropy'],
+    install_requires=['numpy', 'matplotlib', 'scipy', 'astropy', 'lightkurve>=1.0b21'],
     zip_safe=False,
     license='MIT',
 )
