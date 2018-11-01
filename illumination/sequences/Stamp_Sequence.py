@@ -2,6 +2,7 @@
 Define a sequence of images from a Stamp object.
 '''
 from .Image_Sequence import *
+from ..postage.stamps import *
 
 class Stamp_Sequence(Image_Sequence):
     def __init__(self, initial, name='Stamp', **kwargs):
@@ -23,7 +24,7 @@ class Stamp_Sequence(Image_Sequence):
         '''
 
         # make sure we have at least a stamp
-        if type(initial) == Stamp:
+        if isinstance(initial, Stamp) or isinstance(initial, Cube):
             stamp = initial
         elif (type(initial) == str) or (type(initial) == list):
             stamp = Stamp(initial, **kwargs)

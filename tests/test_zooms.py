@@ -79,7 +79,7 @@ def test_FourCameraLocalZoom(N=3, zoom=3, size=(50, 50)):
     nrows, ncols = 300, 300
     data = {'cam{}'.format(i + 1): [create_test_fits(rows=300, cols=300)
                                     for _ in range(10)] for i in range(4)}
-    illustration = FourCameraIllustration(**data, ext_image=1)
+    illustration = FourCameraIllustration(**data)
 
     # add some random zoom to it
     for i in range(N):

@@ -21,7 +21,7 @@ def create_some_files():
                 filename = os.path.join(imagedirectory, filetemplate.format(cam, ccd, n))
                 try:
                     create_test_fits(400,400).writeto(filename)
-                except OSError:
+                except (OSError, IOError):
                     print('{} already exists'.format(filename))
 
 def test_organize():
