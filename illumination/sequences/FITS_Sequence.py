@@ -161,7 +161,9 @@ class FITS_Sequence(Image_Sequence):
         if self._hdulists is not None:
             return self._hdulists[i]
         else:
-            return fits.open(self.filenames[i], memmap=False)
+            hdulist = fits.open(self.filenames[i], memmap=False)
+            hdulist.verify('fix+warn')
+            return hdulist
 
     def _clean_temporal(self):
         '''
