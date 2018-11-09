@@ -258,7 +258,6 @@ class imshowFrame(FrameBase):
         if ('image' in self.plotingredients):# and (image is not None):
 
             # pull out the cmap, normalization, and suggested ticks
-
             cmap, norm, ticks = self._cmap_norm_ticks(image, **self.cmapkw)
 
             # display the image for this frame
@@ -320,19 +319,27 @@ class imshowFrame(FrameBase):
             timestep = None
         self.currenttimestep = timestep
 
-    def process_image(self, image):
+    def get_processed_image(self, timestep):
         '''
-        Apply any extra processing steps to the image
-        (subract a median image, normalize, mask, ???)
+        Get the image, and apply any extra processing
+        steps to it (subtract differences, normalize,
+        subtract smooth backgrounds, etc...?)
         '''
 
+        # pull out the raw image
+        rawimage = self.data[timestep]
+        assert(rawimage is not None)
+
         if 'subtractmedian' in self.processingsteps:
-            processedimage = image - self.data.median()
+            processedimage = rawimage - self.data.median()
             #self.speak('subtracted median image')
         elif 'subtractmean' in self.processingsteps:
-            processedimage = image - self.data.mean()
+            processedimage = rawimage - self.data.mean()
+        elif 'subtractprevious' in self.processingsteps:
+            comparison = timestep - 1 #this wraps at the end
+            processedimage = rawimage - self.data[comparison]
         else:
-            processedimage = image
+            processedimage = rawimage
         return processedimage
 
     def _get_image(self, time=None):
@@ -344,10 +351,8 @@ class imshowFrame(FrameBase):
             if time is None:
                 time = self._get_times()[0]
             timestep = self._find_timestep(time)
-            rawimage = self.data[timestep]
-            assert(rawimage is not None)
 
-            processedimage = self.process_image(rawimage)
+            processedimage = self.get_processed_image(timestep)
             image = self._transformimage(processedimage)
             actual_time = self._get_times()[timestep]
             # self.speak(" ")
