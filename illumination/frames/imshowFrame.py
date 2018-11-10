@@ -338,6 +338,10 @@ class imshowFrame(FrameBase):
         elif 'subtractprevious' in self.processingsteps:
             comparison = timestep - 1 #this wraps at the end
             processedimage = rawimage - self.data[comparison]
+        elif 'subtractbeforeandafter' in self.processingsteps:
+            before = timestep - 1
+            after = (timestep + 1)%len(self.data)
+            processedimage = rawimage - 0.5*(self.data[before] + self.data[after])
         else:
             processedimage = rawimage
         return processedimage
