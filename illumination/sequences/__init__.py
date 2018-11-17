@@ -41,7 +41,7 @@ def make_image_sequence(initial, *args, **kwargs):
     elif initial is [] or initial is None:
         return Sequence()
     # is it a Stamp?
-    elif isinstance(initial, Stamp):
+    elif isinstance(initial, Cube):
         return Stamp_Sequence(initial, *args, **kwargs)
     elif type(initial) == np.ndarray:
         return Image_Sequence(initial, **kwargs)
