@@ -5,6 +5,8 @@ and convert them to dictionaries.
 
 from ..imports import *
 
+
+
 def generic_filenameparser(filename):
     '''
     Parse a general file like, for example,
@@ -118,6 +120,43 @@ def tessqlp_fullcamera_filenameparser(filename):
     d['type'] = components[4]
     return d
 
+
+def mast_filenameparser(filename):
+    '''
+    Parse a MAST-type (single-CCD) file like, for example,
+    "tess2018206192942-s0001-1-1-0120-s_ffic.fits"
+    into a dictionary of important information.
+
+    Parameters
+    ----------
+    filename : str
+        The filename of a single FITS image.
+
+    Returns
+    -------
+    features : dict
+        This dictionary of details contains the filename, the datetime string,
+        an astropytime, a JD, the camera, the CCD, whether or not crm was applied,
+        and the image type.
+    '''
+
+    d = {}
+    d['filename'] = os.path.basename(filename)
+    s = d['filename'].split('.fit')[0]
+    components = s.split('-')
+
+    d['datetime'] = components[0][4:]
+    dt=d['datetime']
+    year, day, hour, minute, second = dt[0:4], dt[4:7], dt[7:9], dt[9:11], dt[11:13]
+    yday = '{}:{}:{}:{}:{}'.format(year, day, hour, minute, second)
+    d['astropytime'] = Time(yday, format='yday')
+    d['jd'] =  d['astropytime'].jd
+    d['camera'] = int(components[2])
+    d['ccd'] = int(components[3])
+    d['crm'] = components[5][0] == 's'
+    d['type'] = components[5][2:6]
+    return d
+
 def flexible_filenameparser(filename):
     '''
     Parse a generic FITS filename,
@@ -137,7 +176,8 @@ def flexible_filenameparser(filename):
     '''
 
     # filename parsers, in order of priority
-    parsers = [ tessqlp_filenameparser,
+    parsers = [ mast_filenameparser,
+                tessqlp_filenameparser,
                 tessqlp_fullcamera_filenameparser,
                 explicit_filenameparser,
                 generic_filenameparser]

@@ -77,6 +77,8 @@ class FrameBase(Talker):
         # keep track of what's been plotted
         self.plotted = {}
 
+        # KLUDGE for now -- need better time label management
+        self.timeformat = 't={offset:.5f}{time:+.5f}'
 
     @property
     def offset(self):
@@ -127,7 +129,8 @@ class FrameBase(Talker):
         else:
             days = time.jd - self.offset
             inunits = (days * u.day).to(self.timeunit)
-            return 't={:.5f}{:+.5f}'.format(self.offset, inunits)
+
+            return self.timeformat.format(offset=self.offset, time=inunits)
 
     def __repr__(self):
         '''
