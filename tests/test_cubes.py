@@ -18,5 +18,5 @@ def test_cube(normalization='none', **kw):
                  color='black', zorder=100, marker='o')
     summed.plot(ax=ax, normalization=normalization,
                 color='red', zorder=100, marker='.', alpha=0.5)
-    plt.savefig('cube-example.pdf')
+    plt.savefig(os.path.join(directory, 'cube-example.pdf'))
     return unbinned, central, summed

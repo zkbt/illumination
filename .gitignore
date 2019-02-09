@@ -10,6 +10,7 @@ notebooks/
 *.gz
 .pytest_cache/
 examples
+.DS_Store
 
 probablyjunk
 

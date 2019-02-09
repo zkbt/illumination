@@ -2,13 +2,15 @@ from illumination.sequences import *
 from illumination.cartoons import *
 from illumination.imports import *
 
+directory = 'examples/'
+mkdir(directory)
 
 def test_Stamps():
     '''
     Run a test of Stamps_Sequence
     '''
 
-    filename = 'temporarystamp.npy'
+    filename = os.path.join(directory, 'temporarystamp.npy')
     stamp = create_test_stamp()
     stamp.save(filename)
     a = Stamp_Sequence(stamp)
@@ -20,8 +22,8 @@ def test_FITS():
     '''
     Run a test of the FITS_Sequence.
     '''
-    filename = 'temporarytest.fits'
-    pattern = 'tempo*arytest.fits'
+    filename = os.path.join(directory, 'temporarytest.fits')
+    pattern = os.path.join(directory, 'tempo*arytest.fits')
     hdulist = create_test_fits()
     hdulist.writeto(filename, overwrite=True)
     ext_image = 1
