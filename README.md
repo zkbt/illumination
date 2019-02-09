@@ -11,7 +11,7 @@ pip install illumination
 
 If you want to be able to modify the code yourself, please also feel free to fork/clone this repository onto your own computer and install directly from that editable package. For example, this might look like:
 ```
-git clone git@https://github.com/zkbt/illumination.git
+git clone https://github.com/zkbt/illumination.git
 cd illumination/
 pip install -e .
 # or, if you don't have root access ...
