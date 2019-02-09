@@ -18,3 +18,8 @@ pip install -e .
 pip install -e . --user
 ```
 This will download the current `illumination` repository to your current directory, and then link the installed version of the `illumination` package to this local repository. Changes you make to the code in the repository should be reflected in what Python sees when it tries to `import illumination`.
+
+To be able to create movies, you will likely want to install `ffmpeg`. To do so, run the command:
+```
+conda install -c conda-forge ffmpeg
+```
