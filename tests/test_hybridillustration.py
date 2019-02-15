@@ -29,5 +29,5 @@ def test_hybrid(howmany=3):
 
 
 if __name__ == '__main__':
-    plt.ion()
+    # plt.ion()
     a = test_hybrid()
