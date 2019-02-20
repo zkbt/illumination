@@ -2,10 +2,9 @@
 Define a generic sequence of images.
 '''
 from .Sequence import *
-from ..cartoons import create_test_times
 
 class Image_Sequence(Sequence):
-    def __init__(self, initial, name='cube', time=None, temporal={}, spatial={}, **kwargs):
+    def __init__(self, name='images', time=None, temporal={}, spatial={}, **kwargs):
         '''
         Initialize a Sequence from a Cube.
         (a Cube is a custom, simplified, set of images)
@@ -52,21 +51,12 @@ class Image_Sequence(Sequence):
             else:
                 self.time = Time(time, format=guess_time_format(time), scale=timescale)
 
-    def __getitem__(self, timestep):
+    def __getitem__(self, *args, **kwargs):
         '''
-        Return the image data for a given timestep.
-
-        This function is called when you say `sequence[timestep]`.
-
-        Parameters
-        ----------
-        timestep : int
-            A timestep index (which element in the sequence do you want?)
+        This should be written over in all sequences that inherit from this one.
+        The function should return the image data for a given timestep.
         '''
-        if timestep is None:
-            return None
-        else:
-            return self.images[timestep, :, :]
+        raise RuntimeError("Sorry! No image-getting procedure is defined for the generic Image_Sequence!")
 
     @property
     def shape(self):
@@ -166,4 +156,5 @@ class Image_Sequence(Sequence):
         '''
         How should this sequence be represented, by default, as a string.
         '''
-        return '<{} of {} images of shape {}>'.format(self.nametag, self.shape[0], self.shape[1:] )
+        shape = self.shape
+        return '<{} of {} images of shape {}>'.format(self.nametag, shape[0], shape[1:])
