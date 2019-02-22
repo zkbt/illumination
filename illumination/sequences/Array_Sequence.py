@@ -19,8 +19,6 @@ class Array_Sequence(Image_Sequence):
         '''
 
 
-        # create a sequence
-        Image_Sequence.__init__(self, name=name, temporal=temporal, spatial=spatial)
 
         # make sure we're dealing with an array
         array = np.atleast_2d(initial)
@@ -31,20 +29,13 @@ class Array_Sequence(Image_Sequence):
         elif len(array.shape) != 3:
             raise RuntimeError("The inputs to Image_Sequence seem to be the wrong shape.")
 
-        # pull out the shape of the array
-        N, ysize, xsize = array.shape
+        # store the (now 3D) array as the images
         self.images = array
 
-        if time is None:
-            self.time = Time(np.arange(N), format='gps', scale='tdb')
-            self._timeisfake = True
-        else:
-            self._timeisfake = False
-            assert(len(time) == N)
-            if isinstance(time, Time):
-                self.time = time
-            else:
-                self.time = Time(time, format=guess_time_format(time), scale=timescale)
+        # create a sequence
+        Image_Sequence.__init__(self, name=name, time=time, temporal=temporal, spatial=spatial)
+
+
 
     def __getitem__(self, timestep):
         '''

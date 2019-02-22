@@ -3,7 +3,9 @@ from .FITS_Sequence import *
 from .Stamp_Sequence import *
 from .TPF_Sequence import *
 from .Timeseries_Sequence import *
+from .Array_Sequence import *
 from .filenameparsers import *
+from .Movie_Sequence import *
 
 def make_image_sequence(initial, *args, **kwargs):
     '''
@@ -44,7 +46,7 @@ def make_image_sequence(initial, *args, **kwargs):
     elif isinstance(initial, Cube):
         return Stamp_Sequence(initial, *args, **kwargs)
     elif type(initial) == np.ndarray:
-        return Image_Sequence(initial, **kwargs)
+        return Array_Sequence(initial, **kwargs)
     else:
         # try:
         #	# is initial a 1D thing?

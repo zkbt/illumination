@@ -24,21 +24,12 @@ class Image_Sequence(Sequence):
         # create a sequence
         Sequence.__init__(self, name=name)
 
-        # make sure we're dealing with an array
-        array = np.atleast_2d(initial)
-
-        # handle a single image as a 1-element array
-        if len(array.shape) == 2:
-            array = array[np.newaxis, :, :]
-        elif len(array.shape) != 3:
-            raise RuntimeError("The inputs to Image_Sequence seem to be the wrong shape.")
-
-        # pull out the shape of the array
-        N, ysize, xsize = array.shape
-        self.images = array
 
         self.temporal = temporal
         self.spatial = spatial
+
+        # pull out the shape of the array
+        N, ysize, xsize = self.shape
 
         if time is None:
             self.time = Time(np.arange(N), format='gps', scale='tdb')
