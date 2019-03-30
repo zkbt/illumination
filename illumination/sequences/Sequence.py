@@ -99,7 +99,7 @@ class Sequence(Talker):
         try:
             return len(self.time)
         except AttributeError:
-            return 0
+            return len(self.images)
 
     def __len__(self):
         return self.N
