@@ -197,7 +197,16 @@ def illustratefits( pattern='*.fits',
         else:
             # (multiple cameras, and each is one psuedo-CCD)
             illustration = FourCameraIllustration(**merge_inputs(data))
+    else:
+        raise ValueError('''
+        Something was wrong with your file(s):
+        {}
 
+        They got parsed as:
+        {}
+
+        I'm not quite sure what went wrong!
+        '''.format(pattern, data))
 
     return illustration
 
