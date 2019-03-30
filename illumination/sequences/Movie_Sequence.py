@@ -2,11 +2,17 @@
 Define a generic sequence of images.
 '''
 from .Image_Sequence import *
-import imageio
+try:
+    import imageio
+except ImportError:
+    pass
 
 class Movie_Sequence(Image_Sequence):
     @property
     def N(self):
+        '''
+        How many frames are in this movie?
+        '''
         return self.video.get_length()
 
 
