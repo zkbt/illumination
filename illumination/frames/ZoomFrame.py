@@ -3,6 +3,13 @@ from astropy.nddata.utils import Cutout2D
 
 
 class ZoomFrame(imshowFrame):
+    '''
+    The ZoomFrame provides an independent imshowFrame that
+    shows a zoomed subset of some other source Frame.
+    
+    Unlike LocalZoomFrame, this ZoomFrame can be totally
+    disconnected from the source frame.
+    '''
     frametype = 'Zoom'
 
     def __init__(self,  source=None,

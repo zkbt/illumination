@@ -6,11 +6,14 @@ from ..utilities import *
 
 class IllustrationBase(Talker):
     '''
-    This contains the basic layout and organization
-    for a linked visualization of images.
+    The IllustrationBase defines the basic layout and
+    organization for a linked visualization of images.
 
-    Other illustrations inherit from this basic one,
-    changing the
+    All other Illustrations inherit from this one.
+    Illustrations will typically have one or more
+    items in the `frames` dictionary, which can be
+    drawn into via the `plot()` and `update()`
+    methods.
     '''
     illustrationtype = 'Base'
 

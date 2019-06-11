@@ -47,6 +47,7 @@ class EarlyTessTargetPixelFile(KeplerTargetPixelFile):
         KeplerTargetPixelFile.__init__(self, *args, **kwargs)
         if np.sum(np.isfinite(self.flux)) == 0:
             self.hdu[1].data['FLUX'] = self.raw_cnts
+        
 
     @property
     def raw_cnts(self):

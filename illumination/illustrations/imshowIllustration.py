@@ -9,7 +9,7 @@ __all__ = ['imshowIllustration']
 
 class imshowIllustration(IllustrationBase):
     '''
-    An illustration for displaying a single image (unrotated, untransformed).
+    The imshowIllustration displays a single generic image.
     '''
     illustrationtype = 'imshowIllustration'
 

@@ -2,6 +2,16 @@ from .imshowFrame import *
 from matplotlib.colors import SymLogNorm, LogNorm
 
 class CameraFrame(imshowFrame):
+    '''
+    The CameraFrame class handles a single TESS camera
+    full-frame image. This is a weird beast that has
+    four CCDs all stitched together into one image.
+
+    The Camera1Frame, Camera2Frame, ... object know
+    how to flip and rotate these full-frame images
+    so they'll make sense on the plane of the sky.
+    '''
+
     frametype = 'camera'
 
     def __init__(self, name='camera',

@@ -178,7 +178,7 @@ def illustratefits( pattern='*.fits',
             seq = data[cam]
             if zoomposition is not None:
                 # display the single image, with a zoom box added
-                illustration = SingleCameraWithZoomIllustration(seq, zoomposition=zoomposition, zoomsize=zoomsize, **illustrationkw)
+                illustration = imshowWithZoomIllustration(seq, zoomposition=zoomposition, zoomsize=zoomsize, **illustrationkw)
             else:
                 # display the single image, just by itself
                 illustration = CameraIllustration(seq, **illustrationkw)

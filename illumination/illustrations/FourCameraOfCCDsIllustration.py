@@ -7,9 +7,9 @@ __all__ = ['FourCameraOfCCDsIllustration']
 
 class FourCameraOfCCDsIllustration(IllustrationBase):
     '''
-    For displaying a single Camera, by organizing
-    individual TESS CCDs into their appropriate
-    places and orientations.
+    The FourCameraOfCCDsIllustration displays all four TESS cameras,
+    starting from individual CCDs, with the appropriate
+    rotations and transformations applied.
     '''
     illustrationtype = 'FourCameraOfCCDs'
 

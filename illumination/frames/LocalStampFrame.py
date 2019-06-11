@@ -6,9 +6,8 @@ from .LocalZoomFrame import LocalZoomFrame
 
 class LocalStampFrame(imshowFrame):
     '''
-    This frame imshows a Stamp object
-    at its appropriate location on
-    some source CameraFrame.
+    The LocalStampFrame frame can imshow a tiny zoomed Stamp object
+    at its appropriate location on some source CameraFrame.
     '''
 
     frametype = 'Stamp'

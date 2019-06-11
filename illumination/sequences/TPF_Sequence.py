@@ -22,21 +22,31 @@ class TPF_Sequence(Image_Sequence):
         '''
 
         # make sure we have a TPF as imput
-        if type(initial) == str:
-            tpf = EarlyTessTargetPixelFile.from_fits(initial)
-        else:
-            tpf = initial
+        #if type(initial) == str:
+        #    tpf = EarlyTessTargetPixelFile.from_fits(initial)
+        #else:
+        tpf = initial
+
+        # set up the basic sequence data
+        self.tpf = tpf
+        self.images = self.tpf.flux
 
         # create a sequence out of that stamp
-        Sequence.__init__(self, name=name)
+        Image_Sequence.__init__(self, name=name)
 
-        # set up the basic sequence
-        self.tpf = tpf
+
 
         # pull out the time
-        self.time = Time(self.tpf.time, format='jd', scale=timescale)
-        self.titlefordisplay = 'TIC{}\nCAM{} | ({},{}) | {:.0f}s'.format(
-            tpf.tic_id, tpf.cam, tpf.col_cent, tpf.row_cent, tpf.cadence.to('s').value)
+        try:
+            baseline = self.tpf.header['BJDREFI'] + self.tpf.header['BJDREFF']
+        except KeyError:
+            baseline = 0
+        self.time = Time(self.tpf.time + baseline, format='jd', scale=timescale)
+        self._timeisfake = False
+        self.titlefordisplay = self.tpf.targetid
+
+        #'TIC{}\nCAM{} | ({},{}) | {:.0f}s'.format(
+        #    tpf.tic_id, tpf.cam, tpf.col_cent, tpf.row_cent, tpf.cadence.to('s').value)
 
     def __getitem__(self, timestep):
         '''

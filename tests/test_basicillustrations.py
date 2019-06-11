@@ -45,7 +45,7 @@ def test_StampsIllustration():
 
 def test_CameraIllustrationWithStamps():
     print("\nTesting a Single Camera with a Zoom.")
-    illustration = SingleCameraWithZoomIllustration(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1,
+    illustration = imshowWithZoomIllustration(data=[create_test_fits(rows=300, cols=300) for _ in range(10)], ext_image=1,
                                                     zoomposition=position, zoomsize=size)
 
     illustration.plot()

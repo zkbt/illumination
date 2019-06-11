@@ -8,11 +8,11 @@ directory = 'examples/'
 mkdir(directory)
 
 
-def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50, 50)):
+def test_imshowWithZoomIllustration(position=(250, 50), size=(50, 50)):
     print("\nTesting a Single Camera with a Zoom.")
 
     # create the illustration
-    illustration = SingleCameraWithZoomIllustration(
+    illustration = imshowWithZoomIllustration(
         data=[create_test_fits(rows=300, cols=300) for _ in range(10)],
         ext_image=1,
         zoomposition=position, zoomsize=size)
@@ -147,6 +147,6 @@ def test_FourCameraWithStamps(N=3):
 """
 
 if __name__ == '__main__':
-    test_SingleCameraWithZoomIllustration()
+    test_imshowWithZoomIllustration()
     test_CameraIllustrationLocalZoom()
     test_FourCameraLocalZoom()

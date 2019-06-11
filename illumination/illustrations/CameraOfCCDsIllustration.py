@@ -6,7 +6,9 @@ __all__ = ['CameraOfCCDsIllustration']
 
 class CameraOfCCDsIllustration(CameraIllustration):
     '''
-    An illustration for displaying a single Camera (unrotated, untransformed).
+    The CameraOfCCDsIllustration displays single TESS Camera
+    that is composed of four TESS individual CCDs. The assembled
+    camera image will by default be unrotated and untransformed.
     '''
     illustrationtype = 'CameraOfCCDsIllustration'
 

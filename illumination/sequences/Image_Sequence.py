@@ -60,28 +60,6 @@ class Image_Sequence(Sequence):
         d = self[0]
         return (self.N, d.shape[0], d.shape[1])
 
-    def _gather_3d(self):
-        '''
-        Gather a 3D cube of images.
-
-        This will generally work, but it
-        may be faster if you already have
-        access to the full 3D array stored
-        in memory (as in a Stamp or TPF).
-
-        Returns
-        -------
-        s : array
-        The image stack, with shape (ntimes x nrows x ncols)
-        '''
-
-        s = np.zeros(self.shape)
-        self.speak('gathering the sequence cube, with shape {}'.format(self.shape))
-        for i in range(self.N):
-            self.speak(' loaded frame {}/{}'.format(i+1, self.N), progress=True)
-            s[i, :, :] = self[i]
-        return s
-
     def median(self):
         '''
         Calculate the median image.
@@ -113,6 +91,25 @@ class Image_Sequence(Sequence):
         s = self._gather_3d()
         return np.nansum(s, axis=0)
 
+    def _gather_3d(self):
+        '''
+        Gather a 3D cube of images.
+
+        This will generally work, but it
+        may be faster if you already have
+        access to the full 3D array stored
+        in memory (as in a Stamp or TPF).
+
+        Returns
+        -------
+        s : array
+        The image stack, with shape (ntimes x nrows x ncols)
+        '''
+
+        # for an array, we're already 3D!
+        s = self.images
+        return s
+
     def mean(self):
         '''
         Calculate the sum of all the images.
@@ -123,25 +120,11 @@ class Image_Sequence(Sequence):
         Returns
         -------
         mean : 2D image
-            The median of the image sequence.
+            The mean of the image sequence.
         '''
 
-        try:
-            self.spatial['mean']
-        except KeyError:
-            self.speak('creating a mean image for {}'.format(self))
+        return np.mean(self.images, 0)
 
-            # calculate the mean in a running fashion (less memory)
-            total = np.zeros_like(self[0])
-            for i in range(self.N):
-                self.speak(' included frame {}/{} in mean'.format(i+1, self.N), progress=True)
-                thisimage = self[i]
-                ok = np.isfinite(thisimage)
-                total[ok] += thisimage[ok]
-
-            self.spatial['mean'] = total/self.N
-
-        return self.spatial['mean']
 
     def __repr__(self):
         '''

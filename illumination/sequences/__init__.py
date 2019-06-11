@@ -45,19 +45,12 @@ def make_image_sequence(initial, *args, **kwargs):
     # is it a Stamp?
     elif isinstance(initial, Cube):
         return Stamp_Sequence(initial, *args, **kwargs)
+    # is it a numpy array?
     elif type(initial) == np.ndarray:
         return Array_Sequence(initial, **kwargs)
+    # is it a TPF, of some kind?
+    elif isinstance(initial, TargetPixelFile):
+        return TPF_Sequence(initial, *args, **kwargs)
+    # if nothing else, assume it is a FITS_Sequence
     else:
-        # try:
-        #	# is initial a 1D thing?
-        #	assert(len(np.shape(initial))==1 or isinstance(initial, LightCurve))
-        #	return Timeseries_Sequence(initial, *args, **kwargs)
-        # except AssertionError:
-
-        # is it a TPF (or can it be used to make one, like a filename)?
-        try:
-            assert(isinstance(initial, TargetPixelFile))
-            return TPF_Sequence(initial, *args, **kwargs)
-        # if nothing else, assume it is a FITS_Sequence
-        except (AttributeError, AssertionError):
-            return FITS_Sequence(initial, *args, **kwargs)
+        return FITS_Sequence(initial, *args, **kwargs)

@@ -7,7 +7,9 @@ __all__ = ['FourCameraIllustration']
 
 class FourCameraIllustration(IllustrationBase):
     '''
-    For displaying a single Camera.
+    The FourCameraIllustration displays all four TESS cameras,
+    starting from full-camera FFIs, with the appropriate
+    rotations and transformations applied.
     '''
     illustrationtype = 'FourCamera'
 

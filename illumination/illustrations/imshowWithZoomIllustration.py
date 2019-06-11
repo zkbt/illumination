@@ -2,14 +2,15 @@ from .GenericIllustration import *
 from ..frames import CameraFrame
 from ..frames import ZoomFrame
 
-__all__ = ['SingleCameraWithZoomIllustration']
+__all__ = ['imshowWithZoomIllustration']
 
 
-class SingleCameraWithZoomIllustration(GenericIllustration):
+class imshowWithZoomIllustration(GenericIllustration):
     '''
-    For displaying a single Camera.
+    The imshowWithZoomeIllustration displays one imshowFrame
+    and one ZoomFrame that magnifies some small region of it.
     '''
-    illustrationtype = 'SingleCameraWithZoomIllustration'
+    illustrationtype = 'imshowWithZoomIllustration'
 
     def __init__(self, data=[], zoomposition=(0, 0), zoomsize=(10, 10), **kwargs):
         '''

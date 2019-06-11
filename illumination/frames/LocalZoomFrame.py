@@ -4,6 +4,15 @@ from matplotlib.patches import Rectangle
 
 
 class LocalZoomFrame(ZoomFrame):
+    '''
+    The LocalZoomFrame can provide a slightly magnified box
+    around any location in a source Frame, drawing its data
+    directly from a cutout from the data in that source.
+
+    Unlike ZoomFrame, this LocalZoomFrame must be displayed
+    directly inside its source frame. 
+    '''
+
     frametype = 'Zoom'
 
     def __init__(self, source, position=(0, 0), size=(10, 10), zoom=10, **kwargs):

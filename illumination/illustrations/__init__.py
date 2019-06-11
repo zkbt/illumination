@@ -5,8 +5,6 @@ from .FourCameraOfCCDsIllustration import *
 from .CameraIllustration import *
 from .imshowIllustration import *
 from .CameraOfCCDsIllustration import *
-from .CCDIllustration  import *
-from .SingleCameraWithZoomIllustration import *
+from .imshowWithZoomIllustration import *
 from .GenericIllustration import GenericIllustration
-from .SideBySideIllustration import SideBySideIllustration
 from ..zoom import *

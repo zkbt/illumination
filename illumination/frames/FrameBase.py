@@ -2,6 +2,14 @@ from ..imports import *
 
 
 class FrameBase(Talker):
+    '''
+    The FrameBase is the class from which all Frames inherit.
+    Illustrations can be composed of one or more frames,
+    and each frame must at least have:
+        + the `plot()` method that plots something
+        + the `update()` method that updates the plot at a new time
+        + at least one `ax` at into which data will be plotted
+    '''
 
     frametype = 'base'
     timeunit = 'day'

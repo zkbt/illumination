@@ -72,7 +72,6 @@ class Array_Sequence(Image_Sequence):
         s = self.images
         return s
 
-
     def mean(self):
         '''
         Calculate the sum of all the images.

@@ -4,7 +4,8 @@ from ..sequences import make_image_sequence
 
 class EmptyTimeseriesFrame(FrameBase):
     '''
-    An EmptyTimeseriesFrame has a vertical bar for time when animated.
+    The EmptyTimeseriesFrame is basically a simply scatter plot
+    with time on the horizontal axis and an animated vertical bar.
 
     The frame should be added to an illustration,
     the illustration should be plotted,
@@ -14,7 +15,12 @@ class EmptyTimeseriesFrame(FrameBase):
 
     frametype = 'timeseries'
 
-    def __init__(self, name='timeseries', xlim=[None, None], ylim=[None, None], ylabel='', histogram=True, **kwargs):
+    def __init__(self, name='timeseries',
+                       xlim=[None, None],
+                       ylim=[None, None],
+                       ylabel='',
+                       histogram=True,
+                       **kwargs):
         '''
         Initialize an empty timeseries frame.
 
@@ -22,19 +28,23 @@ class EmptyTimeseriesFrame(FrameBase):
         ----------
 
         name : string
-                A custom name for this frame.
+            A custom name for this frame.
 
         xlim : tuple
-                Set the xlimits. If None, wait for data to appear.
+            Set the xlimits. If None, wait for data to appear.
 
         ylim : tuple
-                Set the ylimits. If None, wait for data to appear.
+            Set the ylimits. If None, wait for data to appear.
 
         ylabel : string
-                Set a ylabel for this plot.
+            Set a ylabel for this plot.
 
         histogram : bool
-                Should we add an extra axis for a histogram?
+            Should we add an extra axis for a histogram?
+
+        **kwargs : dict
+            Any extra keywords will be passed on to
+            the frame creation.
         '''
         # initialize an empty frame
         FrameBase.__init__(self, name=name, **kwargs)

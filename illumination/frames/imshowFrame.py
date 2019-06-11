@@ -246,8 +246,11 @@ class imshowFrame(FrameBase):
         self.speak('plotting {} for the first time'.format(self))
 
         # make sure we point back at this frame
-        plt.sca(self.ax)
-
+        try:
+            plt.sca(self.ax)
+        except ValueError:
+            self.ax = plt.gca()
+            self.speak('no ax found for {}; creating one'.format(self))
         # kind of a kludge (to make the plots and cmaps reset)?
         self.plotted = {}
 

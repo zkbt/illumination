@@ -4,6 +4,10 @@ __all__ = ['StampsIllustration']
 
 
 class StampsIllustration(IllustrationBase):
+    '''
+    The StampsIllustration makes a grid of lots of postage stamps.
+    '''
+    
     illustrationtype = 'Stamps'
 
     def __init__(self, cubes=[], names=[], aspectratio=np.inf,

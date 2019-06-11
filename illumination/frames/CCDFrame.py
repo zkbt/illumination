@@ -3,8 +3,8 @@ from .CameraFrame import *
 
 class CCDFrame(CameraFrame):
     '''
-    This is an imshowFrame associated with one CCD. It can
-    transform from CCD coordinates to Camera coordinates.
+    The CCDFrame is an imshowFrame associated with one TESS CCD.
+    It can transform from CCD to Camera coordinates.
 
     A single CCD can be created on its own, but more often
     it will be linked to a Camera, to continue the transformation

@@ -6,7 +6,8 @@ __all__ = ['CameraIllustration']
 
 class CameraIllustration(IllustrationBase):
     '''
-    An illustration for displaying a single Camera (unrotated, untransformed).
+    The CameraIllustration displays a single TESS Camera,
+    which will by default be unrotated and untransformed.
     '''
     illustrationtype = 'CameraIllustration'
 

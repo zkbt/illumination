@@ -1,6 +1,14 @@
 from .IllustrationBase import *
 
 class GenericIllustration(IllustrationBase):
+    '''
+    The GenericIllustration is a flexible illustration that
+    can contain any number of imshows and timeseries,
+    with some basic layout capabilities. These objects will
+    generally be created by making a bunch of Frames, and then
+    assembling them together to initilize this GI.
+    '''
+
     illustrationtype = 'Generic'
 
     def __init__(self,  imshows=[],
