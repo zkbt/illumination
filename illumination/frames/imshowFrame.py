@@ -28,6 +28,7 @@ class imshowFrame(FrameBase):
                  processingsteps=[],
                  firstframe=None,
                  cmapkw=dict(),
+                 transform=IdentityTransform(),
                  **kwargs):
         '''
         Initialize this imshowFrame, will can show a sequence of 2D images.
@@ -59,17 +60,26 @@ class imshowFrame(FrameBase):
 
         cmapkw : dict
             Dictionary of keywords to feed into the cmap generation.
+
+        transform : matplotlib.transform
+            A transformation to go from (numpy/matplotlib) image pixel
+            coordinates to some new data coordinates (e.g., from pixels
+            to tangent plane angle coordinates).
+
+            FIXME -- right now this transforms *only* the pixels
+            in the imshow. Arrows, annotations, and other plots
+            will not necessarily be transformed. Ultimately,
+            this "should" replace my kludgy transform framework
+            for rotating/flipping TESS CCDs and cameras.
         '''
 
         # initialize the frame base
-        FrameBase.__init__(self, name=name,
-                                 ax=ax,
-                                 data=data,
-                                 plotingredients=plotingredients,
-                                 **kwargs)
+        FrameBase.__init__(self,    name=name,
+                                    ax=ax,
+                                    data=make_image_sequence(data),
+                                    plotingredients=plotingredients,
+                                    **kwargs)
 
-        # ensure that the data are a sequence of images
-        self.data = make_image_sequence(self.data, **kwargs)
 
         # if there's an image, use it to set the size
         try:
@@ -96,6 +106,9 @@ class imshowFrame(FrameBase):
         # should we plot something special for the first frame?
         self.firstframe = firstframe
 
+        # store the transform
+        self.transform = transform
+
     def _cmap_norm_ticks(self, *args, **cmapkw):
         '''
         Return the cmap and normalization.
@@ -108,6 +121,7 @@ class imshowFrame(FrameBase):
         *args and **kwargs are passed to colors.cmap_norm_ticks
         '''
 
+        # do we need to try to share a colorbar across multiple images?
         if self.illustration.sharecolorbar:
             # pull the cmap and normalization from the illustration
             (self.plotted['cmap'],
@@ -117,7 +131,7 @@ class imshowFrame(FrameBase):
                     self.plotted['norm'],
                     self.plotted['ticks'])
         else:
-            # use already-defined properties, or make new ones
+            # use already-defined plotting options, or make new ones
             try:
                 return  (self.plotted['cmap'],
                          self.plotted['norm'],
@@ -274,7 +288,13 @@ class imshowFrame(FrameBase):
                 firstimage = self.data.median()
 
             self.plotted['image'] = self.ax.imshow(
-                firstimage, extent=extent, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
+                firstimage,
+                extent=extent,
+                interpolation='nearest',
+                origin='lower',
+                transform=transform + self.ax.transData,
+                norm=norm,
+                cmap=cmap)
 
             self.speak('added image of shape {} to {}'.format(firstimage.shape, self))
 
@@ -311,8 +331,11 @@ class imshowFrame(FrameBase):
             plt.axis('off')
 
         # change the x and y limits, if need be
-        self.ax.set_xlim(self.xmin, self.xmax)
-        self.ax.set_ylim(self.ymin, self.ymax)
+        if type(self.transform) == IdentityTransform:
+            self.ax.set_xlim(self.xmin, self.xmax)
+            self.ax.set_ylim(self.ymin, self.ymax)
+
+        # make sure the axes have an equal aspect ratio
         self.ax.set_aspect('equal')
 
         # keep track of the current plotted timestep

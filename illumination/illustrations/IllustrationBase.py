@@ -1,6 +1,6 @@
 from ..imports import *
 from ..sequences import *
-from ..frames import *
+#from ..frames import *
 from ..colors import cmap_norm_ticks
 from ..utilities import *
 
@@ -228,7 +228,7 @@ class IllustrationBase(Talker):
         # (this means we have a shared colorbar)
         if ax is None:
             # pull all the different ax together
-            ax = [f.ax for f in self.frames.values() if isinstance(f, imshowFrame)]
+            ax = [f.ax for f in self.frames.values() if hasattr(f, 'cmapkw')]
             # if an imshow doesn't have its own actual ax, don't include it
             ax = [a for a in ax if a != None]
 

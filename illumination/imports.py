@@ -26,6 +26,7 @@ import astropy.units as u
 
 from .talker import Talker
 
+from matplotlib.transforms import IdentityTransform
 
 '''
 FIXME -- Move these to a separate utilities.py file?

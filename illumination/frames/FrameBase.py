@@ -1,5 +1,5 @@
 from ..imports import *
-
+from ..illustrations.IllustrationBase import IllustrationBase
 
 class FrameBase(Talker):
     '''
@@ -87,6 +87,29 @@ class FrameBase(Talker):
 
         # KLUDGE for now -- need better time label management
         self.timeformat = 't={offset:.5f}{time:+.5f}'
+
+    @property
+    def illustration(self):
+        '''
+        Make sure an illustration exists!
+        '''
+        try:
+            assert(self._illustration is not None)
+            return self._illustration
+        except (AttributeError, AssertionError):
+            self._illustration = IllustrationBase()
+            self._illustration.frames[self.name] = self
+            self.speak('''
+            no illustration was connected to {self},
+            so we created one called {self._illustration}
+            '''.format(**locals()))
+            # kludge
+            self._illustration.plotted = {}
+            return self._illustration
+
+    @illustration.setter
+    def illustration(self, x):
+        self._illustration = x
 
     @property
     def offset(self):

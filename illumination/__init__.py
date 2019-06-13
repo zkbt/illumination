@@ -9,6 +9,7 @@ from .version import __version__
 
 # import some of the basics to be generally available
 from .illustrations import *
+from .frames import *
 from .zoom import *
 from .sequences import *
 from .wrappers import *
