@@ -45,34 +45,63 @@ class IllustrationBase(Talker):
 
         Talker.__init__(self, prefixformat='{:>32}')
 
-        if subplot_spec is not None:
-            # if there's a subplot_spec specified, then populate that
-            self.figure = None
-
-            subset = {k:gridspeckw.get(k) for k in ['wspace', 'hspace', 'height_ratios', 'width_ratios']}
-            self.grid = gs.GridSpecFromSubplotSpec(nrows,
-                                                    ncols,
-                                                    subplot_spec=subplot_spec,
-                                                    **subset)
-            #self.speak('built {} into an existing gridspec'.format(self.illustrationtype))
-        else:
-            # by default, create a new figure and grid spec
-            self.figure = plt.figure(**figkw)
-            self.grid = gs.GridSpec(nrows, ncols, **gridspeckw)
-            #self.speak('built {} into a new figure'.format(self.illustrationtype))
-
-
         # should this illustration have a shared colorbar, or separate ones?
         self.sharecolorbar = sharecolorbar
 
         # keep track of any keywords for generating a cmap (shared for the illustration)
         self.cmapkw = copy.copy(cmapkw) # why do I have to do this?
 
+        # store some figure setup keywords
+        self._subplot_spec = subplot_spec
+        self._figkw = figkw
+        self._figshape = (nrows, ncols)
+        self._gridspeckw = gridspeckw
+
         # create an empty dictionary, where frames will be stored
         self.frames = {}
 
         # has this illustration been plotted yet?
         self.hasbeenplotted = False
+
+
+    @property
+    def figure(self):
+        try:
+            return self._figure
+        except AttributeError:
+            self.setup_figure()
+            return self._figure
+
+    @property
+    def grid(self):
+        try:
+            return self._grid
+        except AttributeError:
+            self.setup_figure()
+            return self._grid
+
+    def setup_figure(self):
+        nrows, ncols = self._figshape
+        if self._subplot_spec is not None:
+            # if there's a subplot_spec specified, then populate that
+            self._figure = None
+
+            # FIXME - could this be removed, if gridspeckw only gets valid kw?
+            subset = {k:self._gridspeckw.get(k) for k in ['wspace',
+                                                          'hspace',
+                                                          'height_ratios',
+                                                          'width_ratios']}
+            self._grid = gs.GridSpecFromSubplotSpec(nrows,
+                                                   ncols,
+                                                   subplot_spec=self._subplot_spec,
+                                                   **subset)
+
+            #self.speak('built {} into an existing gridspec'.format(self.illustrationtype))
+        else:
+            # by default, create a new figure and grid spec
+            self._figure = plt.figure(**self._figkw)
+            self._grid = gs.GridSpec(nrows, ncols, **self._gridspeckw)
+            #self.speak('built {} into a new figure'.format(self.illustrationtype))
 
     def __repr__(self):
         '''

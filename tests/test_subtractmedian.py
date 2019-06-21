@@ -1,5 +1,6 @@
 from illumination.imports import *
 from illumination.illustrations import *
+from illumination.frames import *
 from illumination.cartoons import *
 from illumination.zoom import *
 
@@ -42,4 +43,5 @@ def test_subtractprevious(N=3, **kw):
     return illustration
 
 if __name__ == '__main__':
-    test_subtraction()
+    test_subtractmedian()
+    test_subtractprevious()

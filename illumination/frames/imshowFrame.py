@@ -262,7 +262,7 @@ class imshowFrame(FrameBase):
         # make sure we point back at this frame
         try:
             plt.sca(self.ax)
-        except ValueError:
+        except (AttributeError, ValueError):
             self.ax = plt.gca()
             self.speak('no ax found for {}; creating one'.format(self))
         # kind of a kludge (to make the plots and cmaps reset)?
@@ -292,11 +292,12 @@ class imshowFrame(FrameBase):
                 extent=extent,
                 interpolation='nearest',
                 origin='lower',
-                transform=transform + self.ax.transData,
+                transform=self.transform + self.ax.transData,
                 norm=norm,
                 cmap=cmap)
 
             self.speak('added image of shape {} to {}'.format(firstimage.shape, self))
+            plt.sca(self.ax)
 
         # plot the colorbar
         if ('colorbar' in self.plotingredients) and 'image' in self.plotted:
