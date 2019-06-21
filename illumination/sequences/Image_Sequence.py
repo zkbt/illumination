@@ -123,7 +123,7 @@ class Image_Sequence(Sequence):
             The mean of the image sequence.
         '''
 
-        return np.mean(self.images, 0)
+        return np.mean(self._gather_3d(), 0)
 
 
     def __repr__(self):

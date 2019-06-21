@@ -7,4 +7,5 @@ from .imshowIllustration import *
 from .CameraOfCCDsIllustration import *
 from .imshowWithZoomIllustration import *
 from .GenericIllustration import GenericIllustration
+from .SideBySideIllustration import SideBySideIllustration
 from ..zoom import *

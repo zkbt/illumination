@@ -24,6 +24,7 @@ class SideBySideIllustration(IllustrationBase):
             (1 + (cols - 1) * wspace) / (right - left)
         hsize = fudge * each * rows * (1 + (rows - 1) * hspace) / (top - bottom)
 
+        # create the illustration
         IllustrationBase.__init__(self, rows, cols,
                                   figkw=dict(figsize=(wsize, hsize)),
                                   hspace=hspace, wspace=wspace,

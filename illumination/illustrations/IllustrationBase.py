@@ -63,6 +63,8 @@ class IllustrationBase(Talker):
         # has this illustration been plotted yet?
         self.hasbeenplotted = False
 
+        # create a dictionary to store things that have been plotted
+        self.plotted = {}
 
     @property
     def figure(self):
@@ -184,7 +186,6 @@ class IllustrationBase(Talker):
         *args, **kwargs are passed to frames' .plot()
         '''
 
-        self.plotted = {}
         for k, f in self.frames.items():
             f.plot(*args, **kwargs)
         self.hasbeenplotted = True

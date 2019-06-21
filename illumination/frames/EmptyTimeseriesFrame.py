@@ -19,7 +19,7 @@ class EmptyTimeseriesFrame(FrameBase):
                        xlim=[None, None],
                        ylim=[None, None],
                        ylabel='',
-                       histogram=True,
+                       histogram=False,
                        **kwargs):
         '''
         Initialize an empty timeseries frame.
