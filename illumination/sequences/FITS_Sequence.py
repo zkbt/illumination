@@ -72,6 +72,12 @@ class FITS_Sequence(Image_Sequence):
         if type(initial) == fits.HDUList:
             # if this is one HDUList, make it a list of them
             self._hdulists = [initial]
+        elif type(initial) == fits.PrimaryHDU:
+            # if this is just a primary HDU, package it into an HDUList
+            self._hdulists = [fits.HDUList([initial])]
+        elif type(initial) == fits.ImageHDU:
+            # if this is just an image HDU, package it into an HDUList
+            self._hdulists = [fits.HDUList([initial])]
         elif type(initial) == str:
             # a search string
             if '*' in initial:

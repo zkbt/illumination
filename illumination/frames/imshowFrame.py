@@ -278,7 +278,7 @@ class imshowFrame(FrameBase):
             cmap, norm, ticks = self._cmap_norm_ticks(image, **self.cmapkw)
 
             # display the image for this frame
-            extent = [0, image.shape[1], 0, image.shape[0]]
+            #extent = [0-0.5, image.shape[1]-0.5, 0-0.5, image.shape[0]-0.5]
 
             # make a stacked image
             if self.firstframe is None:
@@ -289,7 +289,7 @@ class imshowFrame(FrameBase):
 
             self.plotted['image'] = self.ax.imshow(
                 firstimage,
-                extent=extent,
+                #extent=extent,
                 interpolation='nearest',
                 origin='lower',
                 transform=self.transform + self.ax.transData,
@@ -331,10 +331,26 @@ class imshowFrame(FrameBase):
             # turn the axes lines off
             plt.axis('off')
 
-        # change the x and y limits, if need be
+        # change the x and y limits to match the data
+
+        # make some corners in original pixel coordinates
+        corners = np.array([[self.xmin, self.ymin],
+                            [self.xmin, self.ymax],
+                            [self.xmax, self.ymax],
+                            [self.xmax, self.ymin]])
+
+        # transform them to the plotted data space
+        newx, newy = self.transform.transform(corners).T
+
         if type(self.transform) == IdentityTransform:
             self.ax.set_xlim(self.xmin, self.xmax)
             self.ax.set_ylim(self.ymin, self.ymax)
+        else:
+            # FIXME can these be merged?
+            #  or will it mess up the axis flipping for CCDs?
+            self.ax.set_xlim(np.min(newx), np.max(newx))
+            self.ax.set_ylim(np.min(newy), np.max(newy))
+
 
         # make sure the axes have an equal aspect ratio
         self.ax.set_aspect('equal')

@@ -24,6 +24,7 @@ class GenericIllustration(IllustrationBase):
                         right=0.9,
                         bottom=0.2,
                         top=0.8,
+                        shareimshowaxes=False,
                         **illkw):
         '''
         Initialize an illustration from list of frames.
@@ -45,6 +46,9 @@ class GenericIllustration(IllustrationBase):
 
         figsize : tuple
             Override the automated figure size with your own, in inches.
+
+        shareimshowaxes : bool
+            Should the axes of the imshows be shared?
 
         **illkw keywords are passed to IllustrationBase
         '''
@@ -88,6 +92,7 @@ class GenericIllustration(IllustrationBase):
                                   **illkw)
 
         # add the imshows to the illustration
+        sharex, sharey = None, None
         for count, i in enumerate(imshows):
             row = count // imshowcols
             col = count % imshowcols
@@ -96,7 +101,9 @@ class GenericIllustration(IllustrationBase):
             i.illustration = self
 
             # create the axes in which this should sit
-            i.ax = plt.subplot(self.grid[row, col])
+            i.ax = plt.subplot(self.grid[row, col], sharex=sharex, sharey=sharey)
+            if shareimshowaxes:
+                sharex, sharey = i.ax, i.ax
 
             # register this in the frames dictionary
             try:
