@@ -123,7 +123,6 @@ class imshowFrame(FrameBase):
                          self.plotted['norm'],
                          self.plotted['ticks'])
             except KeyError:
-
                 # create the cmap from the given data
                 (self.plotted['cmap'],
                  self.plotted['norm'],

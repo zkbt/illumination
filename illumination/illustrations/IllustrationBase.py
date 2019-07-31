@@ -4,6 +4,7 @@ from ..frames import *
 from ..colors import cmap_norm_ticks
 from ..utilities import *
 
+
 class IllustrationBase(Talker):
     '''
     This contains the basic layout and organization
@@ -329,25 +330,26 @@ class IllustrationBase(Talker):
 
         if maxtimespan is not None:
             upper = lower + np.minimum(upper - lower, maxtimespan.to('s').value)
-
+        
         times = np.arange(lower, upper, cadence)
         self.speak('about to animate {} times at {}s cadence for {}'.format(
             len(times), cadence, self))
+        fps = 3
 
         # get the writer
         writer = get_writer(filename, fps=fps)
-
+        print("FPS:",fps)
         self.speak('the animation will be saved to {}'.format(filename))
         # set up the animation writer
         with writer.saving(self.figure,
                            filename,
                            dpi or self.figure.get_dpi()):
-
             for i, t in enumerate(times):
                 self.speak('  {}/{} at {}'.format(i + 1,
                             len(times), Time.now().iso), progress=True)
 
                 # update the illustration to a new time
+                print(Time(t, format='gps', scale='tdb'))
                 self.update(Time(t, format='gps', scale='tdb'))
                 writer.grab_frame()
         self.speak('')

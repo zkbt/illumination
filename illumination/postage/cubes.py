@@ -139,7 +139,6 @@ class Cube(Talker):
 		'''
 		Make an imshow of a single frame of the cube.
 		'''
-
 		a = self.todisplay
 		vmin, vmax = np.percentile(a, [1,99])
 		if (self.todisplay < 0).any():

@@ -55,7 +55,6 @@ def organize_sequences(pattern='*.fits',
 
      ext_image=0, use_headers=False, use_filenames=True,
     '''
-
     # create a list of filenames
     if type(pattern) == list:
         # if given a list, use those as the filenames
