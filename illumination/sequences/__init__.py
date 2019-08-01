@@ -60,4 +60,5 @@ def make_image_sequence(initial, *args, **kwargs):
             return TPF_Sequence(initial, *args, **kwargs)
         # if nothing else, assume it is a FITS_Sequence
         except (AttributeError, AssertionError):
+            print("I am a FITS_Sequence")
             return FITS_Sequence(initial, *args, **kwargs)

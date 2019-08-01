@@ -21,6 +21,7 @@ def get_writer(filename, fps=30, **kw):
     if '.mp4' in filename:
         try:
             writer = ani.writers['ffmpeg'](fps=fps, **kw)
+            # writer = ani.writers['pillow'](fps=fps, **kw)
         except (RuntimeError, KeyError):
             raise RuntimeError('This computer seems unable to ffmpeg.')
     else:
@@ -57,10 +58,10 @@ def guess_time_format(t, default='jd'):
 
     # make some string guesses
     if isinstance(t[0], str):
-        if 'T' in t[0]:
-            return 'isot'
-        else:
-            return 'iso'
+         if 'T' in t[0]:
+             return 'isot'
+         else:
+             return 'iso'
 
     ranges = dict( gps=[0.1e9, 2e9],  # valid between 1983-03-08 09:46:59.000 and 2043-05-23 03:33:39.000
                    # valid between 1858-11-16 12:00:00.000 and 3501-08-15 12:00:00.000
