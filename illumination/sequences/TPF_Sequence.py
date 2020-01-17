@@ -35,8 +35,9 @@ class TPF_Sequence(Image_Sequence):
 
         # pull out the time
         self.time = Time(self.tpf.time, format='jd', scale=timescale)
-        self.titlefordisplay = 'TIC{}\nCAM{} | ({},{}) | {:.0f}s'.format(
-            tpf.tic_id, tpf.cam, tpf.col_cent, tpf.row_cent, tpf.cadence.to('s').value)
+        self.titlefordisplay = f'{self.tpf.targetid}'
+            #'TIC{}\nCAM{} | ({},{}) | {:.0f}s'.format(
+            #    tpf.tic_id, tpf.cam, tpf.col_cent, tpf.row_cent, tpf.cadence.to('s').value)
 
     def __getitem__(self, timestep):
         '''

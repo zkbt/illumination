@@ -68,9 +68,11 @@ class FITS_Sequence(Image_Sequence):
         self._hdulists = None
 
         # ultimately, we want to make a list of filenames or HDULists
-        if type(initial) == fits.HDUList:
+        if type(initial) in [fits.HDUList,
+                             fits.PrimaryHDU,
+                             fits.ImageHDU]:
             # if this is one HDUList, make it a list of them
-            self._hdulists = [initial]
+            self._hdulists = [fits.HDUList(initial)]
         elif type(initial) == str:
             # a search string
             if '*' in initial:
@@ -105,7 +107,7 @@ class FITS_Sequence(Image_Sequence):
         self.temporal = {}
         self.static = {}
         self.spatial = {}
-        
+
         # populate the temporal axes, somehow
         assert(use_headers or use_filenames)
         if use_headers:
@@ -118,7 +120,7 @@ class FITS_Sequence(Image_Sequence):
                 self._populate_from_filenames(filenameparser=filenameparser)
             except:
                 self.speak('unable to extract temporal things from filenames for {}'.format(self))
-        
+
         # make sure a time axis gets defined
         self._define_time_axis(timekey=timekey, timeformat=timeformat)
 
@@ -127,7 +129,7 @@ class FITS_Sequence(Image_Sequence):
 
         # make sure everything gets sorted by time
         self._sort()
-    
+
     def _count(self):
         '''
         Count the temporals
@@ -177,7 +179,7 @@ class FITS_Sequence(Image_Sequence):
             return self._hdulists[i]
         else:
             hdulist = fits.open(self.filenames[i], memmap=False, ignore_missing_end=True)
-            hdulist.verify('fix+warn') 
+            hdulist.verify('fix+warn')
             return hdulist
 
     def _clean_temporal(self):
@@ -249,9 +251,9 @@ class FITS_Sequence(Image_Sequence):
 
             # look through the unique extensions
             extensions = np.unique([self.ext_primary, self.ext_image])
-            
+
             # create lists for each key in the headers
-            for e in extensions[0]:   # DEBUG 
+            for e in extensions[0]:   # DEBUG
                 h = first[e].header
                 for k in h.keys():
                     self.temporal[k] = []

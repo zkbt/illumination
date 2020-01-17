@@ -1,6 +1,6 @@
 from ..imports import *
 from ..sequences import *
-from ..frames import *
+#from ..frames import *
 from ..colors import cmap_norm_ticks
 from ..utilities import *
 
@@ -71,6 +71,9 @@ class IllustrationBase(Talker):
 
         # has this illustration been plotted yet?
         self.hasbeenplotted = False
+
+        # 
+        self.plotted = {}
 
     def __repr__(self):
         '''
@@ -153,7 +156,6 @@ class IllustrationBase(Talker):
         *args, **kwargs are passed to frames' .plot()
         '''
 
-        self.plotted = {}
         for k, f in self.frames.items():
             f.plot(*args, **kwargs)
         self.hasbeenplotted = True

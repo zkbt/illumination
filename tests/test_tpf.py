@@ -13,7 +13,7 @@ def test_tpfbasics():
     lc = tpf.to_lightcurve()
     ax = lc.plot(label='raw')
     lc.flatten().plot(ax, color='orange', label='flattened')
-    lc.flatten().correct().plot(ax, color='blue', label='corrected')
+    #lc.flatten().correct().plot(ax, color='blue', label='corrected')
     plt.savefig('examples/stamp-to-tpf-to-lightcurve.pdf')
     return tpf
 

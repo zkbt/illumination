@@ -16,6 +16,7 @@ class GenericIllustration(IllustrationBase):
                         right=0.9,
                         bottom=0.2,
                         top=0.8,
+                        shareimshowaxes=True,
                         **illkw):
         '''
         Initialize an illustration from list of frames.
@@ -80,6 +81,7 @@ class GenericIllustration(IllustrationBase):
                                   **illkw)
 
         # add the imshows to the illustration
+        share = None
         for count, i in enumerate(imshows):
             row = count // imshowcols
             col = count % imshowcols
@@ -88,7 +90,9 @@ class GenericIllustration(IllustrationBase):
             i.illustration = self
 
             # create the axes in which this should sit
-            i.ax = plt.subplot(self.grid[row, col])
+            i.ax = plt.subplot(self.grid[row, col], sharex=share, sharey=share)
+            if shareimshowaxes:
+                share = i.ax
 
             # register this in the frames dictionary
             try:
