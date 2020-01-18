@@ -43,7 +43,7 @@ class TPF_Sequence(Image_Sequence):
             baseline = 0
         self.time = Time(self.tpf.time + baseline, format='jd', scale=timescale)
         self._timeisfake = False
-        self.titlefordisplay = self.tpf.targetid
+        self.titlefordisplay = f'{self.tpf.targetid}'
 
         #'TIC{}\nCAM{} | ({},{}) | {:.0f}s'.format(
         #    tpf.tic_id, tpf.cam, tpf.col_cent, tpf.row_cent, tpf.cadence.to('s').value)

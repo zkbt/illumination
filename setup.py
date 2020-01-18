@@ -35,14 +35,20 @@ setup(name = "illumination",
     include_package_data=False,
     scripts = [],
     classifiers=[
+      'Intended Audience :: Education',
       'Intended Audience :: Science/Research',
       'Programming Language :: Python',
       'Topic :: Scientific/Engineering :: Astronomy'
       ],
-    install_requires=['numpy', 'matplotlib', 'scipy', 'astropy', 'lightkurve>=1.0b21'],
+    install_requires=['numpy',
+                      'matplotlib',
+                      'scipy',
+                      'astropy>=3.0',
+                      'lightkurve>=1.6.0'],
+    # what version of Python is required?
+    python_requires='>=3.6',
     # the packages in `key` will be installed if folks run `pip install henrietta[key]`
     extras_require={'images':['scikit-image']},
-
     zip_safe=False,
     license='MIT',
 )

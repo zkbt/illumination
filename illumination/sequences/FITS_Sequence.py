@@ -60,7 +60,6 @@ class FITS_Sequence(Image_Sequence):
                 What's the time format for defining the time axis?
 
         '''
-
         # initialize the basic sequence
         Sequence.__init__(self, name=name)
 
@@ -69,7 +68,9 @@ class FITS_Sequence(Image_Sequence):
         self._hdulists = None
 
         # ultimately, we want to make a list of filenames or HDULists
-        if type(initial) == fits.HDUList:
+        if type(initial) in [fits.HDUList,
+                             fits.PrimaryHDU,
+                             fits.ImageHDU]:
             # if this is one HDUList, make it a list of them
             self._hdulists = [initial]
         elif type(initial) == fits.PrimaryHDU:
@@ -96,18 +97,20 @@ class FITS_Sequence(Image_Sequence):
 
         # if we're starting frmo hdulists, then get their filenames
         if self._hdulists is not None:
-            self.filenames = [h.filename() for h in self._hdulists]
-            self._hdulists = np.asarray(self._hdulists)
-
-        self.filenames = np.asarray(self.filenames)
+            try:
+                self.filenames = [h.filename() for h in self._hdulists]
+            except AttributeError:
+                self.filenames = [None]*len(self._hdulists)
+        self._hdulists = np.atleast_2d(self._hdulists)
+        self.filenames = np.atleast_1d(self.filenames)
 
         # make sure this FITS_Sequence isn't empty
-        #assert(len(self.filenames) > 0)
+        # assert(len(self.filenames) > 0)
 
         self.ext_primary = ext_primary
         self.ext_image = ext_image
         if len(self.filenames) > 0:
-        	self.ext_image = np.minimum(self.ext_image, len(self._get_hdulist(0))-1)
+                self.ext_image = np.minimum(self.ext_image, len(self._get_hdulist(0))-1)
 
         self.temporal = {}
         self.static = {}
@@ -129,8 +132,18 @@ class FITS_Sequence(Image_Sequence):
         # make sure a time axis gets defined
         self._define_time_axis(timekey=timekey, timeformat=timeformat)
 
+        # Debug why sort breaks
+        # self._count()
+
         # make sure everything gets sorted by time
         self._sort()
+
+    def _count(self):
+        '''
+        Count the temporals
+        '''
+        for k in self.temporal.keys():
+            print(k,self.temporal[k])
 
     def _sort(self):
         '''
@@ -138,14 +151,20 @@ class FITS_Sequence(Image_Sequence):
         '''
 
         # calculate sorting indices
-        i = np.argsort(self.time.gps)
-
+        i = np.argsort(np.unique(self.time.gps))
+        # print('i',i)
         # sort the temporal values
         for k in self.temporal.keys():
-            self.temporal[k] = np.atleast_1d(self.temporal[k])[i]
-
+            #print('sorting',k, self.temporal[k])    #DEBUG
+            #print(len(np.atleast_1d(self.temporal[k])), len(i))
+            if len(np.atleast_1d(self.temporal[k])) == len(i):
+             #   print("MATCH")
+                self.temporal[k] = np.atleast_1d(self.temporal[k])[i]
+        #print("HI")
         # sort the images
+        #print(self.filenames)
         self.filenames = self.filenames[i]
+        #print("HELLO")
         if self._hdulists is not None:
             self._hdulists = self._hdulists[i]
 
@@ -167,7 +186,7 @@ class FITS_Sequence(Image_Sequence):
         if self._hdulists is not None:
             return self._hdulists[i]
         else:
-            hdulist = fits.open(self.filenames[i], memmap=False)
+            hdulist = fits.open(self.filenames[i], memmap=False, ignore_missing_end=True)
             hdulist.verify('fix+warn')
             return hdulist
 
@@ -204,6 +223,7 @@ class FITS_Sequence(Image_Sequence):
 
             # tack this file onto the list
             for k in this.keys():
+                #print(this[k])
                 self.temporal[k].append(this[k])
 
         # move static things away from temporal
@@ -241,7 +261,7 @@ class FITS_Sequence(Image_Sequence):
             extensions = np.unique([self.ext_primary, self.ext_image])
 
             # create lists for each key in the headers
-            for e in extensions:
+            for e in extensions[0]:   # DEBUG
                 h = first[e].header
                 for k in h.keys():
                     self.temporal[k] = []
@@ -253,6 +273,8 @@ class FITS_Sequence(Image_Sequence):
                 for e in extensions:
                     h = hdulist[e].header
                     for k in h.keys():
+                        # print("populating",k, "with", h[k])
+                        #print(k,self.temporal[k])
                         self.temporal[k].append(h[k])
 
             # move static things away from temporal
@@ -263,6 +285,7 @@ class FITS_Sequence(Image_Sequence):
         # make up an imaginary GPS time (and keep track of whether it is fake)
         self.time = Time(np.arange(self.N), format='gps', scale='tdb')
         self._timeisfake = True
+        #print('define', self.time)
 
         # try to pull out a specific key
         try:
@@ -275,14 +298,19 @@ class FITS_Sequence(Image_Sequence):
             # try to pull a time axis from these
             for k in ['TIME', 'MJD', 'JD', 'BJD', 'BJD_TDB', 'DATE-OBS']:
                 try:
+                    #print('k',k)
                     # treat some value as a time
                     t = self.temporal[k]
+                    # print('t',t)
 
                     # if it's already an astropy time, keep it as such
                     if isinstance(t, Time):
                         self.time = t
                     # make an astropy time out of the values
                     else:
+                        # print("i guess i'm here now")
+                        timescale='utc'
+                        #print(t, timeformat, timescale)
                         self.time = Time(np.asarray(t),
                                     format=timeformat or guess_time_format(t),
                                     scale=timescale)

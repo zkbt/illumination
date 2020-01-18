@@ -1,7 +1,7 @@
 from .FrameBase import *
 from ..colors import cmap_norm_ticks
 from ..sequences import make_image_sequence
-
+from ..illustrations.GenericIllustration import GenericIllustration
 
 class imshowFrame(FrameBase):
     '''
@@ -81,12 +81,6 @@ class imshowFrame(FrameBase):
                                     **kwargs)
 
 
-        # if there's an image, use it to set the size
-        try:
-            self.xmin, self.ymin = 0, 0
-            self.ymax, self.xmax = self.data[0].shape
-        except (IndexError, AttributeError, TypeError):
-            pass
 
         # try to figure out a title for the imshowFrame
         try:
@@ -109,6 +103,14 @@ class imshowFrame(FrameBase):
         # store the transform
         self.transform = transform
 
+
+        try:
+            self.xmin, self.ymin = 0, 0
+            self.ymax, self.xmax = self.data[0].shape
+        except (IndexError, AttributeError, TypeError):
+            pass
+
+
     def _cmap_norm_ticks(self, *args, **cmapkw):
         '''
         Return the cmap and normalization.
@@ -122,11 +124,12 @@ class imshowFrame(FrameBase):
         '''
 
         # do we need to try to share a colorbar across multiple images?
-        if self.illustration.sharecolorbar:
+        i = self.illustration
+        if i.sharecolorbar:
             # pull the cmap and normalization from the illustration
             (self.plotted['cmap'],
              self.plotted['norm'],
-             self.plotted['ticks']) = self.illustration._cmap_norm_ticks(**self.illustration.cmapkw)
+             self.plotted['ticks']) = i._cmap_norm_ticks(**i.cmapkw)
             return (self.plotted['cmap'],
                     self.plotted['norm'],
                     self.plotted['ticks'])
@@ -137,7 +140,6 @@ class imshowFrame(FrameBase):
                          self.plotted['norm'],
                          self.plotted['ticks'])
             except KeyError:
-
                 # create the cmap from the given data
                 (self.plotted['cmap'],
                  self.plotted['norm'],
@@ -158,20 +160,22 @@ class imshowFrame(FrameBase):
 
         '''
         # do we use a shared colorbar for the whole illustration?
-        if self.illustration.sharecolorbar:
+        i = self.illustration
+        if i.sharecolorbar:
             self.speak('making sure a shared colorbar is set up for {}'.format(self))
             try:
                 # if the illustration already has a colorbar, don't remake
-                self.illustration.plotted['colorbar']
+                i.plotted['colorbar']
             except KeyError:
                 # if the illustration needs a colorbar, make one!
-                self.speak('added a shared colorbar for {}'.format(self.illustration))
+                self.speak('added a shared colorbar for {}'.format(i))
 
-                c = self.illustration._add_colorbar(image,
-                                                    ax=None,
-                                                    ticks=self.plotted['ticks'])
-                self.illustration.plotted['colorbar'] = c
-            return self.illustration.plotted['colorbar']
+                c = i._add_colorbar(image,
+                                    ax=None,
+                                    ticks=self.plotted['ticks'])
+                i.plotted['colorbar'] = c
+            return i.plotted['colorbar']
+
         # or do we just give this one frame its own colorbar?
         else:
             self.speak('making sure a unique colorbar is set up for {}'.format(self))
@@ -183,9 +187,9 @@ class imshowFrame(FrameBase):
 
 
                 # create a colorbar for this illustration
-                c = self.illustration._add_colorbar(image,
-                                                    ax=self.ax,
-                                                    ticks=self.plotted['ticks'])
+                c = i._add_colorbar(image,
+                                    ax=self.ax,
+                                    ticks=self.plotted['ticks'])
                 self.plotted['colorbar'] = c
             return self.plotted['colorbar']
 
@@ -260,11 +264,16 @@ class imshowFrame(FrameBase):
         self.speak('plotting {} for the first time'.format(self))
 
         # make sure we point back at this frame
-        try:
-            plt.sca(self.ax)
-        except (AttributeError, ValueError):
-            self.ax = plt.gca()
-            self.speak('no ax found for {}; creating one'.format(self))
+        i = self.illustration
+        #try:
+        plt.sca(self.ax)
+        #except (AttributeError, ValueError):
+        #    self.ax = plt.gca()
+            # FIXME! adding this except was a way to allow imshowFrame to
+            # be plotted without an enclosing illustration for the sake
+            # of making thefriendlystars work, but I'm not 100% this won't
+            # break things!
+
         # kind of a kludge (to make the plots and cmaps reset)?
         self.plotted = {}
 
@@ -378,6 +387,8 @@ class imshowFrame(FrameBase):
             #self.speak('subtracted median image')
         elif 'subtractmean' in self.processingsteps:
             processedimage = rawimage - self.data.mean()
+        elif 'subtractbackground' in self.processingsteps:
+            processedimage = rawimage - np.median(rawimage)
         elif 'subtractprevious' in self.processingsteps:
             comparison = timestep - 1 #this wraps at the end
             processedimage = rawimage - self.data[comparison]

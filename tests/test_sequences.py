@@ -85,7 +85,7 @@ def test_timeseries():
 """
 
 if __name__ == '__main__':
-    test_TPF()
-    test_FITS()
-    test_Stamps()
+#    test_TPF()
+#    test_FITS()
+#    test_Stamps()
     test_make()

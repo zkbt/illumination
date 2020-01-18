@@ -1,5 +1,5 @@
 from ..imports import *
-from ..illustrations.IllustrationBase import IllustrationBase
+from ..illustrations.GenericIllustration import GenericIllustration
 
 class FrameBase(Talker):
     '''
@@ -97,14 +97,8 @@ class FrameBase(Talker):
             assert(self._illustration is not None)
             return self._illustration
         except (AttributeError, AssertionError):
-            self._illustration = IllustrationBase()
-            self._illustration.frames[self.name] = self
-            self.speak('''
-            no illustration was connected to {self},
-            so we created one called {self._illustration}
-            '''.format(**locals()))
-            # kludge
-            self._illustration.plotted = {}
+            new_illustration = GenericIllustration(imshows=[self])
+            self._illustration = new_illustration
             return self._illustration
 
     @illustration.setter
