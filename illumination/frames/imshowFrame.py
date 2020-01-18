@@ -28,6 +28,7 @@ class imshowFrame(FrameBase):
                  processingsteps=[],
                  firstframe=None,
                  cmapkw=dict(),
+                 transform=None,
                  **kwargs):
         '''
         Initialize this imshowFrame, will can show a sequence of 2D images.
@@ -59,6 +60,13 @@ class imshowFrame(FrameBase):
 
         cmapkw : dict
             Dictionary of keywords to feed into the cmap generation.
+
+        transform : None or transforms.Affine2D
+            A special transform to be applied when imshowing, to
+            convert from pixels to some other physical coordinate.
+            For example, this might be a transform that converts from
+            pixel coordinates to local tangent-plane sky coordinates
+            (as done by pix2local in the-friendly-stars).
         '''
 
         # initialize the frame base
@@ -71,12 +79,6 @@ class imshowFrame(FrameBase):
         # ensure that the data are a sequence of images
         self.data = make_image_sequence(self.data, **kwargs)
 
-        # if there's an image, use it to set the size
-        try:
-            self.xmin, self.ymin = 0, 0
-            self.ymax, self.xmax = self.data[0].shape
-        except (IndexError, AttributeError, TypeError):
-            pass
 
         # try to figure out a title for the imshowFrame
         try:
@@ -95,6 +97,17 @@ class imshowFrame(FrameBase):
 
         # should we plot something special for the first frame?
         self.firstframe = firstframe
+
+        # keep track of any special affine transformation to apply
+        self.transform = transform
+
+        # if there's an image, use it to set the size
+        if self.transform is None:
+            try:
+                self.xmin, self.ymin = 0, 0
+                self.ymax, self.xmax = self.data[0].shape
+            except (IndexError, AttributeError, TypeError):
+                pass
 
     def get_enclosing_illustration(self):
         '''
@@ -165,7 +178,7 @@ class imshowFrame(FrameBase):
                 i.plotted['colorbar']
             except KeyError:
                 # if the illustration needs a colorbar, make one!
-                self.speak('added a shared colorbar for {}'.format(self.illustration))
+                self.speak('added a shared colorbar for {}'.format(i))
 
                 c = i._add_colorbar(image,
                                     ax=None,
@@ -261,10 +274,11 @@ class imshowFrame(FrameBase):
         self.speak('plotting {} for the first time'.format(self))
 
         # make sure we point back at this frame
-        try:
-            plt.sca(self.ax)
-        except (AttributeError, ValueError):
-            self.ax = plt.gca()
+        i = self.get_enclosing_illustration()
+        #try:
+        plt.sca(self.ax)
+        #except (AttributeError, ValueError):
+        #    self.ax = plt.gca()
             # FIXME! adding this except was a way to allow imshowFrame to
             # be plotted without an enclosing illustration for the sake
             # of making thefriendlystars work, but I'm not 100% this won't
@@ -292,8 +306,21 @@ class imshowFrame(FrameBase):
                 #assert(np.size(image) < 10000 or self.data.N < 50)
                 firstimage = self.data.median()
 
-            self.plotted['image'] = self.ax.imshow(
-                firstimage, extent=extent, interpolation='nearest', origin='lower', norm=norm, cmap=cmap)
+            # do we need to apply any fancy transformation to the imshow?
+            if self.transform is None:
+                self.plotted['image'] = self.ax.imshow(firstimage,
+                        extent=extent,
+                        interpolation='nearest',
+                        origin='lower',
+                        norm=norm,
+                        cmap=cmap)
+            else:
+                self.ax.imshow(firstimage,
+                     origin='lower',
+                     interpolation='nearest',
+                     cmap=cmap,
+                     norm=norm,
+                     transform=self.transform + self.ax.transData)
 
             self.speak('added image of shape {} to {}'.format(firstimage.shape, self))
 
