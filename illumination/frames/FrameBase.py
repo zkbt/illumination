@@ -97,7 +97,7 @@ class FrameBase(Talker):
             assert(self._illustration is not None)
             return self._illustration
         except (AttributeError, AssertionError):
-            new_illustration = GenericIllustration(imshows=[self])
+            new_illustration = GenericIllustration(imshows=[self], left=0.2) #kludge?
             self._illustration = new_illustration
             return self._illustration
 
