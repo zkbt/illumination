@@ -11,6 +11,6 @@ from .version import __version__
 from .illustrations import *
 from .frames import *
 from .zoom import *
-from .sequences import *
+#from .sequences import *
 from .wrappers import *
-from .cartoons import *
+#from .cartoons import *

@@ -10,8 +10,7 @@ try:
     from lightkurve.lightcurve import LightCurve
     from lightkurve.targetpixelfile import TargetPixelFile
 except:
-    raise RuntimeWarning(
-        "no lightkurve found; some TPF tools may not be available")
+    print("no lightkurve found; some TPF tools may not be available")
 
 timescale = 'tdb'
 # by default, assume all times are TDB
