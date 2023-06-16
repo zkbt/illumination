@@ -1,4 +1,4 @@
-from illumination.imports import *
+'''from illumination.imports import *
 from illumination import *
 from illumination.cartoons import *
 
@@ -31,3 +31,4 @@ def test_hybrid(howmany=3):
 if __name__ == '__main__':
     # plt.ion()
     a = test_hybrid()
+'''

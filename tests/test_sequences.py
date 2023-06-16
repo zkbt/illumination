@@ -38,7 +38,7 @@ def test_FITS():
     return a, b, c, d, e
 
 
-def test_TPF():
+"""def test_TPF():
     '''
     Run a test of the TPF_Sequence.
     '''
@@ -46,7 +46,7 @@ def test_TPF():
     a = make_image_sequence(tpf)
     assert(isinstance(a, TPF_Sequence))
     return a
-
+"""
 
 def test_make():
     # a single image

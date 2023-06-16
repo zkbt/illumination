@@ -1,7 +1,6 @@
 from .FrameBase import *
 from ..colors import cmap_norm_ticks
 from ..sequences import make_image_sequence
-from ..illustrations.GenericIllustration import GenericIllustration
 
 class imshowFrame(FrameBase):
     '''
@@ -117,6 +116,8 @@ class imshowFrame(FrameBase):
 
         # decide if we need to make an illustration
         if self.illustration is None:
+            from ..illustrations.GenericIllustration import GenericIllustration
+
             # create a generic illustration (with limited options)
             new_illustration = GenericIllustration(imshows=[self])
             self.illustration = new_illustration

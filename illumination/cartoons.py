@@ -4,7 +4,7 @@ Make some cartoon datasets to play with.
 
 from .imports import *
 from .postage.stamps import Stamp
-from .postage.tpf import EarlyTessTargetPixelFile, EarlyTessLightCurve
+#from .postage.tpf import EarlyTessTargetPixelFile, EarlyTessLightCurve
 
 def create_test_times(N=100, cadence=2):
     '''
