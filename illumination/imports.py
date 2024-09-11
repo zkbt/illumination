@@ -130,8 +130,8 @@ def binto(
 
     if yuncertainty is not None:
         count, edges = np.histogram(x, bins=bins)
-        numerator, edges = np.histogram(x, bins=bins, weights=y / yuncertainty ** 2)
-        denominator, edges = np.histogram(x, bins=bins, weights=1.0 / yuncertainty ** 2)
+        numerator, edges = np.histogram(x, bins=bins, weights=y / yuncertainty**2)
+        denominator, edges = np.histogram(x, bins=bins, weights=1.0 / yuncertainty**2)
         mean = numerator / denominator
         std = np.sqrt(1.0 / denominator)
         error = std
@@ -149,12 +149,12 @@ def binto(
                 std[i] = 1.48 * mad(y[inbin])
         else:
             if yuncertainty is None:
-                mean = sum.astype(np.float) / count
-                sumofsquares, edges = np.histogram(x, bins=bins, weights=y ** 2)
+                mean = sum.astype(float) / count
+                sumofsquares, edges = np.histogram(x, bins=bins, weights=y**2)
 
-                # *np.sqrt(count.astype(np.float)/np.maximum(count-1.0, 1.0))
+                # *np.sqrt(count.astype(float)/np.maximum(count-1.0, 1.0))
                 std = np.sqrt(
-                    (sumofsquares.astype(np.float) - count * mean ** 2) / (count - 1)
+                    (sumofsquares.astype(float) - count * mean**2) / (count - 1)
                 )
                 # plt.plot(count*mean**2)
                 # plt.plot(sumofsquares)

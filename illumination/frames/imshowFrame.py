@@ -135,12 +135,14 @@ class imshowFrame(FrameBase):
 
         *args and **kwargs are passed to colors.cmap_norm_ticks
         '''
+        self.speak(f'{cmapkw}')
+
         i = self.get_enclosing_illustration()
         if i.sharecolorbar:
             # pull the cmap and normalization from the illustration
             (self.plotted['cmap'],
              self.plotted['norm'],
-             self.plotted['ticks']) = i._cmap_norm_ticks(**i.cmapkw)
+             self.plotted['ticks']) = i._cmap_norm_ticks(**cmapkw, **i.cmapkw) 
             return (self.plotted['cmap'],
                     self.plotted['norm'],
                     self.plotted['ticks'])
