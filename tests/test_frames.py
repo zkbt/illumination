@@ -8,4 +8,3 @@ def test_timeseries():
     y = np.random.normal(0, 1, len(x))
     f = EmptyTimeseriesFrame(ax=plt.gca())
     f.ax.plot(x, y)
-    return f

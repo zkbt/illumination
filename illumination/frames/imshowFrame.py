@@ -1,7 +1,6 @@
 from .FrameBase import *
 from ..colors import cmap_norm_ticks
 from ..sequences import make_image_sequence
-from ..illustrations.GenericIllustration import GenericIllustration
 
 class imshowFrame(FrameBase):
     '''
@@ -117,6 +116,8 @@ class imshowFrame(FrameBase):
 
         # decide if we need to make an illustration
         if self.illustration is None:
+            from ..illustrations.GenericIllustration import GenericIllustration
+
             # create a generic illustration (with limited options)
             new_illustration = GenericIllustration(imshows=[self])
             self.illustration = new_illustration
@@ -134,12 +135,14 @@ class imshowFrame(FrameBase):
 
         *args and **kwargs are passed to colors.cmap_norm_ticks
         '''
+        self.speak(f'{cmapkw}')
+
         i = self.get_enclosing_illustration()
         if i.sharecolorbar:
             # pull the cmap and normalization from the illustration
             (self.plotted['cmap'],
              self.plotted['norm'],
-             self.plotted['ticks']) = i._cmap_norm_ticks(**i.cmapkw)
+             self.plotted['ticks']) = i._cmap_norm_ticks(**cmapkw, **i.cmapkw) 
             return (self.plotted['cmap'],
                     self.plotted['norm'],
                     self.plotted['ticks'])

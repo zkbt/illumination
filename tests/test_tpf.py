@@ -1,4 +1,4 @@
-from illumination.imports import *
+'''from illumination.imports import *
 from illumination.cartoons import *
 from illumination.postage.tpf import EarlyTessTargetPixelFile
 
@@ -20,3 +20,4 @@ def test_tpfbasics():
 
 if __name__ == '__main__':
     test_tpfbasics()
+'''

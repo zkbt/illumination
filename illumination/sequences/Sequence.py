@@ -5,14 +5,13 @@ Define a generic sequence.
 from ..imports import *
 from ..postage.stamps import Stamp
 from ..utilities import *
-try:
+'''try:
     from ..postage.tpf import EarlyTessTargetPixelFile
     from lightkurve.lightcurve import LightCurve
     from lightkurve.targetpixelfile import TargetPixelFile
 except:
-    raise RuntimeWarning(
-        "no lightkurve found; some TPF tools may not be available")
-
+    print("no lightkurve found; some TPF tools may not be available")
+'''
 timescale = 'tdb'
 # by default, assume all times are TDB
 # this is ahead of TAI by about 31.184s

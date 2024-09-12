@@ -195,7 +195,7 @@ class Stamp(Cube):
 
 		# make sure we're dealing with a npy saved file
 		assert('.npy' in filename)
-		loaded = np.load(filename, encoding='latin1')[()]
+		loaded = np.load(filename, allow_pickle=True)[()]#encoding='latin1')[()]
 		self.__init__(self, **loaded)
 		self.speak('loaded from {}'.format(filename))
 

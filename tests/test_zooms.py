@@ -4,7 +4,7 @@ from illumination.zoom import *
 from illumination.cartoons import *
 
 
-directory = 'examples/'
+directory = "examples/"
 mkdir(directory)
 
 
@@ -15,85 +15,83 @@ def test_SingleCameraWithZoomIllustration(position=(250, 50), size=(50, 50)):
     illustration = SingleCameraWithZoomIllustration(
         data=[create_test_fits(rows=300, cols=300) for _ in range(10)],
         ext_image=1,
-        zoomposition=position, zoomsize=size)
+        zoomposition=position,
+        zoomsize=size,
+    )
 
     # plot and animate
     illustration.plot()
-    filename = os.path.join(directory, 'single-camera-zoom-animation.mp4')
+    filename = os.path.join(directory, "single-camera-zoom-animation.mp4")
     illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
-    return illustration
 
 
-def test_CameraIllustrationLocalZoom(N=3,
-                                           testgeometry=False,
-                                           zoom=10,
-                                           size=(10, 10)):
-    '''
+def test_CameraIllustrationLocalZoom(N=3, testgeometry=False, zoom=10, size=(10, 10)):
+    """
     Test the local zoom windows on a Single Camera.
-    '''
+    """
 
     print("\nTesting a Single Camera illustration with local zooms.")
 
     # create the illustration
     nrows, ncols = 300, 300
     illustration = CameraIllustration(
-        data=[create_test_fits(rows=nrows, cols=ncols) for _ in range(10)],
-        ext_image=1)
+        data=[create_test_fits(rows=nrows, cols=ncols) for _ in range(10)], ext_image=1
+    )
 
     # some options for where to add the stamps (corners, or random?)
     if testgeometry:
         for row in [0, nrows]:
             for col in [0, ncols]:
-                f = add_zoom(illustration,
-                             position=(col, row),
-                             zoom=zoom,
-                             size=size)
-        f = add_zoom(illustration, position=(
-            ncols / 2, nrows / 2), zoom=zoom, size=size)
-        filename = 'single-camera-local-zoom-geometry-animation.mp4'
+                f = add_zoom(illustration, position=(col, row), zoom=zoom, size=size)
+        f = add_zoom(
+            illustration, position=(ncols / 2, nrows / 2), zoom=zoom, size=size
+        )
+        filename = "single-camera-local-zoom-geometry-animation.mp4"
     else:
         for i in range(N):
             row, col = np.random.randint(0, nrows), np.random.randint(0, ncols)
-            f = add_zoom(illustration,
-                         position=(col, row),
-                         zoom=zoom, size=size)
-            f.titlefordisplay = ''
-        filename = os.path.join(
-            directory, 'single-camera-local-zoom-animation.mp4')
+            f = add_zoom(illustration, position=(col, row), zoom=zoom, size=size)
+            f.titlefordisplay = ""
+        filename = os.path.join(directory, "single-camera-local-zoom-animation.mp4")
 
     # plot and animate
     illustration.plot()
     illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
-    return illustration
 
 
 def test_FourCameraLocalZoom(N=3, zoom=3, size=(50, 50)):
-    '''
+    """
     Test the local zooms on four cameras.
-    '''
+    """
 
     # create the illustration
     print("\nTesting a FourCamera illustration with local zooms.")
     nrows, ncols = 300, 300
-    data = {'cam{}'.format(i + 1): [create_test_fits(rows=300, cols=300)
-                                    for _ in range(10)] for i in range(4)}
+    data = {
+        "cam{}".format(i + 1): [create_test_fits(rows=300, cols=300) for _ in range(10)]
+        for i in range(4)
+    }
     illustration = FourCameraIllustration(**data)
 
     # add some random zoom to it
     for i in range(N):
         row, col = np.random.randint(0, nrows), np.random.randint(0, ncols)
-        f = add_zoom(illustration, frame='cam{}'.format(np.random.randint(1, 5)),
-                     position=(col, row), zoom=zoom, size=size)
-        f.titlefordisplay = ''
+        f = add_zoom(
+            illustration,
+            frame="cam{}".format(np.random.randint(1, 5)),
+            position=(col, row),
+            zoom=zoom,
+            size=size,
+        )
+        f.titlefordisplay = ""
 
     # plot and animate
-    filename = os.path.join(directory, 'four-camera-local-zoom-animation.mp4')
+    filename = os.path.join(directory, "four-camera-local-zoom-animation.mp4")
     illustration.plot()
     illustration.animate(filename)
     print("Take a look at {} and see what you think!".format(filename))
-    return illustration
 
 
 """
@@ -146,7 +144,7 @@ def test_FourCameraWithStamps(N=3):
     return illustration
 """
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_SingleCameraWithZoomIllustration()
     test_CameraIllustrationLocalZoom()
     test_FourCameraLocalZoom()

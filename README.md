@@ -23,3 +23,6 @@ To be able to create movies, you will likely want to install `ffmpeg`. To do so,
 ```
 conda install -c conda-forge ffmpeg
 ```
+
+### Compatability 
+This code sat in a quiet corner for a while, eventually falling asleep and letting the world pass it by. In that intervening time, some initial attempts to interface with `lightkurve` tools and data formats for TESS and Kepler became obsolete. We're poking at it in June 2023, but we want to warn you that in jumping from version 0.0.12 to 0.1.0, the code loses the ability to directly interface with TESS/Kepler light curves or target pixel files. 

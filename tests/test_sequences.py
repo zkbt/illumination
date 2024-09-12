@@ -2,28 +2,28 @@ from illumination.sequences import *
 from illumination.cartoons import *
 from illumination.imports import *
 
-directory = 'examples/'
+directory = "examples/"
 mkdir(directory)
 
-def test_Stamps():
-    '''
-    Run a test of Stamps_Sequence
-    '''
 
-    filename = os.path.join(directory, 'temporarystamp.npy')
+def test_Stamps():
+    """
+    Run a test of Stamps_Sequence
+    """
+
+    filename = os.path.join(directory, "temporarystamp.npy")
     stamp = create_test_stamp()
     stamp.save(filename)
     a = Stamp_Sequence(stamp)
     b = Stamp_Sequence(filename)
-    return a, b
 
 
 def test_FITS():
-    '''
+    """
     Run a test of the FITS_Sequence.
-    '''
-    filename = os.path.join(directory, 'temporarytest.fits')
-    pattern = os.path.join(directory, 'tempo*arytest.fits')
+    """
+    filename = os.path.join(directory, "temporarytest.fits")
+    pattern = os.path.join(directory, "tempo*arytest.fits")
     hdulist = create_test_fits()
     hdulist.writeto(filename, overwrite=True)
     ext_image = 1
@@ -35,10 +35,8 @@ def test_FITS():
     d = FITS_Sequence(filename, ext_image=ext_image)
     e = FITS_Sequence([hdulist], ext_image=ext_image)
 
-    return a, b, c, d, e
 
-
-def test_TPF():
+"""def test_TPF():
     '''
     Run a test of the TPF_Sequence.
     '''
@@ -46,6 +44,7 @@ def test_TPF():
     a = make_image_sequence(tpf)
     assert(isinstance(a, TPF_Sequence))
     return a
+"""
 
 
 def test_make():
@@ -54,7 +53,7 @@ def test_make():
     print(singleimage.shape, type(singleimage))
     make_image_sequence(singleimage)
 
-    #multiple images
+    # multiple images
     manyimages = create_test_array(N=3, xsize=100, ysize=50)
     print(manyimages.shape, type(manyimages))
     make_image_sequence(manyimages)
@@ -84,8 +83,8 @@ def test_timeseries():
 	return a
 """
 
-if __name__ == '__main__':
-#    test_TPF()
-#    test_FITS()
-#    test_Stamps()
+if __name__ == "__main__":
+    #    test_TPF()
+    #    test_FITS()
+    #    test_Stamps()
     test_make()

@@ -115,12 +115,16 @@ class FITS_Sequence(Image_Sequence):
                 self._populate_from_headers()
             except:
                 self.speak('unable to extract temporal things from headers for {}'.format(self))
+                self.speak('making up fake times')
+                self._define_time_axis()
         if use_filenames:
             try:
                 self._populate_from_filenames(filenameparser=filenameparser)
             except:
                 self.speak('unable to extract temporal things from filenames for {}'.format(self))
-
+                self.speak('making up fake times')
+                self._define_time_axis()
+                
         # make sure a time axis gets defined
         self._define_time_axis(timekey=timekey, timeformat=timeformat)
 
