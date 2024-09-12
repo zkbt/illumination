@@ -1,0 +1,1 @@
+The **illumination** package is a set of tools for visualizing astronomical images. The illustrations it produces can be saved either as static images or as linked animations. It was designed with imaging from the NASA TESS Mission in mind, but may be generally useful for any time-series imaging data.
