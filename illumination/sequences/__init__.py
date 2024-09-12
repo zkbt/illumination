@@ -1,14 +1,16 @@
 from .Sequence import *
 from .FITS_Sequence import *
 from .Stamp_Sequence import *
-#from .TPF_Sequence import *
+
+# from .TPF_Sequence import *
 from .Timeseries_Sequence import *
 from .Array_Sequence import *
 from .filenameparsers import *
 from .Movie_Sequence import *
 
+
 def make_image_sequence(initial, *args, **kwargs):
-    '''
+    """
     Initialize a Sequence for viewing with tv.
 
     This is a general wrapper that *tries* to
@@ -34,7 +36,7 @@ def make_image_sequence(initial, *args, **kwargs):
         **kwargs
             Keyword arguments will be passed on to whatever Sequence is initialized
 
-    '''
+    """
 
     # is it already a sequence?
     if issubclass(initial.__class__, Sequence):
@@ -49,16 +51,15 @@ def make_image_sequence(initial, *args, **kwargs):
         return Array_Sequence(initial, **kwargs)
     else:
         # try:
-        #	# is initial a 1D thing?
-        #	assert(len(np.shape(initial))==1 or isinstance(initial, LightCurve))
-        #	return Timeseries_Sequence(initial, *args, **kwargs)
+        # 	# is initial a 1D thing?
+        # 	assert(len(np.shape(initial))==1 or isinstance(initial, LightCurve))
+        # 	return Timeseries_Sequence(initial, *args, **kwargs)
         # except AssertionError:
 
         # is it a TPF (or can it be used to make one, like a filename)?
         try:
-            assert(isinstance(initial, TargetPixelFile))
+            assert isinstance(initial, TargetPixelFile)
             return TPF_Sequence(initial, *args, **kwargs)
         # if nothing else, assume it is a FITS_Sequence
         except (AttributeError, AssertionError):
-            print("I am a FITS_Sequence")
             return FITS_Sequence(initial, *args, **kwargs)

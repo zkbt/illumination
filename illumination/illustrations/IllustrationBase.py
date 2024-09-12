@@ -250,11 +250,11 @@ class IllustrationBase(Talker):
             ticks=ticks,
         )
 
-        # colorbarred = plt.colorbar(self.plotted['image'], ax=axes, orientation='horizontal', label=self.data.colorbarlabelfordisplay, fraction=0.04, pad=0.07, ticks=ticks)
         colorbar.ax.set_xticklabels(
             ["{:.0f}".format(v) for v in ticks], fontsize=8, color="gray"
         )
         colorbar.outline.set_visible(False)
+        colorbar.ax.minorticks_off()
 
         return colorbar
 
@@ -368,9 +368,9 @@ class IllustrationBase(Talker):
                 )
 
                 # update the illustration to a new time
-                self.speak(
-                    "setting time to {}".format(Time(t, format="gps", scale="tdb"))
-                )
+                # self.speak(
+                #    "setting time to {}".format(Time(t, format="gps", scale="tdb"))
+                # )
                 self.update(Time(t, format="gps", scale="tdb"))
                 writer.grab_frame()
         self.speak("")
